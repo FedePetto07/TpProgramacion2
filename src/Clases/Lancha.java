@@ -4,10 +4,14 @@ import Enums.TipoCombustible;
 
 public class Lancha extends Embarcacion {
 
+    /// ATRIBUTOS
+
     private int potenciaMotor;
     private double longitudMetros;
     private int capacidadPersonas;
     private TipoCombustible combustible;
+
+    /// CONSTRUCTOR
 
     public Lancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) {
         super(nombre, matricula, precioDiario, disponible);
@@ -16,6 +20,8 @@ public class Lancha extends Embarcacion {
         this.capacidadPersonas = capacidadPersonas;
         this.combustible = combustible;
     }
+
+    /// GETTERS
 
     public int getPotenciaMotor() {
         return potenciaMotor;
@@ -32,6 +38,8 @@ public class Lancha extends Embarcacion {
     public TipoCombustible getCombustible() {
         return combustible;
     }
+
+    /// ToString
 
     @Override
     public String toString() {

@@ -2,11 +2,15 @@ package Clases;
 
 public class Velero extends Embarcacion {
 
+    /// ATRIBUTOS
+
     private int cantidadVelas;
     private Double longitudMetros;
     private int capacidadPersonas;
     private int cantidadCamarotes;
     private boolean requiereCapitan;
+
+    /// CONSTRUCTOR
 
     public Velero(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan) {
         super(nombre, matricula, precioDiario, disponible);
@@ -16,6 +20,8 @@ public class Velero extends Embarcacion {
         this.cantidadCamarotes = cantidadCamarotes;
         this.requiereCapitan = requiereCapitan;
     }
+
+    /// GETTERS
 
     public int getCantidadVelas() {
         return cantidadVelas;
@@ -36,6 +42,8 @@ public class Velero extends Embarcacion {
     public boolean isRequiereCapitan() {
         return requiereCapitan;
     }
+
+    /// ToString
 
     @Override
     public String toString() {

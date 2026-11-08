@@ -2,10 +2,14 @@ package Clases;
 
 public class Embarcacion {
 
+    /// ATRIBUTOS
+
     private String nombre;
     private String matricula;
     private double precioDiario;
     private boolean disponible;
+
+    /// CONSTRUCTOR
 
     public Embarcacion(String nombre, String matricula, double precioDiario, boolean disponible) {
         this.nombre = nombre;
@@ -13,6 +17,8 @@ public class Embarcacion {
         this.precioDiario = precioDiario;
         this.disponible = disponible;
     }
+
+    /// GETTERS
 
     public String getNombre() {
         return nombre;
@@ -41,6 +47,8 @@ public class Embarcacion {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    /// ToString
 
     @Override
     public String toString() {
