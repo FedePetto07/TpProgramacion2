@@ -1,0 +1,47 @@
+package Clases;
+import java.time.temporal.ChronoUnit;
+public class Alquiler implements CalcularPrecio, Identificable{
+    ///- int id
+    /// - Reserva reserva
+    /// - Double montoFinal
+    private int id;
+    private Reserva reserva;
+    private double montoFinal;
+
+    public Alquiler(int id, Reserva reserva) {
+        this.id = id;
+        this.reserva = reserva;
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    public Reserva getReserva() {
+        return reserva;
+    }
+
+    public double getMontoFinal() {
+        return montoFinal;
+    }
+    ///
+    @Override
+    public double calcularPrecio()
+    {
+        double precioDiario = reserva.getEmbarcacion().getPrecioDiario();
+        long cantDias = ChronoUnit.DAYS.between(reserva.getFechaDeInicio(),reserva.getFechaDeFin());
+        this.montoFinal = cantDias*precioDiario;
+
+        return montoFinal;
+    }
+    ///////////
+    public String toString()
+    {
+        return "\nAlquiler{" +
+                " \n |id=" + id +
+                "| \n |Datos reserva=" + reserva.toString() +
+                "| \n |Monto final=" + montoFinal +
+                '}';
+    }
+}
