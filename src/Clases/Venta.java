@@ -1,5 +1,7 @@
 package Clases;
 
+import Interfaces.CalcularPrecio;
+
 public class Venta implements CalcularPrecio {
     ///- int id
     /// - Cliente comprador

@@ -1,5 +1,5 @@
 package Clases;
-import Interfaces.Identificable;
+import Interfaces.CalcularPrecio;
 
 import java.time.temporal.ChronoUnit;
 public class Alquiler implements CalcularPrecio {

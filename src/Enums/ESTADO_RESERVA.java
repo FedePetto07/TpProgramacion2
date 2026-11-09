@@ -1,4 +1,4 @@
-package Clases;
+package Enums;
 
 public enum ESTADO_RESERVA {
     PENDIENTE,

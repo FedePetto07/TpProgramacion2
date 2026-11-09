@@ -1,5 +1,7 @@
 package Clases;
 
+import Enums.ESTADO_RESERVA;
+
 import java.time.LocalDate;
 
 public class Reserva  {
