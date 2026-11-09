@@ -1,6 +1,6 @@
 package Clases;
 
-public class Venta implements Identificable, CalcularPrecio {
+public class Venta implements CalcularPrecio {
     ///- int id
     /// - Cliente comprador
     /// - Embarcacion embarcacion
@@ -18,7 +18,6 @@ public class Venta implements Identificable, CalcularPrecio {
         this.montoFinal = montoFinal;
     }
 
-    @Override
     public int getId() {
         return id;
     }

@@ -2,7 +2,7 @@ package Clases;
 
 import java.time.LocalDate;
 
-public class Reserva implements Identificable {
+public class Reserva  {
     ///- int id, Cliente cliente ,Embarcacion embarcacion ,
     ///LocalDate fechaInicio, LocalDate fechaFin ,EstadoReserva estado
     private int id;
@@ -21,7 +21,6 @@ public class Reserva implements Identificable {
         this.estadoReserva = estadoReserva;
     }
     ///////
-    @Override
     public int getId() {
         return id;
     }

@@ -1,6 +1,8 @@
 package Clases;
+import Interfaces.Identificable;
+
 import java.time.temporal.ChronoUnit;
-public class Alquiler implements CalcularPrecio, Identificable{
+public class Alquiler implements CalcularPrecio {
     ///- int id
     /// - Reserva reserva
     /// - Double montoFinal
@@ -13,8 +15,7 @@ public class Alquiler implements CalcularPrecio, Identificable{
         this.reserva = reserva;
     }
 
-    @Override
-    public int getId() {
+    public int getID() {
         return id;
     }
 
