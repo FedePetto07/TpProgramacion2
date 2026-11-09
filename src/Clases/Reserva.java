@@ -1,10 +1,11 @@
 package Clases;
 
 import Enums.ESTADO_RESERVA;
+import Interfaces.Identificable;
 
 import java.time.LocalDate;
 
-public class Reserva  {
+public class Reserva implements Identificable<Integer> {
     ///- int id, Cliente cliente ,Embarcacion embarcacion ,
     ///LocalDate fechaInicio, LocalDate fechaFin ,EstadoReserva estado
     private int id;
@@ -23,7 +24,7 @@ public class Reserva  {
         this.estadoReserva = estadoReserva;
     }
     ///////
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 

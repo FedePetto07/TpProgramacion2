@@ -1,5 +1,5 @@
 package Enums;
 
 public enum TipoCombustible {
-    Diesel, Nafta, GNC, Electrico, Hibrido
+    DIESEL, NAFTA, GNC, ELECTRICO, HIBRIDO
 }
