@@ -3,6 +3,8 @@ package Clases;
 import Enums.Puesto;
 import Interfaces.Identificable;
 
+import java.util.Objects;
+
 public abstract class Persona implements Identificable<Integer> {
 
     private int dni;
@@ -47,5 +49,16 @@ public abstract class Persona implements Identificable<Integer> {
                 "| \n |telefono=" + telefono +
                 "| \n |email=" + email +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Persona persona)) return false;
+        return dni == persona.dni;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(dni);
     }
 }

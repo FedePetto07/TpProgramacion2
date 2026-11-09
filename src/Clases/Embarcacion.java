@@ -1,5 +1,7 @@
 package Clases;
 
+import java.util.Objects;
+
 public class Embarcacion {
 
     /// ATRIBUTOS
@@ -58,5 +60,17 @@ public class Embarcacion {
                 "|\n |disponible:" + disponible +
                 '|';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Embarcacion that)) return false;
+        return Objects.equals(matricula, that.matricula);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(matricula);
+    }
+
 
 }
