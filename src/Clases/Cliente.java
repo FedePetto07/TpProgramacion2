@@ -7,18 +7,18 @@ public class Cliente extends Persona{
     private LocalDate fechaNacimiento;
     private int cantidadAlquileres;
 
-    public Cliente(int dni, String nombre, int telefono, String email,
+    public Cliente(int dni, String nombre, int edad, int telefono, String email,
                    int numeroLicencia, LocalDate fechaNacimiento, int cantidadAlquileres) {
-        super(dni, nombre, telefono, email);
+        super(dni, nombre, edad, telefono, email);
         this.numeroLicencia = numeroLicencia;
         this.fechaNacimiento = fechaNacimiento;
         this.cantidadAlquileres = cantidadAlquileres;
     }
 
     //Segundo Constructor en caso de que el cliente no posee licencia
-    public Cliente(int dni, String nombre, int telefono, String email,
+    public Cliente(int dni, String nombre, int edad, int telefono, String email,
                    LocalDate fechaNacimiento) {
-        this(dni, nombre, telefono, email, 0, fechaNacimiento, 0);
+        this(dni, nombre, edad, telefono, email, 0, fechaNacimiento, 0);
     }
 
     public int getNumeroLicencia() {

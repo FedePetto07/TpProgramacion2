@@ -11,18 +11,18 @@ public class Empleado extends Persona {
     private LocalDate fechaIngreso;
 
     // Constructor 1: con todos los datos
-    public Empleado(int dni, String nombre, int telefono, String email,
+    public Empleado(int dni, String nombre, int edad, int telefono, String email,
                     Puesto puesto, double salario, LocalDate fechaIngreso) {
-        super(dni, nombre, telefono, email);
+        super(dni, nombre, edad, telefono, email);
         this.puesto = puesto;
         this.salario = salario;
         this.fechaIngreso = fechaIngreso;
     }
 
     // Constructor 2: empleado que ingresa hoy
-    public Empleado(int dni, String nombre, int telefono, String email,
+    public Empleado(int dni, String nombre, int edad, int telefono, String email,
                     Puesto puesto, double salario) {
-        this(dni, nombre, telefono, email, puesto, salario, LocalDate.now());
+        this(dni, nombre, edad, telefono, email, puesto, salario, LocalDate.now());
     }
 
     public Puesto getPuesto() {
