@@ -1,10 +1,12 @@
 package Clases;
 
+import Enums.ESTADO_RESERVA;
 import Enums.Puesto;
 import Enums.TipoCombustible;
 import Excepciones.AccionImposibleEx;
 import Excepciones.ElementoDuplicadoEx;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -162,5 +164,30 @@ public class Agencia {
 
         throw new AccionImposibleEx("No existe un embarcacion con esa matricula");
     }
+    //////////CREAR RESERVA
 
+       public boolean agregarUnaReserva(int id, Cliente cliente, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) throws AccionImposibleEx, ElementoDuplicadoEx
+       {
+           Clases.Reserva aux = listaReservas.BuscarPorId(id);
+           if(aux != null)
+           {
+               throw new ElementoDuplicadoEx("ERROR. Ya existe una reserva con este identificador");
+           }
+           if(embarcaciones.containsKey(embarcacion.getMatricula()) == false)
+           {
+               throw new AccionImposibleEx("ERROR. la matricula de la embarcacion ingresada no existe.");
+           }
+           if(!clientes.contains(cliente))
+           {
+               throw new AccionImposibleEx("ERROR. EL numero de la licencia del cliente ingresado, no existe.");
+           }
+           LocalDate inicio = LocalDate.of(añoInicio,mesInicio,diaInicio);
+           LocalDate fin = LocalDate.of(añoFin,mesFin,diaFin);
+         if(inicio.isAfter(fin))
+         {
+             throw new AccionImposibleEx("ERROR. La fecha de inicio es posterior a la de fin.");
+         }
+         aux = new Reserva(id, cliente,embarcacion, añoInicio, mesInicio, diaInicio, añoFin,  mesFin, diaFin, estadoReserva);
+         return listaReservas.guardar(aux);
+       }
 }

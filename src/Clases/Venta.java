@@ -1,9 +1,6 @@
 package Clases;
-
 import Interfaces.CalcularPrecio;
-import Interfaces.Identificable;
-
-public class Venta implements CalcularPrecio, Identificable<Integer> {
+public class Venta implements CalcularPrecio {
     ///- int id
     /// - Cliente comprador
     /// - Embarcacion embarcacion
@@ -21,8 +18,7 @@ public class Venta implements CalcularPrecio, Identificable<Integer> {
         this.montoFinal = montoFinal;
     }
 
-    @Override
-    public Integer getID() {
+    public int getId() {
         return id;
     }
 

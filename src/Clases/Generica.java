@@ -13,8 +13,8 @@ public class Generica <T extends Identificable>{
         this.lista = new ArrayList<>();
     }
 
-    public void guardar(T elemento) {
-        lista.add(elemento);
+    public boolean guardar(T elemento) {
+        return lista.add(elemento);
     }
 
     public T BuscarPorId(int id){
