@@ -29,6 +29,19 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
         return montoFinal;
     }
     ///
+   public void cambiarDisponibilidad()
+   {
+       if(reserva.getEmbarcacion().isDisponible() == true)
+       {
+           reserva.getEmbarcacion().setDisponible(false);
+       }
+       else
+       {
+           reserva.getEmbarcacion().setDisponible(true);
+       }
+
+   }
+    ///
     @Override
     public double calcularPrecio()
     {

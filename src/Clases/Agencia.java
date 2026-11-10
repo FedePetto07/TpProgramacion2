@@ -9,7 +9,6 @@ import Excepciones.ElementoDuplicadoEx;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 
 public class Agencia {
@@ -190,4 +189,25 @@ public class Agencia {
          aux = new Reserva(id, cliente,embarcacion, añoInicio, mesInicio, diaInicio, añoFin,  mesFin, diaFin, estadoReserva);
          return listaReservas.guardar(aux);
        }
+
+
+       public boolean confirmarReservaIniciarAlquiler(int id, int idReserva) throws AccionImposibleEx
+       {
+
+           Reserva aux = null;
+
+           aux = listaReservas.BuscarPorId(idReserva);
+
+           if (aux == null){
+               throw new AccionImposibleEx("La reserva no existe");
+           }
+
+           Alquiler auxAlquiler = new Alquiler(id, aux);
+           auxAlquiler.cambiarDisponibilidad();
+           listaAlquileres.guardar(auxAlquiler);
+           return true;
+       }
+
+
+
 }
