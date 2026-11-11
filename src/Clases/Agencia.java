@@ -236,7 +236,7 @@ public class Agencia {
          rta = listaReservas.listarElementos();
          return rta;
      }
-
+///////////////////////////////////////////////////////////////
        public boolean confirmarReservaIniciarAlquiler(int id, int idReserva) throws AccionImposibleEx
        {
 
@@ -254,6 +254,41 @@ public class Agencia {
            return true;
        }
 
-      //////
-
+      //////registrar Venta
+     public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoFinal) throws AccionImposibleEx
+     {
+         if(!clientes.contains(clienteComprador))
+         {
+             throw new AccionImposibleEx("ERROR. el identificador del comprador ingresado no existe...");
+         }
+         if(embarcaciones.containsKey(embarcacion.getMatricula()) == false)
+         {
+             throw new AccionImposibleEx("ERROR. la matricula ingresada no existe...");
+         }
+         if(montoFinal<0)
+         {
+             throw new AccionImposibleEx("ERROR. el monto final debe ser mayor a 0");
+         }
+         Venta aux = new Venta(id, clienteComprador, embarcacion, montoFinal);
+         return listaVentas.guardar(aux);
+     }
+     //////verVentas
+    public String verVentas()
+    {
+        String rta = "";
+        rta = listaVentas.listarElementos();
+        return rta;
+    }
+    //////verVentaid
+    public String verVentaId(int idVenta) throws ObjetoNoEncontradoEx
+    {
+        String rta = "";
+        Venta aux = listaVentas.BuscarPorId(idVenta);
+        if(aux == null)
+        {
+            throw  new ObjetoNoEncontradoEx("ERROR. la venta buscada no existe");
+        }
+        rta = aux.toString();
+        return rta;
+    }
 }
