@@ -10,14 +10,16 @@ public class Reserva implements Identificable<Integer> {
     ///LocalDate fechaInicio, LocalDate fechaFin ,EstadoReserva estado
     private int id;
     private Cliente cliente;
+    private int cantidadPersonas;
     private Embarcacion embarcacion;
     private LocalDate fechaDeInicio;
     private LocalDate fechaDeFin;
     private ESTADO_RESERVA estadoReserva;
 
-    public Reserva(int id, Cliente cliente, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) {
+    public Reserva(int id, Cliente cliente, int cantidadPersonas, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) {
         this.id = id;
         this.cliente = cliente;
+        this.cantidadPersonas = cantidadPersonas;
         this.embarcacion = embarcacion;
         this.fechaDeInicio = LocalDate.of(añoInicio,mesInicio,diaInicio);
         this.fechaDeFin = LocalDate.of(añoFin,mesFin,diaFin);

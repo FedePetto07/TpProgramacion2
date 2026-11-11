@@ -16,9 +16,13 @@ public class Cliente extends Persona{
     }
 
     //Segundo Constructor en caso de que el cliente no posee licencia
+
+
     public Cliente(int dni, String nombre, int edad, int telefono, String email,
-                   LocalDate fechaNacimiento) {
-        this(dni, nombre, edad, telefono, email, 0, fechaNacimiento, 0);
+            LocalDate fechaNacimiento, int cantidadAlquileres) {
+        super(dni, nombre, edad, telefono, email);
+        this.fechaNacimiento = fechaNacimiento;
+        this.cantidadAlquileres = cantidadAlquileres;
     }
 
     public int getNumeroLicencia() {

@@ -6,17 +6,15 @@ public class Velero extends Embarcacion {
 
     private int cantidadVelas;
     private Double longitudMetros;
-    private int capacidadPersonas;
     private int cantidadCamarotes;
     private boolean requiereCapitan;
 
     /// CONSTRUCTOR
 
     public Velero(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan) {
-        super(nombre, matricula, precioDiario, disponible);
+        super(nombre, matricula, precioDiario, disponible, capacidadPersonas);
         this.cantidadVelas = cantidadVelas;
         this.longitudMetros = longitudMetros;
-        this.capacidadPersonas = capacidadPersonas;
         this.cantidadCamarotes = cantidadCamarotes;
         this.requiereCapitan = requiereCapitan;
     }
@@ -29,10 +27,6 @@ public class Velero extends Embarcacion {
 
     public Double getLongitudMetros() {
         return longitudMetros;
-    }
-
-    public int getCapacidadPersonas() {
-        return capacidadPersonas;
     }
 
     public int getCantidadCamarotes() {
@@ -50,7 +44,6 @@ public class Velero extends Embarcacion {
         return "\nVELERO" + super.toString() +
                 "\n |cantidadVelas: " + cantidadVelas +
                 "|\n |longitudMetros: " + longitudMetros +
-                "|\n |capacidadPersonas: " + capacidadPersonas +
                 "|\n |cantidadCamarotes: " + cantidadCamarotes +
                 "|\n |requiereCapitan: " + requiereCapitan +
                 '|';

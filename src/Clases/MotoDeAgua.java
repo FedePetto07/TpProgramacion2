@@ -10,8 +10,8 @@ public class MotoDeAgua extends Embarcacion {
 
     /// CONSTRUCTOR
 
-    public MotoDeAgua(String nombre, String matricula, double precioDiario, boolean disponible, int cilindrada, double limiteVelocidad, boolean requiereLicencia) {
-        super(nombre, matricula, precioDiario, disponible);
+    public MotoDeAgua(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia) {
+        super(nombre, matricula, precioDiario, disponible, capacidadPersonas);
         this.cilindrada = cilindrada;
         this.limiteVelocidad = limiteVelocidad;
         this.requiereLicencia = requiereLicencia;

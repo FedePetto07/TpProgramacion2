@@ -10,14 +10,16 @@ public class Embarcacion {
     private String matricula;
     private double precioDiario;
     private boolean disponible;
+    private int capacidadPersonas;
 
     /// CONSTRUCTOR
 
-    public Embarcacion(String nombre, String matricula, double precioDiario, boolean disponible) {
+    public Embarcacion(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas) {
         this.nombre = nombre;
         this.matricula = matricula;
         this.precioDiario = precioDiario;
         this.disponible = disponible;
+        this.capacidadPersonas = capacidadPersonas;
     }
 
     /// GETTERS
@@ -38,8 +40,14 @@ public class Embarcacion {
         return disponible;
     }
 
+    public int getCapacidadPersonas() {return capacidadPersonas;}
+
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
+    }
+
+    public void setCapacidadPersonas(int capacidadPersonas) {
+        this.capacidadPersonas = capacidadPersonas;
     }
 
     public void setPrecioDiario(double precioDiario) {
@@ -58,6 +66,7 @@ public class Embarcacion {
                 "|\n |matricula:'" + matricula + '\'' +
                 "|\n |precioDiario:" + precioDiario +
                 "|\n |disponible:" + disponible +
+                "|\n |capacidadPersonas:" + capacidadPersonas +
                 '|';
     }
 
