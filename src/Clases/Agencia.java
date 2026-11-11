@@ -5,6 +5,7 @@ import Enums.Puesto;
 import Enums.TipoCombustible;
 import Excepciones.AccionImposibleEx;
 import Excepciones.ElementoDuplicadoEx;
+import Excepciones.ObjetoNoEncontradoEx;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -190,6 +191,51 @@ public class Agencia {
          return listaReservas.guardar(aux);
        }
 
+     ///////cancelar reserva
+     public String cancelarReserva(int idReserva) throws ObjetoNoEncontradoEx,AccionImposibleEx
+     {
+         if(listaReservas.BuscarPorId(idReserva) == null)
+         {
+             throw new ObjetoNoEncontradoEx( "ERROR. No existe el id ingresado de la reserva.");
+         }
+         Reserva aux = listaReservas.BuscarPorId(idReserva);
+         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CANCELADA))
+         {
+            throw new AccionImposibleEx ( "ERROR.No se pudo canclear la reserva. Ya esta cancelda...");
+         }
+         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.FINALIZADA))
+         {
+             throw new AccionImposibleEx("ERROR. la reserva ya esta finalizada, no se puede cancelar...");
+         }
+         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CONFIRMADA))
+         {
+             LocalDate fechaActual = LocalDate.now();
+             if(aux.getFechaDeInicio().isAfter(fechaActual))
+             {
+                 throw new AccionImposibleEx("ERROR. no se puede cancelar la reserva porque esta confirmada en la fecha determinada.");
+             }
+         }
+         aux.cancelar();
+        return "Cancelado correctamente";
+     }
+     ////////Listar por id
+     public String listarPorID(int idBusqueda) throws ObjetoNoEncontradoEx
+     {
+         if(listaReservas.BuscarPorId(idBusqueda) == null)
+         {
+             throw new ObjetoNoEncontradoEx( "ERROR. No existe el id ingresado de la reserva.");
+         }
+         Reserva aux = listaReservas.BuscarPorId(idBusqueda);
+         return aux.toString();
+     }
+
+     ////ver todas las reservas
+     public String listarTodasLasReservas()
+     {
+         String rta = "";
+         rta = listaReservas.listarElementos();
+         return rta;
+     }
 
        public boolean confirmarReservaIniciarAlquiler(int id, int idReserva) throws AccionImposibleEx
        {
@@ -208,6 +254,6 @@ public class Agencia {
            return true;
        }
 
-
+      //////
 
 }

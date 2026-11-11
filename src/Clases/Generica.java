@@ -40,5 +40,15 @@ public class Generica <T extends Identificable>{
             }
         }
     }
+    public String listarElementos()
+    {
+        String rta ="";
+        for (T elemento : lista)
+        {
+            rta += elemento.toString();
+            rta +="\n";
+        }
+        return rta;
+    }
 
 }
