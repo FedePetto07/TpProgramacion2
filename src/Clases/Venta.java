@@ -2,7 +2,7 @@ package Clases;
 import Interfaces.CalcularPrecio;
 import Interfaces.Identificable;
 
-public class Venta implements Identificable<Integer>, CalcularPrecio {
+public class Venta implements Identificable<Integer> {
     ///- int id
     /// - Cliente comprador
     /// - Embarcacion embarcacion
@@ -16,12 +16,13 @@ public class Venta implements Identificable<Integer>, CalcularPrecio {
 
 
     ////
-    public Venta(int id, Cliente clienteComprador, Embarcacion embarcacion, double montoFinal) {
+    public Venta(int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) {
         this.id = id;
         this.clienteComprador = clienteComprador;
         this.embarcacion = embarcacion;
-        this.montoFinal = montoFinal;
+        this.montoBase = montoBase;
         this.reporteVenta = null;
+        this.montoFinal = montoBase;
     }
 
     public Integer getID() {
@@ -55,8 +56,7 @@ public class Venta implements Identificable<Integer>, CalcularPrecio {
         this.montoFinal = montoFinal;
     }
 
-    @Override
-    public double calcularPrecio() {
+    public void calcularPrecio() {
         double monto = montoFinal;
         if (reporteVenta != null){
             if (reporteVenta.isCargoAgencia()){
@@ -67,7 +67,7 @@ public class Venta implements Identificable<Integer>, CalcularPrecio {
             }
         }
 
-        return monto;
+        setMontoFinal(monto);
     }
 
     ////

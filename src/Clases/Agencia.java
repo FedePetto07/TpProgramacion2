@@ -354,7 +354,7 @@ public class Agencia {
 
 
       //////registrar Venta
-     public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoFinal) throws AccionImposibleEx
+     public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws AccionImposibleEx
      {
          if(!clientes.getLista().contains(clienteComprador))
          {
@@ -364,11 +364,11 @@ public class Agencia {
          {
              throw new AccionImposibleEx("ERROR. la matricula ingresada no existe...");
          }
-         if(montoFinal<0)
+         if(montoBase<0)
          {
-             throw new AccionImposibleEx("ERROR. el monto final debe ser mayor a 0");
+             throw new AccionImposibleEx("ERROR. el monto base debe ser mayor a 0");
          }
-         Venta aux = new Venta(id, clienteComprador, embarcacion, montoFinal);
+         Venta aux = new Venta(id, clienteComprador, embarcacion, montoBase);
          return listaVentas.guardar(aux);
      }
      //////verVentas
