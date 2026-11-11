@@ -2,7 +2,7 @@ package Clases;
 
 import java.util.Objects;
 
-public class Embarcacion {
+public abstract class Embarcacion {
 
     /// ATRIBUTOS
 
