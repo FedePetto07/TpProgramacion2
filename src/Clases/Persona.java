@@ -3,6 +3,7 @@ package Clases;
 import Enums.Puesto;
 import Interfaces.Identificable;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 public abstract class Persona implements Identificable<Integer> {
@@ -12,6 +13,7 @@ public abstract class Persona implements Identificable<Integer> {
     private int edad;
     private int telefono;
     private String email;
+    private LocalDate fechaIngreso;
 
     public Persona(int dni, String nombre, int edad, int telefono, String email) {
         this.dni = dni;
@@ -19,6 +21,16 @@ public abstract class Persona implements Identificable<Integer> {
         this.edad = edad;
         this.telefono = telefono;
         this.email = email;
+        this.fechaIngreso = LocalDate.now();
+    }
+
+    public Persona(int dni, String nombre, int edad, int telefono, String email, LocalDate fechaIngreso) {
+        this.dni = dni;
+        this.nombre = nombre;
+        this.edad = edad;
+        this.telefono = telefono;
+        this.email = email;
+        this.fechaIngreso = fechaIngreso;
     }
 
     @Override
@@ -40,6 +52,10 @@ public abstract class Persona implements Identificable<Integer> {
         return email;
     }
 
+    public LocalDate getFechaIngreso() {
+        return fechaIngreso;
+    }
+
     @Override
     public String toString() {
         return "\nPERSONA" +
@@ -48,6 +64,7 @@ public abstract class Persona implements Identificable<Integer> {
                 "| \n |Edad=" + edad +
                 "| \n |telefono=" + telefono +
                 "| \n |email=" + email +
+                "| \n |fechaIngreso=" + fechaIngreso +
                 '}';
     }
 

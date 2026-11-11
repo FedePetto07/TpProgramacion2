@@ -18,7 +18,7 @@ public class Agencia {
 
     private HashMap<String, Embarcacion> embarcaciones;
     private Generica<Cliente> clientes;
-    private ArrayList<Empleado> empleados;
+    private Generica<Empleado> empleados;
     private Generica<Reserva> listaReservas;
     private Generica<Alquiler> listaAlquileres;
     private Generica<Venta> listaVentas;
@@ -28,7 +28,7 @@ public class Agencia {
     public Agencia() {
         this.embarcaciones = new HashMap<>();
         this.clientes = new Generica<>();
-        this.empleados = new ArrayList<>();
+        this.empleados = new Generica<>();
         this.listaReservas = new Generica<>();
         this.listaAlquileres = new Generica<>();
         this.listaVentas = new Generica<>();
@@ -40,7 +40,7 @@ public class Agencia {
 
     public boolean agregarEmpleado(int dni, String nombre, int edad, int telefono, String email, Puesto puesto, double salario) throws AccionImposibleEx, ElementoDuplicadoEx {
 
-        for (Empleado empleado : empleados) {
+        for (Empleado empleado : empleados.getLista()) {
             if (empleado.getID() == dni) {
                 throw new ElementoDuplicadoEx("Ya existe un empleado con ese DNI");
             }
@@ -49,13 +49,13 @@ public class Agencia {
             }
         }
 
-        empleados.add(new Empleado(dni, nombre, edad, telefono, email, puesto, salario));
+        empleados.guardar(new Empleado(dni, nombre, edad, telefono, email, puesto, salario));
 
         return true;
     }
 
     public boolean eliminarEmpleado(int dni) throws AccionImposibleEx {
-        Iterator<Empleado> iterator = empleados.iterator();
+        Iterator<Empleado> iterator = empleados.getLista().iterator();
         while (iterator.hasNext()) {
             Empleado empleado = iterator.next();
             if (empleado.getID() == dni) {
@@ -72,13 +72,13 @@ public class Agencia {
     public StringBuilder listarEmpleados() throws AccionImposibleEx {
         StringBuilder sb = new StringBuilder();
 
-        if (empleados.isEmpty()) {
+        if (empleados.getLista().isEmpty()) {
             throw new AccionImposibleEx("La lista está vacía");
         }
 
         sb.append("Lista de empleados:\n");
 
-        for (Empleado empleado : empleados) {
+        for (Empleado empleado : empleados.getLista()) {
             sb.append(empleado.toString());
         }
 
@@ -86,7 +86,7 @@ public class Agencia {
     }
 
     public String verEmpleadoId(int dni) throws AccionImposibleEx {
-        for (Empleado empleado : empleados) {
+        for (Empleado empleado : empleados.getLista()) {
             if (empleado.getID() == dni) {
                 return empleado.toString();
             }
@@ -100,7 +100,7 @@ public class Agencia {
 // AGREGAR Y ELIMINAR CLIENTES
 
     public boolean agregarCliente(int dni, String nombre, int edad, int telefono, String email,
-                                  int numeroLicencia, LocalDate fechaNacimiento) throws AccionImposibleEx, ElementoDuplicadoEx {
+                                  int numeroLicencia) throws AccionImposibleEx, ElementoDuplicadoEx {
 
         if (edad < 18) {
             throw new AccionImposibleEx("El cliente no puede ser menor de 18");
@@ -110,7 +110,7 @@ public class Agencia {
             throw new ElementoDuplicadoEx("Ya existe un cliente con ese DNI");
         }
 
-        return clientes.guardar(new Cliente(dni, nombre, edad, telefono, email, numeroLicencia, fechaNacimiento, 0));
+        return clientes.guardar(new Cliente(dni, nombre, edad, telefono, email, numeroLicencia, 0));
     }
 
     public boolean eliminarCliente(int dni) throws ObjetoNoEncontradoEx {

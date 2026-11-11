@@ -8,15 +8,13 @@ public class Empleado extends Persona {
 
     private Puesto puesto;
     private double salario;
-    private LocalDate fechaIngreso;
 
-    // Constructor 1: con todos los datos
+    // Constructor 1: con todos los datos (BDD)
     public Empleado(int dni, String nombre, int edad, int telefono, String email,
                     Puesto puesto, double salario, LocalDate fechaIngreso) {
-        super(dni, nombre, edad, telefono, email);
+        super(dni, nombre, edad, telefono, email, fechaIngreso);
         this.puesto = puesto;
         this.salario = salario;
-        this.fechaIngreso = fechaIngreso;
     }
 
     // Constructor 2: empleado que ingresa hoy
@@ -33,15 +31,10 @@ public class Empleado extends Persona {
         return salario;
     }
 
-    public LocalDate getFechaIngreso() {
-        return fechaIngreso;
-    }
-
     @Override
     public String toString() {
         return "\nEMPLEADO" + super.toString() +
                 " \n |puesto=" + puesto +
-                "| \n |salario=" + salario +
-                "| \n |fechaIngreso=" + fechaIngreso + "|";
+                "| \n |salario=" + salario + "|";
     }
 }
