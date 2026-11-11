@@ -17,7 +17,7 @@ public class Agencia {
     /// ATRIBUTOS
 
     private HashMap<String, Embarcacion> embarcaciones;
-    private ArrayList<Cliente> clientes;
+    private Generica<Cliente> clientes;
     private ArrayList<Empleado> empleados;
     private Generica<Reserva> listaReservas;
     private Generica<Alquiler> listaAlquileres;
@@ -27,7 +27,7 @@ public class Agencia {
 
     public Agencia() {
         this.embarcaciones = new HashMap<>();
-        this.clientes = new ArrayList<>();
+        this.clientes = new Generica<>();
         this.empleados = new ArrayList<>();
         this.listaReservas = new Generica<>();
         this.listaAlquileres = new Generica<>();
@@ -96,6 +96,71 @@ public class Agencia {
     }
 
     /// CLIENTES
+
+// AGREGAR Y ELIMINAR CLIENTES
+
+    public boolean agregarCliente(int dni, String nombre, int edad, int telefono, String email,
+                                  int numeroLicencia, LocalDate fechaNacimiento) throws AccionImposibleEx, ElementoDuplicadoEx {
+
+        if (edad < 18) {
+            throw new AccionImposibleEx("El cliente no puede ser menor de 18");
+        }
+
+        if (clientes.BuscarPorId(dni) != null) {
+            throw new ElementoDuplicadoEx("Ya existe un cliente con ese DNI");
+        }
+
+        return clientes.guardar(new Cliente(dni, nombre, edad, telefono, email, numeroLicencia, fechaNacimiento, 0));
+    }
+
+    public boolean eliminarCliente(int dni) throws ObjetoNoEncontradoEx {
+        if (!clientes.eliminar(dni)) {
+            throw new ObjetoNoEncontradoEx("No existe un cliente con ese DNI");
+        }
+
+        return true;
+    }
+
+// VER CLIENTES
+
+    public String verClienteDni(int dni) throws ObjetoNoEncontradoEx {
+        Cliente aux = clientes.BuscarPorId(dni);
+
+        if (aux == null) {
+            throw new ObjetoNoEncontradoEx("No existe un cliente con ese DNI");
+        }
+
+        return aux.toString();
+    }
+
+    public String listarClientes() throws ObjetoNoEncontradoEx {
+        if (clientes.getLista().isEmpty()) {
+            throw new ObjetoNoEncontradoEx("La lista está vacía");
+        }
+
+        return "Lista de clientes:\n" + clientes.listarElementos();
+    }
+
+// LIMPIAR CLIENTES NO RECURRENTES
+
+    public int limpiarClientes(int mesesMinimos, int alquileresMinimos) throws ObjetoNoEncontradoEx {
+        if (clientes.getLista().isEmpty()) {
+            throw new ObjetoNoEncontradoEx("La lista está vacía");
+        }
+
+        int eliminados = 0;
+
+        Iterator<Cliente> it = clientes.getLista().iterator();
+        while (it.hasNext()) {
+            Cliente c = it.next();
+            if (!c.esRecurrente(mesesMinimos, alquileresMinimos)) {
+                it.remove();
+                eliminados++;
+            }
+        }
+
+        return eliminados;
+    }
 
 
     /// EMBARCACIONES
@@ -177,7 +242,7 @@ public class Agencia {
            {
                throw new AccionImposibleEx("ERROR. la matricula de la embarcacion ingresada no existe.");
            }
-           if(!clientes.contains(cliente))
+           if(!clientes.getLista().contains(cliente))
            {
                throw new AccionImposibleEx("ERROR. EL numero de la licencia del cliente ingresado, no existe.");
            }
@@ -291,7 +356,7 @@ public class Agencia {
       //////registrar Venta
      public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoFinal) throws AccionImposibleEx
      {
-         if(!clientes.contains(clienteComprador))
+         if(!clientes.getLista().contains(clienteComprador))
          {
              throw new AccionImposibleEx("ERROR. el identificador del comprador ingresado no existe...");
          }

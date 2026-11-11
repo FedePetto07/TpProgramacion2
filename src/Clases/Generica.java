@@ -1,9 +1,8 @@
 package Clases;
 
 import Interfaces.Identificable;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Generica <T extends Identificable>{
 
@@ -33,12 +32,15 @@ public class Generica <T extends Identificable>{
         return lista;
     }
 
-    public void eliminar(int id) {
-        for (T elemento : lista) {
-            if (elemento.getID().equals(id)) {
-                lista.remove(elemento);
+    public boolean eliminar(int id) {
+        Iterator<T> it = lista.iterator();
+        while (it.hasNext()) {
+            if (it.next().getID().equals(id)) {
+                it.remove();
+                return true;
             }
         }
+        return false;
     }
     public String listarElementos()
     {
