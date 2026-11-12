@@ -1,8 +1,11 @@
 package Clases;
 
+import Interfaces.CalcularPrecio;
+import Interfaces.Identificable;
+
 import java.util.Objects;
 
-public abstract class Embarcacion {
+public abstract class Embarcacion implements Identificable<String> {
 
     /// ATRIBUTOS
 
@@ -28,8 +31,9 @@ public abstract class Embarcacion {
         return nombre;
     }
 
-    public String getMatricula() {
-        return matricula;
+    @Override
+    public String getID() {
+        return this.matricula;
     }
 
     public double getPrecioDiario() {

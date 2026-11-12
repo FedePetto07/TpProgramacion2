@@ -13,18 +13,6 @@ public class BDDManager {
 
      static final String url = "jdbc:mysql://localhost/";
 
-
-     public static String Conectar(){
-
-        try(Connection c = DriverManager.getConnection(url)){
-            return "Conexion exitosa";
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return null;
-     }
-
      public static HashMap<String,Embarcacion> getEmbarcacionesBDD() {
 
          String query = """
@@ -206,7 +194,7 @@ public class BDDManager {
     }
 
 /////////////////////////////////////////////////////////////////////
-public static ArrayList<Reporte> getReportesBDD()
+    public static ArrayList<Reporte> getReportesBDD()
 {
     String query = "SELECT * FROM reportes";
     ArrayList<Reporte> listaReportes = new ArrayList<>();
@@ -276,7 +264,7 @@ public static ArrayList<Reporte> getReportesBDD()
         return listaVenta;
     }
     //////////
-public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <String,Embarcacion> e)
+    public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <String,Embarcacion> e)
 {
     String query = "SELECT * FROM reservas";
 
@@ -330,7 +318,7 @@ public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <Str
     return listaReservas;
 }
 
-public static Generica<Alquiler> getAlquileresBDD(Generica<Reserva> r)
+    public static Generica<Alquiler> getAlquileresBDD(Generica<Reserva> r)
 {
     String query = "SELECT * FROM alquileres";
     Generica<Alquiler> listaAlquileres = new Generica<>();
@@ -357,4 +345,79 @@ public static Generica<Alquiler> getAlquileresBDD(Generica<Reserva> r)
     }
     return listaAlquileres;
 }
+
+    public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
+    {
+        int idAgregado = -1;
+        String query = "INSERT INTO velero (nombre, matricula, precioDiario, disponible, cantidadVelas, longitudMetros, capacidadPersonas, cantidadCamarotes, requiereCapitan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection c = DriverManager.getConnection(url);
+        PreparedStatement ps = c.prepareStatement(query)){
+
+            ps.setString(1, nombre);
+            ps.setString(2, matricula);
+            ps.setDouble(3, precioDiario);
+            ps.setBoolean(4, disponible);
+            ps.setInt(5, cantidadVelas);
+            ps.setDouble(6, longitudMetros);
+            ps.setInt(7, cantidadCamarotes);
+            ps.setInt(8, capacidadPersonas);
+            ps.setBoolean(9, requiereCapitan);
+
+            ps.executeUpdate();
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
+    {
+        int idAgregado = -1;
+        String query = "INSERT INTO velero (nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query)){
+
+            ps.setString(1, nombre);
+            ps.setString(2, matricula);
+            ps.setDouble(3, precioDiario);
+            ps.setBoolean(4, disponible);
+            ps.setInt(5, capacidadPersonas);
+            ps.setInt(6, cilindrada);
+            ps.setDouble(7, limiteVelocidad);
+            ps.setBoolean(8, requiereLicencia);
+
+            ps.executeUpdate();
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
+    {
+        int idAgregado = -1;
+        String query = "INSERT INTO velero (nombre, matricula, precioDiario, disponible, potenciaMotor, longitudMetros, capacidadPersonas, combustible) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query)){
+
+            ps.setString(1, nombre);
+            ps.setString(2, matricula);
+            ps.setDouble(3, precioDiario);
+            ps.setBoolean(4, disponible);
+            ps.setInt(5, potenciaMotor);
+            ps.setDouble(6, longitudMetros);
+            ps.setInt(7, capacidadPersonas);
+            ps.setString(8, combustible.name());
+
+            ps.executeUpdate();
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+
+
 }
