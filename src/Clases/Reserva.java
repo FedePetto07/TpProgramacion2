@@ -49,6 +49,9 @@ public class Reserva implements Identificable<Integer> {
     public ESTADO_RESERVA getEstadoReserva() {
         return estadoReserva;
     }
+
+    public int getCantidadPersonas() {return cantidadPersonas;}
+
     ////////////////////
 
     public void confirmar()
@@ -67,6 +70,7 @@ public class Reserva implements Identificable<Integer> {
         return "\nRESERVA{" +
                 " \n |id=" + id +
                 "| \n |Datos cliente=" + cliente.toString() +
+                "| \n |Cantidad de personas=" + estadoReserva +
                 "| \n |Datos embarcacion=" + embarcacion.toString() +
                 "| \n |Fecha de inicio=" + fechaDeInicio +
                 "| \n |Fecha de fin=" + fechaDeFin +

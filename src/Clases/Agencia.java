@@ -12,26 +12,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+
 public class Agencia {
 
     /// ATRIBUTOS
 
-    private HashMap<String, Embarcacion> embarcaciones;
+    private HashMap<String, Embarcacion>embarcaciones;
     private Generica<Cliente> clientes;
     private Generica<Empleado> empleados;
     private Generica<Reserva> listaReservas;
     private Generica<Alquiler> listaAlquileres;
     private Generica<Venta> listaVentas;
+    private ArrayList <Reporte>listaReportes;
+
 
     /// CONSTRUCTOR
 
     public Agencia() {
-        this.embarcaciones = new HashMap<>();
-        this.clientes = new Generica<>();
-        this.empleados = new Generica<>();
-        this.listaReservas = new Generica<>();
-        this.listaAlquileres = new Generica<>();
-        this.listaVentas = new Generica<>();
+        this.embarcaciones = BDDManager.getEmbarcacionesBDD();
+        this.clientes = BDDManager.getClientesBDD();
+        this.empleados = BDDManager.getEmpleados();
+        this.listaReportes = BDDManager.getReportesBDD();
+        this.listaVentas = BDDManager.listaVenta(clientes,embarcaciones,listaReportes);
+        this.listaReservas = BDDManager.getReservasBDD(clientes,embarcaciones);
+        this.listaAlquileres = BDDManager.getAlquileresBDD(listaReservas);
     }
 
     /// EMPLEADOS

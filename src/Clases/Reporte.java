@@ -2,14 +2,16 @@ package Clases;
 
 public class Reporte {
 
+    private int id;
     private String descripcion;
     private double coste;
     private boolean cargoAgencia;
 
-    public Reporte(String descripcion, double coste, boolean cargoAgencia) {
+    public Reporte(int id, String descripcion, double coste, boolean cargoAgencia) {
         this.descripcion = descripcion;
         this.coste = coste;
         this.cargoAgencia = cargoAgencia;
+        this.id = id;
     }
 
     public String getDescripcion() {
@@ -22,6 +24,10 @@ public class Reporte {
 
     public boolean isCargoAgencia() {
         return cargoAgencia;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override

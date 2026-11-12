@@ -16,6 +16,16 @@ public class Venta implements Identificable<Integer> {
 
 
     ////
+    public Venta(int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase, Reporte reporteVenta, double montoFinal) {
+        this.id = id;
+        this.clienteComprador = clienteComprador;
+        this.embarcacion = embarcacion;
+        this.montoBase = montoBase;
+        this.reporteVenta = null;
+        this.montoFinal = montoBase;
+        this.reporteVenta = reporteVenta;
+        this.montoFinal = montoFinal;
+    }
     public Venta(int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) {
         this.id = id;
         this.clienteComprador = clienteComprador;
@@ -49,7 +59,7 @@ public class Venta implements Identificable<Integer> {
 
     public Reporte iniciarReporte(String descripcion, double coste, boolean cargoAgencia)
     {
-       return this.reporteVenta = new Reporte(descripcion, coste, cargoAgencia);
+       return this.reporteVenta = new Reporte(this.id, descripcion, coste, cargoAgencia);
     }
 
     public void setMontoFinal(double montoFinal) {

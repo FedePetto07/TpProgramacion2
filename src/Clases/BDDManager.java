@@ -1,11 +1,13 @@
 package Clases;
 
+import Enums.ESTADO_RESERVA;
 import Enums.Puesto;
 import Enums.TipoCombustible;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BDDManager {
 
@@ -23,7 +25,7 @@ public class BDDManager {
         return null;
      }
 
-     public static ArrayList<Embarcacion> getEmbarcacionesBDD() {
+     public static HashMap<String,Embarcacion> getEmbarcacionesBDD() {
 
          String query = """
         SELECT
@@ -52,7 +54,7 @@ public class BDDManager {
         LEFT JOIN moto_de_agua m ON e.matricula = m.matricula
         LEFT JOIN lancha l ON e.matricula = l.matricula
         """;
-         ArrayList<Embarcacion> listaEmbarcacion = new ArrayList<>();
+         HashMap<String,Embarcacion> listaEmbarcacion = new HashMap<>();
 
          try(Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
@@ -119,7 +121,7 @@ public class BDDManager {
                     }
 
                     if(embarcacion != null) {
-                        listaEmbarcacion.add(embarcacion);
+                        listaEmbarcacion.put(matricula,embarcacion);
                     }
                 }
             }
@@ -131,7 +133,7 @@ public class BDDManager {
          return listaEmbarcacion;
      }
 
-    public static ArrayList<Empleado> getEmpleadosBDD() {
+    public static Generica<Empleado> getEmpleados() {
         String query = """
         SELECT p.dni, p.nombre, p.edad, p.telefono, p.email,
                p.fecha_ingreso, e.puesto, e.salario
@@ -139,7 +141,7 @@ public class BDDManager {
         INNER JOIN empleado e ON p.dni = e.dni
         """;
 
-        ArrayList<Empleado> listaEmpleados = new ArrayList<>();
+        Generica<Empleado> empleados = new Generica<>();
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query);
@@ -157,17 +159,17 @@ public class BDDManager {
                         LocalDate.parse(rs.getString("fecha_ingreso"))
                 );
 
-                listaEmpleados.add(empleado);
+                empleados.guardar(empleado);
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
-        return listaEmpleados;
+        return empleados;
     }
 
-    public static ArrayList<Cliente> getClientesBDD() {
+    public static Generica<Cliente> getClientesBDD() {
         String query = """
         SELECT p.dni, p.nombre, p.edad, p.telefono, p.email,
                p.fecha_ingreso, c.numero_licencia, c.cantidad_alquileres
@@ -175,7 +177,7 @@ public class BDDManager {
         INNER JOIN cliente c ON p.dni = c.dni
         """;
 
-        ArrayList<Cliente> listaClientes = new ArrayList<>();
+        Generica<Cliente> listaClientes = new Generica<>();
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query);
@@ -193,7 +195,7 @@ public class BDDManager {
                         rs.getInt("cantidad_alquileres")
                 );
 
-                listaClientes.add(cliente);
+                listaClientes.guardar(cliente);
             }
 
         } catch (SQLException ex) {
@@ -203,5 +205,156 @@ public class BDDManager {
         return listaClientes;
     }
 
+/////////////////////////////////////////////////////////////////////
+public static ArrayList<Reporte> getReportesBDD()
+{
+    String query = "SELECT * FROM reportes";
+    ArrayList<Reporte> listaReportes = new ArrayList<>();
+    try(Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
 
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next())
+        {
+            int id = resultSet.getInt("id");
+            String descripcion = resultSet.getString("descripcion");
+            double coste = resultSet.getDouble("coste");
+            boolean cargoAgencia = resultSet.getBoolean("cargoAgencia");
+
+            Reporte aux = new Reporte(id,descripcion,coste,cargoAgencia);
+            listaReportes.add(aux);
+        }
+    }
+    catch (SQLException e)
+    {
+        e.printStackTrace();
+    }
+    return  listaReportes;
+}
+
+/////
+    public static Generica<Venta> listaVenta(Generica<Cliente> c , HashMap<String,Embarcacion>e, ArrayList <Reporte> r)
+    {
+        String query = "SELECT * FROM Venta";
+        Generica<Venta> listaVenta = new Generica<>();
+
+        HashMap<Integer, Reporte> hashReportes = new HashMap<>();
+        for(Reporte contador : r)
+        {
+            hashReportes.put(contador.getId(),contador);
+        }
+//////////////////////////
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                int id = resultSet.getInt("id");
+                int idClienteComprador = resultSet.getInt("idClienteComprador");
+                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
+                double montoBase = resultSet.getDouble("montoBase");
+                int idReporteVenta = resultSet.getInt("idReporteVenta");
+                double montoFinal = resultSet.getDouble("montoFinal");
+
+
+                Embarcacion auxE = e.get(matriculaEmbarcacion);
+                Cliente auxC = c.BuscarPorId(idClienteComprador);
+                Reporte auxR = hashReportes.get(idReporteVenta);
+
+                Venta aux = new Venta(id,auxC,auxE,montoBase,auxR,montoFinal);
+                listaVenta.guardar(aux);
+            }
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return listaVenta;
+    }
+    //////////
+public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <String,Embarcacion> e)
+{
+    String query = "SELECT * FROM reservas";
+
+    Generica <Reserva> listaReservas = new Generica<>();
+
+    try(Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next())
+        {
+            int id = resultSet.getInt("id");
+            int idCliente = resultSet.getInt("idCLiente");
+            int cantidadPersonas = resultSet.getInt("CantidadPersonas");
+            String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
+             LocalDate fechaDeInicio = resultSet.getDate("fechaDeInicio").toLocalDate();
+            LocalDate fechaDeFin = resultSet.getDate("fechaDeFin").toLocalDate();
+            String estadoReserva = resultSet.getString("estadoReserva");
+
+            ESTADO_RESERVA reserva = null;
+            switch (estadoReserva)
+            {
+                case "CANCELADA":
+                    reserva = ESTADO_RESERVA.CANCELADA;
+                    break;
+                case "CONFIRMADA":
+                    reserva = ESTADO_RESERVA.CONFIRMADA;
+                    break;
+                case "PENDIENTE":
+                    reserva = ESTADO_RESERVA.PENDIENTE;
+                    break;
+                case "FINALIZADA":
+                    reserva = ESTADO_RESERVA.FINALIZADA;
+                    break;
+            }
+            ////////
+
+            Cliente aux = c.BuscarPorId(idCliente);
+            Embarcacion auxE = e.get(matriculaEmbarcacion);
+
+            Reserva auxR = new Reserva(id,aux,cantidadPersonas,auxE,fechaDeInicio.getYear(),fechaDeInicio.getMonthValue(),fechaDeInicio.getDayOfMonth(),fechaDeFin.getYear(),fechaDeFin.getMonthValue(),fechaDeFin.getDayOfMonth(),reserva);
+            listaReservas.guardar(auxR);
+        }
+    }
+    catch (SQLException ex)
+    {
+        ex.printStackTrace();;
+    }
+    return listaReservas;
+}
+
+public static Generica<Alquiler> getAlquileresBDD(Generica<Reserva> r)
+{
+    String query = "SELECT * FROM alquileres";
+    Generica<Alquiler> listaAlquileres = new Generica<>();
+
+    try(Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next())
+        {
+            int id = resultSet.getInt("id");
+            int idReserva = resultSet.getInt("idReserva");
+
+            Reserva aux = r.BuscarPorId(idReserva);
+
+            Alquiler auxA = new Alquiler(id, aux);
+            listaAlquileres.guardar(auxA);
+        }
+    }
+    catch (SQLException ex)
+    {
+        ex.printStackTrace();;
+    }
+    return listaAlquileres;
+}
 }
