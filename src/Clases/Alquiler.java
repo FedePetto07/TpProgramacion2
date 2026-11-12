@@ -1,4 +1,5 @@
 package Clases;
+import Excepciones.DatoErroneoEx;
 import Interfaces.CalcularPrecio;
 import Interfaces.Identificable;
 
@@ -11,9 +12,22 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
     private Reserva reserva;
     private double montoFinal;
 
+    /// CONSTRUCTOR BDD
+
     public Alquiler(int id, Reserva reserva) {
-        this.id = id;
         this.reserva = reserva;
+        this.id = id;
+        this.montoFinal = calcularPrecio();
+    }
+
+    public Alquiler(Reserva reserva) throws DatoErroneoEx {
+
+        if (reserva == null) {
+            throw new DatoErroneoEx("El alquiler debe estar asociado a una reserva.");
+        }
+
+        this.reserva = reserva;
+        this.montoFinal = calcularPrecio();
     }
 
     @Override
@@ -28,6 +42,8 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
     public double getMontoFinal() {
         return montoFinal;
     }
+
+
     ///
    public void cambiarDisponibilidad()
    {

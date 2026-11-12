@@ -1,6 +1,7 @@
 package Clases;
 
 import Enums.TipoCombustible;
+import Excepciones.DatoErroneoEx;
 
 public class Lancha extends Embarcacion {
 
@@ -12,8 +13,17 @@ public class Lancha extends Embarcacion {
 
     /// CONSTRUCTOR
 
-    public Lancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) {
+    public Lancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) throws DatoErroneoEx {
         super(nombre, matricula, precioDiario, disponible, capacidadPersonas);
+
+        if (potenciaMotor <= 15) {
+            throw new DatoErroneoEx("La potencia del motor debe ser mayor a 15.");
+        }
+
+        if (longitudMetros < 3) {
+            throw new DatoErroneoEx("La longitud debe ser mayor a 3 metros.");
+        }
+
         this.potenciaMotor = potenciaMotor;
         this.longitudMetros = longitudMetros;
         this.combustible = combustible;

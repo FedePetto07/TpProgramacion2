@@ -1,4 +1,5 @@
 package Clases;
+import Excepciones.DatoErroneoEx;
 import Interfaces.CalcularPrecio;
 import Interfaces.Identificable;
 
@@ -15,24 +16,47 @@ public class Venta implements Identificable<Integer> {
     private double montoFinal;
 
 
-    ////
+    /// CONSTRUCTOR BDD
     public Venta(int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase, Reporte reporteVenta, double montoFinal) {
         this.id = id;
         this.clienteComprador = clienteComprador;
         this.embarcacion = embarcacion;
         this.montoBase = montoBase;
-        this.reporteVenta = null;
-        this.montoFinal = montoBase;
         this.reporteVenta = reporteVenta;
         this.montoFinal = montoFinal;
     }
-    public Venta(int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) {
-        this.id = id;
+
+
+    public Venta(Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws DatoErroneoEx {
+
+        if (clienteComprador == null) {
+            throw new DatoErroneoEx("La venta debe tener un cliente comprador.");
+        }
+
+        if (embarcacion == null) {
+            throw new DatoErroneoEx("La venta debe tener una embarcación asignada.");
+        }
+
+        if (montoBase <= 0 || !Double.isFinite(montoBase)) {
+            throw new DatoErroneoEx("El monto base debe ser mayor a 0.");
+        }
+
+        if (reporteVenta == null) {
+            throw new DatoErroneoEx("La venta debe tener un reporte asociado.");
+        }
+
+        if (montoFinal <= 0 || !Double.isFinite(montoFinal)) {
+            throw new DatoErroneoEx("El monto final debe ser mayor a 0.");
+        }
+
+        if (montoFinal < montoBase) {
+            throw new DatoErroneoEx("El monto final no puede ser menor al monto base.");
+        }
+
         this.clienteComprador = clienteComprador;
         this.embarcacion = embarcacion;
         this.montoBase = montoBase;
         this.reporteVenta = null;
-        this.montoFinal = montoBase;
     }
 
     public Integer getID() {

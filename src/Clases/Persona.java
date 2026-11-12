@@ -1,6 +1,7 @@
 package Clases;
 
 import Enums.Puesto;
+import Excepciones.DatoErroneoEx;
 import Interfaces.Identificable;
 
 import java.time.LocalDate;
@@ -15,7 +16,24 @@ public abstract class Persona implements Identificable<Long> {
     private String email;
     private LocalDate fechaIngreso;
 
-    public Persona(long dni, String nombre, int edad, long telefono, String email) {
+    public Persona(long dni, String nombre, int edad, long telefono, String email) throws DatoErroneoEx {
+
+        if (String.valueOf(dni).length() != 8) {
+            throw new DatoErroneoEx("El DNI debe tener exactamente 8 dígitos.");
+        }
+
+        if (nombre == null || nombre.isBlank() || nombre.matches(".*\\d.*")) {
+            throw new DatoErroneoEx("El nombre no puede estar vacío ni contener números.");
+        }
+
+        if (String.valueOf(telefono).length() != 10) {
+            throw new DatoErroneoEx("El teléfono debe tener exactamente 10 dígitos.");
+        }
+
+        if (edad < 18) {
+            throw new DatoErroneoEx("El cliente no puede ser menor de 18");
+        }
+
         this.dni = dni;
         this.nombre = nombre;
         this.edad = edad;
@@ -24,7 +42,26 @@ public abstract class Persona implements Identificable<Long> {
         this.fechaIngreso = LocalDate.now();
     }
 
-    public Persona(long dni, String nombre, int edad, long telefono, String email, LocalDate fechaIngreso) {
+    /// CONSTRUCTOR BDD
+
+    public Persona(long dni, String nombre, int edad, long telefono, String email, LocalDate fechaIngreso) throws DatoErroneoEx {
+
+        if (String.valueOf(dni).length() != 8) {
+            throw new DatoErroneoEx("El DNI debe tener exactamente 8 dígitos.");
+        }
+
+        if (nombre == null || nombre.isBlank() || nombre.matches(".*\\d.*")) {
+            throw new DatoErroneoEx("El nombre no puede estar vacío ni contener números.");
+        }
+
+        if (String.valueOf(telefono).length() != 10) {
+            throw new DatoErroneoEx("El teléfono debe tener exactamente 10 dígitos.");
+        }
+
+        if (edad < 18) {
+            throw new DatoErroneoEx("El cliente no puede ser menor de 18");
+        }
+
         this.dni = dni;
         this.nombre = nombre;
         this.edad = edad;

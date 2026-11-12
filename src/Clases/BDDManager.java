@@ -3,6 +3,7 @@ package Clases;
 import Enums.ESTADO_RESERVA;
 import Enums.Puesto;
 import Enums.TipoCombustible;
+import Excepciones.DatoErroneoEx;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -52,6 +53,7 @@ public class BDDManager {
         String queryMoto = "SELECT * FROM moto_de_agua";
         String queryLancha = "SELECT * FROM lancha";
 
+
         try (Connection c = DriverManager.getConnection(url)) {
 
             // VELEROS
@@ -62,19 +64,25 @@ public class BDDManager {
 
                     String matricula = rs.getString("matricula");
 
-                    Embarcacion embarcacion = new Velero(
-                            rs.getString("nombre"),
-                            matricula,
-                            rs.getDouble("precio_diario"),
-                            rs.getBoolean("disponible"),
-                            rs.getInt("cantidad_velas"),
-                            rs.getDouble("longitud_metros"),
-                            rs.getInt("capacidad_personas"),
-                            rs.getInt("cantidad_camarotes"),
-                            rs.getBoolean("requiere_capitan")
-                    );
+                    try {
+
+                        Embarcacion embarcacion = new Velero(
+                                rs.getString("nombre"),
+                                matricula,
+                                rs.getDouble("precio_diario"),
+                                rs.getBoolean("disponible"),
+                                rs.getInt("cantidad_velas"),
+                                rs.getDouble("longitud_metros"),
+                                rs.getInt("capacidad_personas"),
+                                rs.getInt("cantidad_camarotes"),
+                                rs.getBoolean("requiere_capitan")
+                        );
 
                     listaEmbarcacion.put(matricula, embarcacion);
+
+                    }catch (DatoErroneoEx ex){
+                        ex.getMessage();
+                    }
                 }
             }
 
@@ -85,6 +93,8 @@ public class BDDManager {
                 while (rs.next()) {
 
                     String matricula = rs.getString("matricula");
+
+                    try {
 
                     Embarcacion embarcacion = new MotoDeAgua(
                             rs.getString("nombre"),
@@ -98,6 +108,9 @@ public class BDDManager {
                     );
 
                     listaEmbarcacion.put(matricula, embarcacion);
+                    }catch (DatoErroneoEx ex){
+                        ex.getMessage();
+                    }
                 }
             }
 
@@ -108,6 +121,8 @@ public class BDDManager {
                 while (rs.next()) {
 
                     String matricula = rs.getString("matricula");
+
+                    try {
 
                     Embarcacion embarcacion = new Lancha(
                             rs.getString("nombre"),
@@ -121,6 +136,9 @@ public class BDDManager {
                     );
 
                     listaEmbarcacion.put(matricula, embarcacion);
+                    }catch (DatoErroneoEx ex){
+                        ex.getMessage();
+                    }
                 }
             }
 
@@ -146,6 +164,9 @@ public class BDDManager {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+
+                try {
+
                 Empleado empleado = new Empleado(
                         rs.getLong("dni"),
                         rs.getString("nombre"),
@@ -158,6 +179,9 @@ public class BDDManager {
                 );
 
                 empleados.guardar(empleado);
+                }catch (DatoErroneoEx ex){
+                    ex.getMessage();
+                }
             }
 
         } catch (SQLException ex) {
@@ -182,6 +206,7 @@ public class BDDManager {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+                try {
                 Cliente cliente = new Cliente(
                         rs.getLong("dni"),
                         rs.getString("nombre"),
@@ -194,6 +219,9 @@ public class BDDManager {
                 );
 
                 listaClientes.guardar(cliente);
+                }catch (DatoErroneoEx ex){
+                    ex.getMessage();
+                }
             }
 
         } catch (SQLException ex) {
@@ -317,8 +345,12 @@ public class BDDManager {
             Cliente aux = c.BuscarPorId(idCliente);
             Embarcacion auxE = e.get(matriculaEmbarcacion);
 
+            try {
             Reserva auxR = new Reserva(id,aux,cantidadPersonas,auxE,fechaDeInicio.getYear(),fechaDeInicio.getMonthValue(),fechaDeInicio.getDayOfMonth(),fechaDeFin.getYear(),fechaDeFin.getMonthValue(),fechaDeFin.getDayOfMonth(),reserva);
             listaReservas.guardar(auxR);
+            }catch (DatoErroneoEx ex){
+                ex.getMessage();
+            }
         }
     }
     catch (SQLException ex)
@@ -450,7 +482,7 @@ public class BDDManager {
 
     /// CLIENTE
 
-    public static void agregarCliente(Long dni, String nombre, int edad, Long telefono, String email,int numeroLicencia, int cantidadAlquileres){
+    public static void agregarCliente(Cliente c){
 
         String query = """
     INSERT INTO clientes
@@ -459,17 +491,17 @@ public class BDDManager {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
-        try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement ps = c.prepareStatement(query)){
+        try (Connection con = DriverManager.getConnection(url);
+             PreparedStatement ps = con.prepareStatement(query)){
 
-            ps.setLong(1, dni);
-            ps.setString(2, nombre);
-            ps.setInt(3, edad);
-            ps.setLong(4, telefono);
-            ps.setString(5, email);
+            ps.setLong(1, c.getID());
+            ps.setString(2, c.getNombre());
+            ps.setInt(3, c.getEdad());
+            ps.setLong(4, c.getTelefono());
+            ps.setString(5, c.getEmail());
             ps.setDate(6, java.sql.Date.valueOf(LocalDate.now()));
-            ps.setInt(7, numeroLicencia);
-            ps.setInt(8, cantidadAlquileres);
+            ps.setInt(7, c.getNumeroLicencia());
+            ps.setInt(8, c.getCantidadAlquileres());
             ps.executeUpdate();
 
         }catch (SQLException ex){
@@ -560,7 +592,11 @@ public class BDDManager {
                     LocalDate fechaIngreso = rs.getDate("fecha_ingreso").toLocalDate();
                     Puesto puesto = Puesto.valueOf(rs.getString("puesto"));
                     double salario = rs.getDouble("salario");
-                    empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario, fechaIngreso);
+                    try {
+                        empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario, fechaIngreso);
+                    }catch (DatoErroneoEx ex){
+                        ex.getMessage();
+                    }
                 }
             }
         }catch (SQLException e){

@@ -4,6 +4,7 @@ import Enums.ESTADO_RESERVA;
 import Enums.Puesto;
 import Enums.TipoCombustible;
 import Excepciones.AccionImposibleEx;
+import Excepciones.DatoErroneoEx;
 import Excepciones.ElementoDuplicadoEx;
 import Excepciones.ObjetoNoEncontradoEx;
 
@@ -42,19 +43,15 @@ public class Agencia {
 
     // AGREGAR Y ELIMINAR EMPLEADOS
 
-    public boolean agregarEmpleado(Long dni, String nombre, int edad, Long telefono, String email, Puesto puesto, double salario) throws AccionImposibleEx, ElementoDuplicadoEx {
+    public boolean agregarEmpleado(Long dni, String nombre, int edad, Long telefono, String email, Puesto puesto, String contraseña) throws ElementoDuplicadoEx, DatoErroneoEx {
 
         for (Empleado empleado : empleados.getLista()) {
             if (empleado.getID() == dni) {
                 throw new ElementoDuplicadoEx("Ya existe un empleado con ese DNI");
             }
-            if (empleado.getEdad() < 18) {
-                throw new AccionImposibleEx("El empleado no puede ser menor a 18");
-            }
         }
 
-        empleados.guardar(new Empleado(dni, nombre, edad, telefono, email, puesto, salario));
-
+        empleados.guardar(new Empleado(dni, nombre, edad, telefono, email, puesto));
         return true;
     }
 
@@ -103,18 +100,16 @@ public class Agencia {
 
 // AGREGAR Y ELIMINAR CLIENTES
 
-    public boolean agregarCliente(Long dni, String nombre, int edad, Long telefono, String email,
-                                  int numeroLicencia) throws AccionImposibleEx, ElementoDuplicadoEx {
+    public boolean agregarCliente(Long dni, String nombre, int edad, Long telefono, String email, int numeroLicencia) throws ElementoDuplicadoEx, DatoErroneoEx {
 
-        if (edad < 18) {
-            throw new AccionImposibleEx("El cliente no puede ser menor de 18");
-        }
 
         if (clientes.BuscarPorId(dni) != null) {
             throw new ElementoDuplicadoEx("Ya existe un cliente con ese DNI");
         }
 
-        return clientes.guardar(new Cliente(dni, nombre, edad, telefono, email, numeroLicencia, 0));
+
+        clientes.guardar(new Cliente(dni, nombre, edad, telefono, email, numeroLicencia));
+        return true;
     }
 
     public boolean eliminarCliente(long dni) throws ObjetoNoEncontradoEx {
@@ -171,7 +166,7 @@ public class Agencia {
 
     // AGREGAR Y ELIMINAR EMBARCACIONES
 
-    public boolean registrarVelero(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan) throws ElementoDuplicadoEx {
+    public boolean registrarVelero(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan) throws ElementoDuplicadoEx, DatoErroneoEx {
         if (embarcaciones.containsKey(matricula)) {
             throw new ElementoDuplicadoEx("Ya existe un velero con esa matricula");
         }
@@ -180,16 +175,17 @@ public class Agencia {
         return true;
     }
 
-    public boolean registrarMotoDeAgua(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia) throws ElementoDuplicadoEx {
+    public boolean registrarMotoDeAgua(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia) throws ElementoDuplicadoEx, DatoErroneoEx {
         if (embarcaciones.containsKey(matricula)) {
             throw new ElementoDuplicadoEx("Ya existe una moto de agua con esa matricula");
         }
+
 
         embarcaciones.put(matricula, new MotoDeAgua(nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia));
         return true;
     }
 
-    public boolean registrarLancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) throws ElementoDuplicadoEx {
+    public boolean registrarLancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) throws ElementoDuplicadoEx, DatoErroneoEx {
         if (embarcaciones.containsKey(matricula)){
             throw new ElementoDuplicadoEx("Ya existe una lancha con esa matricula");
         }
@@ -235,7 +231,7 @@ public class Agencia {
     }
     //////////CREAR RESERVA
 
-       public boolean agregarUnaReserva(int id, Cliente cliente, int cantidadPersonas, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) throws AccionImposibleEx, ElementoDuplicadoEx
+       public boolean agregarUnaReserva(int id, Cliente cliente, int cantidadPersonas, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) throws AccionImposibleEx, ElementoDuplicadoEx, DatoErroneoEx
        {
            Clases.Reserva aux = listaReservas.BuscarPorId(id);
            if(aux != null)
@@ -259,6 +255,7 @@ public class Agencia {
          {
              throw new AccionImposibleEx("ERROR. La fecha de inicio es posterior a la de fin.");
          }
+
          aux = new Reserva(id, cliente, cantidadPersonas, embarcacion, añoInicio, mesInicio, diaInicio, añoFin,  mesFin, diaFin, estadoReserva);
          return listaReservas.guardar(aux);
        }
@@ -362,7 +359,7 @@ public class Agencia {
 
 
       //////registrar Venta
-     public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws AccionImposibleEx
+     public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws AccionImposibleEx, DatoErroneoEx
      {
          if(!clientes.getLista().contains(clienteComprador))
          {
@@ -376,7 +373,7 @@ public class Agencia {
          {
              throw new AccionImposibleEx("ERROR. el monto base debe ser mayor a 0");
          }
-         Venta aux = new Venta(id, clienteComprador, embarcacion, montoBase);
+         Venta aux = new Venta(clienteComprador, embarcacion, montoBase);
          return listaVentas.guardar(aux);
      }
      //////verVentas

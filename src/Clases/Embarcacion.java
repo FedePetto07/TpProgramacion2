@@ -1,5 +1,6 @@
 package Clases;
 
+import Excepciones.DatoErroneoEx;
 import Interfaces.CalcularPrecio;
 import Interfaces.Identificable;
 
@@ -17,7 +18,24 @@ public abstract class Embarcacion implements Identificable<String> {
 
     /// CONSTRUCTOR
 
-    public Embarcacion(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas) {
+    public Embarcacion(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas) throws DatoErroneoEx {
+
+        if (nombre == null || nombre.isBlank()) {
+            throw new DatoErroneoEx("El nombre no puede estar vacío.");
+        }
+
+        if (matricula == null || !matricula.matches("[A-Z]{3}[0-9]{3}")) {
+            throw new DatoErroneoEx("La matrícula debe tener el formato ABC123.");
+        }
+
+        if (precioDiario < 10000) {
+            throw new DatoErroneoEx("El precio diario debe ser como mínimo $10.000.");
+        }
+
+        if (capacidadPersonas < 2) {
+            throw new DatoErroneoEx("La capacidad mínima es de 2 personas.");
+        }
+
         this.nombre = nombre;
         this.matricula = matricula;
         this.precioDiario = precioDiario;

@@ -1,5 +1,7 @@
 package Clases;
 
+import Excepciones.DatoErroneoEx;
+
 import java.time.LocalDate;
 
 public class Cliente extends Persona {
@@ -8,26 +10,23 @@ public class Cliente extends Persona {
 
     /// CONSTRUCTOR BDD
 
-    public Cliente(Long dni, String nombre, int edad, Long telefono, String email, LocalDate fechaIngreso, int numeroLicencia, int cantidadAlquileres) {
+    public Cliente(Long dni, String nombre, int edad, Long telefono, String email, LocalDate fechaIngreso, int numeroLicencia, int cantidadAlquileres) throws DatoErroneoEx {
         super(dni, nombre, edad, telefono, email, fechaIngreso);
         this.numeroLicencia = numeroLicencia;
         this.cantidadAlquileres = cantidadAlquileres;
     }
 
-    public Cliente(Long dni, String nombre, int edad, Long telefono, String email,
-                   int numeroLicencia, int cantidadAlquileres) {
+    public Cliente(Long dni, String nombre, int edad, Long telefono, String email, int numeroLicencia) throws DatoErroneoEx {
         super(dni, nombre, edad, telefono, email);
+
+        if (numeroLicencia != 0 && (numeroLicencia < 5 || numeroLicencia > 9)) {
+            throw new DatoErroneoEx("La licencia debe ser 0 o tener un código entre 5 y 9.");
+        }
+
         this.numeroLicencia = numeroLicencia;
-        this.cantidadAlquileres = cantidadAlquileres;
+        this.cantidadAlquileres = 0;
     }
 
-    // Segundo constructor en caso de que el cliente no posea licencia
-    public Cliente(Long dni, String nombre, int edad, Long telefono, String email,
-                   int cantidadAlquileres) {
-        super(dni, nombre, edad, telefono, email);
-        this.numeroLicencia = 0;
-        this.cantidadAlquileres = cantidadAlquileres;
-    }
 
     public int getNumeroLicencia() {
         return numeroLicencia;

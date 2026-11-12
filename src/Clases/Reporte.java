@@ -1,5 +1,7 @@
 package Clases;
 
+import Excepciones.DatoErroneoEx;
+
 public class Reporte {
 
     private int id;
@@ -7,7 +9,29 @@ public class Reporte {
     private double coste;
     private boolean cargoAgencia;
 
+
     public Reporte(int id, String descripcion, double coste, boolean cargoAgencia) {
+        this.id = id;
+        this.descripcion = descripcion;
+        this.coste = coste;
+        this.cargoAgencia = cargoAgencia;
+    }
+
+    public Reporte(String descripcion, double coste, boolean cargoAgencia) throws DatoErroneoEx {
+
+        if (descripcion == null || descripcion.isBlank()) {
+            throw new DatoErroneoEx("La descripción no puede estar vacía.");
+        }
+
+        if (descripcion.length() > 500) {
+            throw new DatoErroneoEx("La descripción no puede superar los 500 caracteres.");
+        }
+
+        if (coste < 0 || !Double.isFinite(coste)) {
+            throw new DatoErroneoEx("El coste no puede ser negativo ni inválido.");
+        }
+
+
         this.descripcion = descripcion;
         this.coste = coste;
         this.cargoAgencia = cargoAgencia;
