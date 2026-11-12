@@ -80,6 +80,8 @@ public abstract class Embarcacion implements Identificable<String> {
         this.nombre = nombre;
     }
 
+
+
     /// ToString
 
     @Override

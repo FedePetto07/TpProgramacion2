@@ -152,7 +152,8 @@ public class Agencia {
         Iterator<Cliente> it = clientes.getLista().iterator();
         while (it.hasNext()) {
             Cliente c = it.next();
-            if (!c.esRecurrente(mesesMinimos, alquileresMinimos)) {
+            if (!c.esRecurrente(mesesMinimos, alquileresMinimos) && !tieneReservas(c)
+                    && !tieneAlquileres(c)) {
                 it.remove();
                 eliminados++;
             }
@@ -161,6 +162,90 @@ public class Agencia {
         return eliminados;
     }
 
+    public StringBuilder modificarDatosCliente(long dni, String nombreNuevo, int edadNueva, Long telefonoNuevo, String emailNuevo, int numeroLicenciaNuevo) throws DatoErroneoEx
+    {
+
+        Cliente aux = clientes.BuscarPorId(dni);
+
+        StringBuilder informacionNueva = new StringBuilder();
+
+        if (nombreNuevo != null) {
+            aux.setNombre(nombreNuevo);
+            informacionNueva.append("Se ha actualizado el nombre");
+        }
+        if (edadNueva > 0) {
+            aux.setEdad(edadNueva);
+            informacionNueva.append("Se ha actualizado la edad");
+        }
+        if (telefonoNuevo != null) {
+            aux.setTelefono(telefonoNuevo);
+            informacionNueva.append("Se ha actualizado el telefono");
+        }
+        if (emailNuevo != null) {
+            aux.setEmail(emailNuevo);
+            informacionNueva.append("Se ha actualizado el email");
+        }
+        if (numeroLicenciaNuevo > 0) {
+            aux.setNumeroLicencia(numeroLicenciaNuevo);
+            informacionNueva.append("Se ha actualizado el numero de licencia");
+        }
+
+        return informacionNueva;
+    }
+
+    public ArrayList<Reserva> getReservasCliente(long dni)
+            throws ObjetoNoEncontradoEx {
+
+        ArrayList<Reserva> resultado = new ArrayList<>();
+
+        for (Reserva r : listaReservas.getLista()) {
+            if (r.getCliente().getID() == dni) {
+                resultado.add(r);
+            }
+        }
+
+        if (resultado.isEmpty()) {
+            throw new ObjetoNoEncontradoEx("El cliente no tiene reservas.");
+        }
+
+        return resultado;
+    }
+
+    public ArrayList<Alquiler> getAlquileresCliente(long dni)
+            throws ObjetoNoEncontradoEx {
+
+        ArrayList<Alquiler> resultado = new ArrayList<>();
+
+        for (Alquiler a : listaAlquileres.getLista()) {
+            if (a.getReserva().getCliente().getID() == dni) {
+                resultado.add(a);
+            }
+        }
+
+        if (resultado.isEmpty()) {
+            throw new ObjetoNoEncontradoEx("El cliente no tiene alquileres.");
+        }
+
+        return resultado;
+    }
+
+    public ArrayList<Venta> getVentasCliente(long dni)
+            throws ObjetoNoEncontradoEx {
+
+        ArrayList<Venta> resultado = new ArrayList<>();
+
+        for (Venta v : listaVentas.getLista()) {
+            if (v.getClienteComprador().getID() == dni) {
+                resultado.add(v);
+            }
+        }
+
+        if (resultado.isEmpty()) {
+            throw new ObjetoNoEncontradoEx("El cliente no tiene compras.");
+        }
+
+        return resultado;
+    }
 
     /// EMBARCACIONES
 
@@ -194,15 +279,29 @@ public class Agencia {
         return true;
     }
 
-    public boolean eliminarEmbarcacion(String matricula) throws AccionImposibleEx
+    public boolean eliminarEmbarcacion(String matricula) throws AccionImposibleEx, DatoErroneoEx
     {
+
+        Embarcacion e = embarcaciones.get(matricula);
+
         if (embarcaciones.containsKey(matricula)) {
             embarcaciones.remove(matricula);
+
+            if (tieneReservas(e)) {
+                throw new DatoErroneoEx("No se puede eliminar: la embarcación tiene reservas asociadas.");
+            }
+
+            if (tieneAlquileres(e)) {
+                throw new DatoErroneoEx("No se puede eliminar: la embarcación tiene alquileres asociados.");
+            }
+
             return true;
         }
 
         throw new AccionImposibleEx("No existe un embarcacion con esa matricula");
     }
+
+    //public StringBuilder actualizarEmbarcacion()
 
     // VER EMBARCACIONES
 
@@ -402,4 +501,43 @@ public class Agencia {
 
         return aux.toString();
     }
+
+    /// Comprobaciones
+
+    private boolean tieneReservas(Cliente cliente) {
+        for (Reserva r : listaReservas.getLista()) {
+            if (r.getCliente().getID() == cliente.getID()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean tieneAlquileres(Cliente cliente) {
+        for (Alquiler a : listaAlquileres.getLista()) {
+            if (a.getReserva().getCliente().getID() == cliente.getID()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean tieneReservas(Embarcacion embarcacion) {
+        for (Reserva r : listaReservas.getLista()) {
+            if (r.getEmbarcacion().getID().equals(embarcacion.getID())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean tieneAlquileres(Embarcacion embarcacion) {
+        for (Alquiler a : listaAlquileres.getLista()) {
+            if (a.getReserva().getEmbarcacion().getID().equals(embarcacion.getID())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

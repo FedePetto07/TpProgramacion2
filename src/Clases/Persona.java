@@ -34,6 +34,10 @@ public abstract class Persona implements Identificable<Long> {
             throw new DatoErroneoEx("El cliente no puede ser menor de 18");
         }
 
+        if (email == null || !email.endsWith("@gmail.com")) {
+            throw new DatoErroneoEx("El email debe terminar en @gmail.com, y no puede estar vacio.");
+        }
+
         this.dni = dni;
         this.nombre = nombre;
         this.edad = edad;
@@ -60,6 +64,10 @@ public abstract class Persona implements Identificable<Long> {
 
         if (edad < 18) {
             throw new DatoErroneoEx("El cliente no puede ser menor de 18");
+        }
+
+        if (email == null || !email.endsWith("@gmail.com")) {
+            throw new DatoErroneoEx("El email debe terminar en @gmail.com, y no puede estar vacio.");
         }
 
         this.dni = dni;
@@ -91,6 +99,40 @@ public abstract class Persona implements Identificable<Long> {
 
     public LocalDate getFechaIngreso() {
         return fechaIngreso;
+    }
+
+    public void setTelefono(long telefono) throws DatoErroneoEx {
+        if (String.valueOf(telefono).length() != 10) {
+            throw new DatoErroneoEx("El teléfono debe tener exactamente 10 dígitos.");
+        }
+
+        this.telefono = telefono;
+    }
+
+    public void setEmail(String email) throws DatoErroneoEx {
+
+        if (email == null || !email.endsWith("@gmail.com")) {
+            throw new DatoErroneoEx("El email debe terminar en @gmail.com, y no puede estar vacio.");
+        }
+
+        this.email = email;
+    }
+
+    public void setEdad(int edad) throws DatoErroneoEx {
+        if (edad < 18) {
+            throw new DatoErroneoEx("El cliente no puede ser menor de 18");
+        }
+
+        this.edad = edad;
+    }
+
+    public void setNombre(String nombre) throws DatoErroneoEx {
+
+        if (nombre == null || nombre.isBlank() || nombre.matches(".*\\d.*")) {
+            throw new DatoErroneoEx("El nombre no puede estar vacío ni contener números.");
+        }
+
+        this.nombre = nombre;
     }
 
     @Override

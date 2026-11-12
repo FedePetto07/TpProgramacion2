@@ -27,6 +27,14 @@ public class Cliente extends Persona {
         this.cantidadAlquileres = 0;
     }
 
+    public void setNumeroLicencia(int numeroLicencia) throws DatoErroneoEx {
+
+        if (numeroLicencia != 0 && (numeroLicencia < 5 || numeroLicencia > 9)) {
+            throw new DatoErroneoEx("La licencia debe ser 0 o tener un código entre 5 y 9.");
+        }
+
+        this.numeroLicencia = numeroLicencia;
+    }
 
     public int getNumeroLicencia() {
         return numeroLicencia;
