@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class BDDManager {
 
-     static final String url = "jdbc:mysql://localhost/";
+    static final String url = "jdbc:mysql://localhost/";
 
     public static boolean existeMatriculaBDD(String matricula) {
 
@@ -78,7 +78,7 @@ public class BDDManager {
                                 rs.getBoolean("requiere_capitan")
                         );
 
-                    listaEmbarcacion.put(matricula, embarcacion);
+                        listaEmbarcacion.put(matricula, embarcacion);
 
                     }catch (DatoErroneoEx ex){
                         ex.getMessage();
@@ -96,18 +96,18 @@ public class BDDManager {
 
                     try {
 
-                    Embarcacion embarcacion = new MotoDeAgua(
-                            rs.getString("nombre"),
-                            matricula,
-                            rs.getDouble("precio_diario"),
-                            rs.getBoolean("disponible"),
-                            rs.getInt("capacidad_personas"),
-                            rs.getInt("cilindrada"),
-                            rs.getDouble("limite_velocidad"),
-                            rs.getBoolean("requiere_licencia")
-                    );
+                        Embarcacion embarcacion = new MotoDeAgua(
+                                rs.getString("nombre"),
+                                matricula,
+                                rs.getDouble("precio_diario"),
+                                rs.getBoolean("disponible"),
+                                rs.getInt("capacidad_personas"),
+                                rs.getInt("cilindrada"),
+                                rs.getDouble("limite_velocidad"),
+                                rs.getBoolean("requiere_licencia")
+                        );
 
-                    listaEmbarcacion.put(matricula, embarcacion);
+                        listaEmbarcacion.put(matricula, embarcacion);
                     }catch (DatoErroneoEx ex){
                         ex.getMessage();
                     }
@@ -124,18 +124,18 @@ public class BDDManager {
 
                     try {
 
-                    Embarcacion embarcacion = new Lancha(
-                            rs.getString("nombre"),
-                            matricula,
-                            rs.getDouble("precio_diario"),
-                            rs.getBoolean("disponible"),
-                            rs.getInt("potencia_motor"),
-                            rs.getDouble("longitud_metros"),
-                            rs.getInt("capacidad_personas"),
-                            TipoCombustible.valueOf(rs.getString("combustible"))
-                    );
+                        Embarcacion embarcacion = new Lancha(
+                                rs.getString("nombre"),
+                                matricula,
+                                rs.getDouble("precio_diario"),
+                                rs.getBoolean("disponible"),
+                                rs.getInt("potencia_motor"),
+                                rs.getDouble("longitud_metros"),
+                                rs.getInt("capacidad_personas"),
+                                TipoCombustible.valueOf(rs.getString("combustible"))
+                        );
 
-                    listaEmbarcacion.put(matricula, embarcacion);
+                        listaEmbarcacion.put(matricula, embarcacion);
                     }catch (DatoErroneoEx ex){
                         ex.getMessage();
                     }
@@ -167,18 +167,18 @@ public class BDDManager {
 
                 try {
 
-                Empleado empleado = new Empleado(
-                        rs.getLong("dni"),
-                        rs.getString("nombre"),
-                        rs.getInt("edad"),
-                        rs.getLong("telefono"),
-                        rs.getString("email"),
-                        Puesto.valueOf(rs.getString("puesto")),
-                        rs.getDouble("salario"),
-                        LocalDate.parse(rs.getString("fecha_ingreso"))
-                );
+                    Empleado empleado = new Empleado(
+                            rs.getLong("dni"),
+                            rs.getString("nombre"),
+                            rs.getInt("edad"),
+                            rs.getLong("telefono"),
+                            rs.getString("email"),
+                            Puesto.valueOf(rs.getString("puesto")),
+                            rs.getDouble("salario"),
+                            LocalDate.parse(rs.getString("fecha_ingreso"))
+                    );
 
-                empleados.guardar(empleado);
+                    empleados.guardar(empleado);
                 }catch (DatoErroneoEx ex){
                     ex.getMessage();
                 }
@@ -207,18 +207,18 @@ public class BDDManager {
 
             while (rs.next()) {
                 try {
-                Cliente cliente = new Cliente(
-                        rs.getLong("dni"),
-                        rs.getString("nombre"),
-                        rs.getInt("edad"),
-                        rs.getLong("telefono"),
-                        rs.getString("email"),
-                        LocalDate.parse(rs.getString("fecha_ingreso")),
-                        rs.getInt("numero_licencia"),
-                        rs.getInt("cantidad_alquileres")
-                );
+                    Cliente cliente = new Cliente(
+                            rs.getLong("dni"),
+                            rs.getString("nombre"),
+                            rs.getInt("edad"),
+                            rs.getLong("telefono"),
+                            rs.getString("email"),
+                            LocalDate.parse(rs.getString("fecha_ingreso")),
+                            rs.getInt("numero_licencia"),
+                            rs.getInt("cantidad_alquileres")
+                    );
 
-                listaClientes.guardar(cliente);
+                    listaClientes.guardar(cliente);
                 }catch (DatoErroneoEx ex){
                     ex.getMessage();
                 }
@@ -231,36 +231,36 @@ public class BDDManager {
         return listaClientes;
     }
 
-/////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////
     public static ArrayList<Reporte> getReportesBDD()
-{
-    String query = "SELECT * FROM reportes";
-    ArrayList<Reporte> listaReportes = new ArrayList<>();
-    try(Connection connection = DriverManager.getConnection(url))
     {
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-        while (resultSet.next())
+        String query = "SELECT * FROM reportes";
+        ArrayList<Reporte> listaReportes = new ArrayList<>();
+        try(Connection connection = DriverManager.getConnection(url))
         {
-            int id = resultSet.getInt("id");
-            String descripcion = resultSet.getString("descripcion");
-            double coste = resultSet.getDouble("coste");
-            boolean cargoAgencia = resultSet.getBoolean("cargoAgencia");
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
 
-            Reporte aux = new Reporte(id,descripcion,coste,cargoAgencia);
-            listaReportes.add(aux);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                int id = resultSet.getInt("id");
+                String descripcion = resultSet.getString("descripcion");
+                double coste = resultSet.getDouble("coste");
+                boolean cargoAgencia = resultSet.getBoolean("cargoAgencia");
+
+                Reporte aux = new Reporte(id,descripcion,coste,cargoAgencia);
+                listaReportes.add(aux);
+            }
         }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return  listaReportes;
     }
-    catch (SQLException e)
-    {
-        e.printStackTrace();
-    }
-    return  listaReportes;
-}
 
-/////
+    /////
     public static Generica<Venta> listaVenta(Generica<Cliente> c , HashMap<String,Embarcacion>e, ArrayList <Reporte> r)
     {
         String query = "SELECT * FROM Venta";
@@ -303,90 +303,90 @@ public class BDDManager {
     }
     //////////
     public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <String,Embarcacion> e)
-{
-    String query = "SELECT * FROM reservas";
-
-    Generica <Reserva> listaReservas = new Generica<>();
-
-    try(Connection connection = DriverManager.getConnection(url))
     {
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        String query = "SELECT * FROM reservas";
 
-        ResultSet resultSet = preparedStatement.executeQuery();
+        Generica <Reserva> listaReservas = new Generica<>();
 
-        while (resultSet.next())
+        try(Connection connection = DriverManager.getConnection(url))
         {
-            int id = resultSet.getInt("id");
-            int idCliente = resultSet.getInt("idCLiente");
-            int cantidadPersonas = resultSet.getInt("CantidadPersonas");
-            String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
-             LocalDate fechaDeInicio = resultSet.getDate("fechaDeInicio").toLocalDate();
-            LocalDate fechaDeFin = resultSet.getDate("fechaDeFin").toLocalDate();
-            String estadoReserva = resultSet.getString("estadoReserva");
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
 
-            ESTADO_RESERVA reserva = null;
-            switch (estadoReserva)
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next())
             {
-                case "CANCELADA":
-                    reserva = ESTADO_RESERVA.CANCELADA;
-                    break;
-                case "CONFIRMADA":
-                    reserva = ESTADO_RESERVA.CONFIRMADA;
-                    break;
-                case "PENDIENTE":
-                    reserva = ESTADO_RESERVA.PENDIENTE;
-                    break;
-                case "FINALIZADA":
-                    reserva = ESTADO_RESERVA.FINALIZADA;
-                    break;
-            }
-            ////////
+                int id = resultSet.getInt("id");
+                int idCliente = resultSet.getInt("idCLiente");
+                int cantidadPersonas = resultSet.getInt("CantidadPersonas");
+                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
+                LocalDate fechaDeInicio = resultSet.getDate("fechaDeInicio").toLocalDate();
+                LocalDate fechaDeFin = resultSet.getDate("fechaDeFin").toLocalDate();
+                String estadoReserva = resultSet.getString("estadoReserva");
 
-            Cliente aux = c.BuscarPorId(idCliente);
-            Embarcacion auxE = e.get(matriculaEmbarcacion);
+                ESTADO_RESERVA reserva = null;
+                switch (estadoReserva)
+                {
+                    case "CANCELADA":
+                        reserva = ESTADO_RESERVA.CANCELADA;
+                        break;
+                    case "CONFIRMADA":
+                        reserva = ESTADO_RESERVA.CONFIRMADA;
+                        break;
+                    case "PENDIENTE":
+                        reserva = ESTADO_RESERVA.PENDIENTE;
+                        break;
+                    case "FINALIZADA":
+                        reserva = ESTADO_RESERVA.FINALIZADA;
+                        break;
+                }
+                ////////
 
-            try {
-            Reserva auxR = new Reserva(id,aux,cantidadPersonas,auxE,fechaDeInicio.getYear(),fechaDeInicio.getMonthValue(),fechaDeInicio.getDayOfMonth(),fechaDeFin.getYear(),fechaDeFin.getMonthValue(),fechaDeFin.getDayOfMonth(),reserva);
-            listaReservas.guardar(auxR);
-            }catch (DatoErroneoEx ex){
-                ex.getMessage();
+                Cliente aux = c.BuscarPorId(idCliente);
+                Embarcacion auxE = e.get(matriculaEmbarcacion);
+
+                try {
+                    Reserva auxR = new Reserva(id,aux,cantidadPersonas,auxE,fechaDeInicio.getYear(),fechaDeInicio.getMonthValue(),fechaDeInicio.getDayOfMonth(),fechaDeFin.getYear(),fechaDeFin.getMonthValue(),fechaDeFin.getDayOfMonth(),reserva);
+                    listaReservas.guardar(auxR);
+                }catch (DatoErroneoEx ex){
+                    ex.getMessage();
+                }
             }
         }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();;
+        }
+        return listaReservas;
     }
-    catch (SQLException ex)
-    {
-        ex.printStackTrace();;
-    }
-    return listaReservas;
-}
 
     public static Generica<Alquiler> getAlquileresBDD(Generica<Reserva> r)
-{
-    String query = "SELECT * FROM alquileres";
-    Generica<Alquiler> listaAlquileres = new Generica<>();
-
-    try(Connection connection = DriverManager.getConnection(url))
     {
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        ResultSet resultSet = preparedStatement.executeQuery();
+        String query = "SELECT * FROM alquileres";
+        Generica<Alquiler> listaAlquileres = new Generica<>();
 
-        while (resultSet.next())
+        try(Connection connection = DriverManager.getConnection(url))
         {
-            int id = resultSet.getInt("id");
-            int idReserva = resultSet.getInt("idReserva");
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            Reserva aux = r.BuscarPorId(idReserva);
+            while (resultSet.next())
+            {
+                int id = resultSet.getInt("id");
+                int idReserva = resultSet.getInt("idReserva");
 
-            Alquiler auxA = new Alquiler(id, aux);
-            listaAlquileres.guardar(auxA);
+                Reserva aux = r.BuscarPorId(idReserva);
+
+                Alquiler auxA = new Alquiler(id, aux);
+                listaAlquileres.guardar(auxA);
+            }
         }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();;
+        }
+        return listaAlquileres;
     }
-    catch (SQLException ex)
-    {
-        ex.printStackTrace();;
-    }
-    return listaAlquileres;
-}
 
     /// VELERO
 
@@ -401,7 +401,7 @@ public class BDDManager {
     """;
 
         try (Connection c = DriverManager.getConnection(url);
-        PreparedStatement ps = c.prepareStatement(query)){
+             PreparedStatement ps = c.prepareStatement(query)){
 
             ps.setString(1, nombre);
             ps.setString(2, matricula);
@@ -581,6 +581,39 @@ public class BDDManager {
         }
     }
 
+    public static boolean agregarEmpleado(Empleado e, String password) {
+
+        String sqlUsuario = "INSERT INTO usuarios (dni, nombre, edad, telefono, email, puesto, salario, fecha_ingreso) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlPassword = "INSERT INTO password (dni_usuario, password) VALUES (?, ?)";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement psUsuario = c.prepareStatement(sqlUsuario);
+             PreparedStatement psPassword = c.prepareStatement(sqlPassword)) {
+
+            psUsuario.setLong(1, e.getID());
+            psUsuario.setString(2, e.getNombre());
+            psUsuario.setInt(3, e.getEdad());
+            psUsuario.setLong(4, e.getTelefono());
+            psUsuario.setString(5, e.getEmail());
+            psUsuario.setString(6, e.getPuesto().name());
+            psUsuario.setDouble(7, e.getSalario());
+            psUsuario.setString(8, LocalDate.now().toString());
+
+            psUsuario.executeUpdate();
+
+            psPassword.setLong(1, e.getID());
+            psPassword.setString(2, password);
+
+            psPassword.executeUpdate();
+
+            return true;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 
     public static Empleado getEmpleado(Long dni){
         Empleado empleado= null;
