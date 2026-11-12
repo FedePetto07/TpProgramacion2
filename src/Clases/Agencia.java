@@ -322,6 +322,10 @@ public class Agencia {
 
            aux = listaReservas.BuscarPorId(idReserva);
 
+           if (aux.getEstadoReserva() != ESTADO_RESERVA.CONFIRMADA){
+               throw new AccionImposibleEx("La reserva no está confirmada");
+           }
+
            if (aux == null){
                throw new AccionImposibleEx("La reserva no existe");
            }
