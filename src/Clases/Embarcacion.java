@@ -24,10 +24,6 @@ public abstract class Embarcacion {
 
     /// GETTERS
 
-    public String getNombre() {
-        return nombre;
-    }
-
     public String getMatricula() {
         return matricula;
     }
@@ -44,18 +40,6 @@ public abstract class Embarcacion {
 
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
-    }
-
-    public void setCapacidadPersonas(int capacidadPersonas) {
-        this.capacidadPersonas = capacidadPersonas;
-    }
-
-    public void setPrecioDiario(double precioDiario) {
-        this.precioDiario = precioDiario;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     /// ToString
