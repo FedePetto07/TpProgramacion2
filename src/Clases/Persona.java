@@ -6,16 +6,16 @@ import Interfaces.Identificable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public abstract class Persona implements Identificable<Integer> {
+public abstract class Persona implements Identificable<Long> {
 
-    private int dni;
+    private long dni;
     private String nombre;
     private int edad;
-    private int telefono;
+    private long telefono;
     private String email;
     private LocalDate fechaIngreso;
 
-    public Persona(int dni, String nombre, int edad, int telefono, String email) {
+    public Persona(long dni, String nombre, int edad, long telefono, String email) {
         this.dni = dni;
         this.nombre = nombre;
         this.edad = edad;
@@ -24,7 +24,7 @@ public abstract class Persona implements Identificable<Integer> {
         this.fechaIngreso = LocalDate.now();
     }
 
-    public Persona(int dni, String nombre, int edad, int telefono, String email, LocalDate fechaIngreso) {
+    public Persona(long dni, String nombre, int edad, long telefono, String email, LocalDate fechaIngreso) {
         this.dni = dni;
         this.nombre = nombre;
         this.edad = edad;
@@ -34,7 +34,7 @@ public abstract class Persona implements Identificable<Integer> {
     }
 
     @Override
-    public Integer getID() {
+    public Long getID() {
         return dni;
     }
 
@@ -44,7 +44,7 @@ public abstract class Persona implements Identificable<Integer> {
 
     public int getEdad() { return edad; }
 
-    public int getTelefono() {
+    public Long getTelefono() {
         return telefono;
     }
 

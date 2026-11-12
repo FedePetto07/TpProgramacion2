@@ -137,10 +137,10 @@ public class BDDManager {
 
             while (rs.next()) {
                 Empleado empleado = new Empleado(
-                        rs.getInt("dni"),
+                        rs.getLong("dni"),
                         rs.getString("nombre"),
                         rs.getInt("edad"),
-                        rs.getInt("telefono"),
+                        rs.getLong("telefono"),
                         rs.getString("email"),
                         Puesto.valueOf(rs.getString("puesto")),
                         rs.getDouble("salario"),
@@ -173,10 +173,10 @@ public class BDDManager {
 
             while (rs.next()) {
                 Cliente cliente = new Cliente(
-                        rs.getInt("dni"),
+                        rs.getLong("dni"),
                         rs.getString("nombre"),
                         rs.getInt("edad"),
-                        rs.getInt("telefono"),
+                        rs.getLong("telefono"),
                         rs.getString("email"),
                         LocalDate.parse(rs.getString("fecha_ingreso")),
                         rs.getInt("numero_licencia"),
@@ -349,7 +349,7 @@ public class BDDManager {
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
     {
         int idAgregado = -1;
-        String query = "INSERT INTO velero (nombre, matricula, precioDiario, disponible, cantidadVelas, longitudMetros, capacidadPersonas, cantidadCamarotes, requiereCapitan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Velero (nombre, matricula, precioDiario, disponible, cantidadVelas, longitudMetros, capacidadPersonas, cantidadCamarotes, requiereCapitan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection c = DriverManager.getConnection(url);
         PreparedStatement ps = c.prepareStatement(query)){
@@ -374,7 +374,7 @@ public class BDDManager {
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
     {
         int idAgregado = -1;
-        String query = "INSERT INTO velero (nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO MotoDeAgua (nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
@@ -398,7 +398,7 @@ public class BDDManager {
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
     {
         int idAgregado = -1;
-        String query = "INSERT INTO velero (nombre, matricula, precioDiario, disponible, potenciaMotor, longitudMetros, capacidadPersonas, combustible) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Lancha (nombre, matricula, precioDiario, disponible, potenciaMotor, longitudMetros, capacidadPersonas, combustible) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
@@ -418,6 +418,56 @@ public class BDDManager {
             ex.printStackTrace();
         }
     }
+
+    public static void agregarCliente(Long dni, String nombre, int edad, Long telefono, String email,int numeroLicencia, int cantidadAlquileres){
+
+        int idAgregado = -1;
+        String query = "INSERT INTO Cliente (dni, nombre, edad, telefono, email, fechaIngreso, numeroLicencia, cantidadAlquileres) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query)){
+
+            ps.setLong(1, dni);
+            ps.setString(2, nombre);
+            ps.setInt(3, edad);
+            ps.setLong(4, telefono);
+            ps.setString(5, email);
+            ps.setDate(6, java.sql.Date.valueOf(LocalDate.now()));
+            ps.setInt(7, numeroLicencia);
+            ps.setInt(8, cantidadAlquileres);
+            ps.executeUpdate();
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+
+    }
+
+    public static void agregarEmpleado(Long dni, String nombre, int edad, Long telefono, String email, Puesto puesto, double salario, LocalDate fechaIngreso){
+
+        int idAgregado = -1;
+        String query = "INSERT INTO Cliente (dni, nombre, edad, telefono, email, fechaIngreso, numeroLicencia, cantidadAlquileres) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query)){
+
+            ps.setLong(1, dni);
+            ps.setString(2, nombre);
+            ps.setInt(3, edad);
+            ps.setLong(4, telefono);
+            ps.setString(5, email);
+            ps.setString(6, puesto.name());
+            ps.setDouble(7, salario);
+            ps.setDate(8, java.sql.Date.valueOf(LocalDate.now()));
+
+            ps.executeUpdate();
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+
+    }
+
 
 
 }

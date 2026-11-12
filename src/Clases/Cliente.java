@@ -8,13 +8,13 @@ public class Cliente extends Persona {
 
     /// CONSTRUCTOR BDD
 
-    public Cliente(int dni, String nombre, int edad, int telefono, String email, LocalDate fechaIngreso, int numeroLicencia, int cantidadAlquileres) {
+    public Cliente(Long dni, String nombre, int edad, Long telefono, String email, LocalDate fechaIngreso, int numeroLicencia, int cantidadAlquileres) {
         super(dni, nombre, edad, telefono, email, fechaIngreso);
         this.numeroLicencia = numeroLicencia;
         this.cantidadAlquileres = cantidadAlquileres;
     }
 
-    public Cliente(int dni, String nombre, int edad, int telefono, String email,
+    public Cliente(Long dni, String nombre, int edad, Long telefono, String email,
                    int numeroLicencia, int cantidadAlquileres) {
         super(dni, nombre, edad, telefono, email);
         this.numeroLicencia = numeroLicencia;
@@ -22,7 +22,7 @@ public class Cliente extends Persona {
     }
 
     // Segundo constructor en caso de que el cliente no posea licencia
-    public Cliente(int dni, String nombre, int edad, int telefono, String email,
+    public Cliente(Long dni, String nombre, int edad, Long telefono, String email,
                    int cantidadAlquileres) {
         super(dni, nombre, edad, telefono, email);
         this.numeroLicencia = 0;

@@ -10,7 +10,7 @@ public class Empleado extends Persona {
     private double salario;
 
     // Constructor 1: con todos los datos (BDD)
-    public Empleado(int dni, String nombre, int edad, int telefono, String email,
+    public Empleado(Long dni, String nombre, int edad, Long telefono, String email,
                     Puesto puesto, double salario, LocalDate fechaIngreso) {
         super(dni, nombre, edad, telefono, email, fechaIngreso);
         this.puesto = puesto;
@@ -18,7 +18,7 @@ public class Empleado extends Persona {
     }
 
     // Constructor 2: empleado que ingresa hoy
-    public Empleado(int dni, String nombre, int edad, int telefono, String email,
+    public Empleado(Long dni, String nombre, int edad, Long telefono, String email,
                     Puesto puesto, double salario) {
         this(dni, nombre, edad, telefono, email, puesto, salario, LocalDate.now());
     }

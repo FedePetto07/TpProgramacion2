@@ -42,7 +42,7 @@ public class Agencia {
 
     // AGREGAR Y ELIMINAR EMPLEADOS
 
-    public boolean agregarEmpleado(int dni, String nombre, int edad, int telefono, String email, Puesto puesto, double salario) throws AccionImposibleEx, ElementoDuplicadoEx {
+    public boolean agregarEmpleado(Long dni, String nombre, int edad, Long telefono, String email, Puesto puesto, double salario) throws AccionImposibleEx, ElementoDuplicadoEx {
 
         for (Empleado empleado : empleados.getLista()) {
             if (empleado.getID() == dni) {
@@ -103,7 +103,7 @@ public class Agencia {
 
 // AGREGAR Y ELIMINAR CLIENTES
 
-    public boolean agregarCliente(int dni, String nombre, int edad, int telefono, String email,
+    public boolean agregarCliente(Long dni, String nombre, int edad, Long telefono, String email,
                                   int numeroLicencia) throws AccionImposibleEx, ElementoDuplicadoEx {
 
         if (edad < 18) {
@@ -117,7 +117,7 @@ public class Agencia {
         return clientes.guardar(new Cliente(dni, nombre, edad, telefono, email, numeroLicencia, 0));
     }
 
-    public boolean eliminarCliente(int dni) throws ObjetoNoEncontradoEx {
+    public boolean eliminarCliente(long dni) throws ObjetoNoEncontradoEx {
         if (!clientes.eliminar(dni)) {
             throw new ObjetoNoEncontradoEx("No existe un cliente con ese DNI");
         }
@@ -127,7 +127,7 @@ public class Agencia {
 
 // VER CLIENTES
 
-    public String verClienteDni(int dni) throws ObjetoNoEncontradoEx {
+    public String verClienteDni(Long dni) throws ObjetoNoEncontradoEx {
         Cliente aux = clientes.BuscarPorId(dni);
 
         if (aux == null) {
@@ -242,7 +242,7 @@ public class Agencia {
            {
                throw new ElementoDuplicadoEx("ERROR. Ya existe una reserva con este identificador");
            }
-           if(embarcaciones.containsKey(embarcacion.getMatricula()) == false)
+           if(embarcaciones.containsKey(embarcacion.getID()) == false)
            {
                throw new AccionImposibleEx("ERROR. la matricula de la embarcacion ingresada no existe.");
            }
@@ -364,7 +364,7 @@ public class Agencia {
          {
              throw new AccionImposibleEx("ERROR. el identificador del comprador ingresado no existe...");
          }
-         if(embarcaciones.containsKey(embarcacion.getMatricula()) == false)
+         if(embarcaciones.containsKey(embarcacion.getID()) == false)
          {
              throw new AccionImposibleEx("ERROR. la matricula ingresada no existe...");
          }

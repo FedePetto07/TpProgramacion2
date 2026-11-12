@@ -16,6 +16,18 @@ public class Generica <T extends Identificable>{
         return lista.add(elemento);
     }
 
+    public T BuscarPorId(Long id){
+
+        for(T elemento : lista){
+            if (elemento.getID().equals(id)) {
+
+                return elemento;
+
+            }
+        }
+        return null;
+    }
+
     public T BuscarPorId(int id){
 
         for(T elemento : lista){
@@ -32,7 +44,7 @@ public class Generica <T extends Identificable>{
         return lista;
     }
 
-    public boolean eliminar(int id) {
+    public boolean eliminar(Long id) {
         Iterator<T> it = lista.iterator();
         while (it.hasNext()) {
             if (it.next().getID().equals(id)) {
