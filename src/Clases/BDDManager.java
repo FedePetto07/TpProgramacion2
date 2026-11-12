@@ -13,113 +13,123 @@ public class BDDManager {
 
      static final String url = "jdbc:mysql://localhost/";
 
-     public static HashMap<String,Embarcacion> getEmbarcacionesBDD() {
+    public static boolean existeMatriculaBDD(String matricula) {
 
-         String query = """
-        SELECT
-            e.matricula AS matricula,
-            e.nombre AS nombre,
-            e.precio_diario AS precio_diario,
-            e.disponible AS disponible,
-            e.capacidad_personas AS capacidad_personas,
-            e.tipo_embarcacion AS tipo_embarcacion,
+        String[] tablas = {"lancha", "velero", "moto_de_agua"};
 
-            v.cantidad_velas AS cantidad_velas,
-            v.longitud_metros AS longitud_velero,
-            v.requiere_capitan AS requiere_capitan,
-            v.cantidad_camarotes AS cantidad_camarotes,
+        try (Connection c = DriverManager.getConnection(url)) {
 
-            m.cilindrada AS cilindrada,
-            m.requiere_licencia AS requiere_licencia,
-            m.limite_velocidad AS limite_velocidad,
+            for (String tabla : tablas) {
 
-            l.potencia_motor AS potencia_motor,
-            l.longitud_metros AS longitud_lancha,
-            l.combustible AS combustible
+                String query = "SELECT 1 FROM " + tabla +
+                        " WHERE matricula = ?";
 
-        FROM embarcacion e
-        LEFT JOIN velero v ON e.matricula = v.matricula
-        LEFT JOIN moto_de_agua m ON e.matricula = m.matricula
-        LEFT JOIN lancha l ON e.matricula = l.matricula
-        """;
-         HashMap<String,Embarcacion> listaEmbarcacion = new HashMap<>();
+                try (PreparedStatement ps = c.prepareStatement(query)) {
 
-         try(Connection c = DriverManager.getConnection(url);
-             PreparedStatement ps = c.prepareStatement(query)){
+                    ps.setString(1, matricula);
 
-            try (ResultSet rs = ps.executeQuery()){
-                while (rs.next()) {
+                    try (ResultSet rs = ps.executeQuery()) {
 
-                    String nombre = rs.getString("nombre");
-                    String matricula = rs.getString("matricula");
-                    double precio = rs.getDouble("precio_diario");
-                    boolean disponible = rs.getBoolean("disponible");
-                    int capacidad = rs.getInt("capacidad_personas");
-
-                    String tipo = rs.getString("tipo_embarcacion");
-
-                    Embarcacion embarcacion = null;
-
-                    switch(tipo) {
-
-                        case "Velero":
-
-                            embarcacion = new Velero(
-                                    nombre,
-                                    matricula,
-                                    precio,
-                                    disponible,
-                                    rs.getInt("cantidad_velas"),
-                                    rs.getDouble("longitud_velero"),
-                                    capacidad,
-                                    rs.getInt("cantidad_camarotes"),
-                                    rs.getBoolean("requiere_capitan")
-                            );
-                            break;
-
-                        case "Moto de Agua":
-
-                            embarcacion = new MotoDeAgua(
-                                    nombre,
-                                    matricula,
-                                    precio,
-                                    disponible,
-                                    capacidad,
-                                    rs.getInt("cilindrada"),
-                                    rs.getDouble("limite_velocidad"),
-                                    rs.getBoolean("requiere_licencia")
-                            );
-                            break;
-
-                        case "Lancha":
-
-                            embarcacion = new Lancha(
-                                    nombre,
-                                    matricula,
-                                    precio,
-                                    disponible,
-                                    rs.getInt("potencia_motor"),
-                                    rs.getDouble("longitud_lancha"),
-                                    capacidad,
-                                    TipoCombustible.valueOf(
-                                            rs.getString("combustible")
-                                    )
-                            );
-                            break;
-                    }
-
-                    if(embarcacion != null) {
-                        listaEmbarcacion.put(matricula,embarcacion);
+                        if (rs.next()) {
+                            return true;
+                        }
                     }
                 }
             }
 
-         }catch(SQLException ex){
-             ex.printStackTrace();
-         }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 
-         return listaEmbarcacion;
-     }
+        return false;
+    }
+
+    public static HashMap<String, Embarcacion> getEmbarcacionesBDD() {
+
+        HashMap<String, Embarcacion> listaEmbarcacion = new HashMap<>();
+
+        String queryVelero = "SELECT * FROM velero";
+        String queryMoto = "SELECT * FROM moto_de_agua";
+        String queryLancha = "SELECT * FROM lancha";
+
+        try (Connection c = DriverManager.getConnection(url)) {
+
+            // VELEROS
+            try (PreparedStatement ps = c.prepareStatement(queryVelero);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    String matricula = rs.getString("matricula");
+
+                    Embarcacion embarcacion = new Velero(
+                            rs.getString("nombre"),
+                            matricula,
+                            rs.getDouble("precio_diario"),
+                            rs.getBoolean("disponible"),
+                            rs.getInt("cantidad_velas"),
+                            rs.getDouble("longitud_metros"),
+                            rs.getInt("capacidad_personas"),
+                            rs.getInt("cantidad_camarotes"),
+                            rs.getBoolean("requiere_capitan")
+                    );
+
+                    listaEmbarcacion.put(matricula, embarcacion);
+                }
+            }
+
+            // MOTOS DE AGUA
+            try (PreparedStatement ps = c.prepareStatement(queryMoto);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    String matricula = rs.getString("matricula");
+
+                    Embarcacion embarcacion = new MotoDeAgua(
+                            rs.getString("nombre"),
+                            matricula,
+                            rs.getDouble("precio_diario"),
+                            rs.getBoolean("disponible"),
+                            rs.getInt("capacidad_personas"),
+                            rs.getInt("cilindrada"),
+                            rs.getDouble("limite_velocidad"),
+                            rs.getBoolean("requiere_licencia")
+                    );
+
+                    listaEmbarcacion.put(matricula, embarcacion);
+                }
+            }
+
+            // LANCHAS
+            try (PreparedStatement ps = c.prepareStatement(queryLancha);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    String matricula = rs.getString("matricula");
+
+                    Embarcacion embarcacion = new Lancha(
+                            rs.getString("nombre"),
+                            matricula,
+                            rs.getDouble("precio_diario"),
+                            rs.getBoolean("disponible"),
+                            rs.getInt("potencia_motor"),
+                            rs.getDouble("longitud_metros"),
+                            rs.getInt("capacidad_personas"),
+                            TipoCombustible.valueOf(rs.getString("combustible"))
+                    );
+
+                    listaEmbarcacion.put(matricula, embarcacion);
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return listaEmbarcacion;
+    }
 
     public static Generica<Empleado> getEmpleados() {
         String query = """
@@ -346,10 +356,17 @@ public class BDDManager {
     return listaAlquileres;
 }
 
+    /// VELERO
+
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
     {
-        int idAgregado = -1;
-        String query = "INSERT INTO Velero (nombre, matricula, precioDiario, disponible, cantidadVelas, longitudMetros, capacidadPersonas, cantidadCamarotes, requiereCapitan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = """
+    INSERT INTO velero
+    (nombre, matricula, precio_diario, disponible,
+     cantidad_velas, longitud_metros, capacidad_personas,
+     cantidad_camarotes, requiere_capitan)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection c = DriverManager.getConnection(url);
         PreparedStatement ps = c.prepareStatement(query)){
@@ -371,10 +388,16 @@ public class BDDManager {
         }
     }
 
+    /// MotoDeAgua
+
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
     {
-        int idAgregado = -1;
-        String query = "INSERT INTO MotoDeAgua (nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = """
+    INSERT INTO moto_de_agua
+    (nombre, matricula, precio_diario, disponible,
+     capacidad_personas, cilindrada, limite_velocidad, requiere_licencia)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
@@ -395,10 +418,16 @@ public class BDDManager {
         }
     }
 
+    /// LANCHA
+
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
     {
-        int idAgregado = -1;
-        String query = "INSERT INTO Lancha (nombre, matricula, precioDiario, disponible, potenciaMotor, longitudMetros, capacidadPersonas, combustible) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = """
+    INSERT INTO lancha
+    (nombre, matricula, precio_diario, disponible,
+     potencia_motor, longitud_metros, capacidad_personas, combustible)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
@@ -419,10 +448,16 @@ public class BDDManager {
         }
     }
 
+    /// CLIENTE
+
     public static void agregarCliente(Long dni, String nombre, int edad, Long telefono, String email,int numeroLicencia, int cantidadAlquileres){
 
-        int idAgregado = -1;
-        String query = "INSERT INTO Cliente (dni, nombre, edad, telefono, email, fechaIngreso, numeroLicencia, cantidadAlquileres) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = """
+    INSERT INTO clientes
+    (dni, nombre, edad, telefono, email, fecha_ingreso,
+     numero_licencia, cantidad_alquileres)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
@@ -443,21 +478,25 @@ public class BDDManager {
 
     }
 
-    public static void agregarEmpleado(Long dni, String nombre, int edad, Long telefono, String email, Puesto puesto, double salario, LocalDate fechaIngreso){
+    public static void agregarEmpleado(Empleado e){
 
-        int idAgregado = -1;
-        String query = "INSERT INTO Cliente (dni, nombre, edad, telefono, email, fechaIngreso, numeroLicencia, cantidadAlquileres) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = """
+    INSERT INTO usuarios
+    (dni, nombre, edad, telefono, email, fecha_ingreso,
+     puesto, salario)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
 
-            ps.setLong(1, dni);
-            ps.setString(2, nombre);
-            ps.setInt(3, edad);
-            ps.setLong(4, telefono);
-            ps.setString(5, email);
-            ps.setString(6, puesto.name());
-            ps.setDouble(7, salario);
+            ps.setLong(1, e.getID());
+            ps.setString(2, e.getNombre());
+            ps.setInt(3, e.getEdad());
+            ps.setLong(4, e.getTelefono());
+            ps.setString(5, e.getEmail());
+            ps.setString(6, e.getPuesto().name());
+            ps.setDouble(7, e.getSalario());
             ps.setDate(8, java.sql.Date.valueOf(LocalDate.now()));
 
             ps.executeUpdate();
@@ -468,6 +507,88 @@ public class BDDManager {
 
     }
 
+    public static void agregarReservaBDD(Reserva reserva) {
+
+        String query = """
+        INSERT INTO reserva
+        (dni_cliente, cantidad_personas, matricula_embarcacion,
+         fecha_inicio, fecha_fin, estado_reserva)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """;
+
+        String matricula = reserva.getEmbarcacion().getID();
+
+        if (!existeMatriculaBDD(matricula)) {
+            System.out.println("La embarcación no existe.");
+            return;
+        }
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query)) {
+
+            ps.setLong(1, reserva.getCliente().getID());
+            ps.setInt(2, reserva.getCantidadPersonas());
+            ps.setString(3, matricula);
+            ps.setString(4, reserva.getFechaDeInicio().toString());
+            ps.setString(5, reserva.getFechaDeFin().toString());
+            ps.setString(6, reserva.getEstadoReserva().name());
+
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    public static Empleado getEmpleado(Long dni){
+        Empleado empleado= null;
+        String getUserQuery = "SELECT * from usuarios where  dni= ?";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(getUserQuery)) {
+
+            ps.setLong(1,dni);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    dni = rs.getLong("dni");
+                    String nombre = rs.getString("nombre");
+                    int edad = rs.getInt("edad");
+                    long telefono = rs.getLong("telefono");
+                    String email = rs.getString("email");
+                    LocalDate fechaIngreso = rs.getDate("fecha_ingreso").toLocalDate();
+                    Puesto puesto = Puesto.valueOf(rs.getString("puesto"));
+                    double salario = rs.getDouble("salario");
+                    empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario, fechaIngreso);
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return empleado;
+    }
+
+    //Conseguir Contraseña
+    public static String getPassword(int dni){
+        String password = null;
+        String getPassQuery = "SELECT * from password where dni_empleado = ?";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(getPassQuery)) {
+            ps.setInt(1, dni);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    password = rs.getString("password_hash");
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return password;
+    }
 
 
 }
