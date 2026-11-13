@@ -761,5 +761,22 @@ public class BDDManager {
 
 /////////////////////////BORRAR///////////////////////////////////////////
 
+public static int eliminarClienteBDD(int dniCliente)
+{
+    String query = "DELETE FROM Clientes WHERE dni=?";
+    int filasAfectadas= 0;
+    try(Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1,dniCliente);
+
+        filasAfectadas = preparedStatement.executeUpdate();
+    }catch (SQLException ex)
+    {
+        ex.printStackTrace();;
+    }
+    return filasAfectadas;
+}
+
 
 }
