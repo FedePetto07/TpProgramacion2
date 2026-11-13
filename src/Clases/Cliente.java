@@ -49,6 +49,9 @@ public class Cliente extends Persona {
         return cantidadAlquileres;
     }
 
+    public void setCantidadAlquileres(int cantidadAlquileres) {
+        this.cantidadAlquileres = cantidadAlquileres;
+    }
 
     public boolean esRecurrente(int mesesMinimos, int alquileresMinimos) {
         LocalDate limite = LocalDate.now().minusMonths(mesesMinimos);

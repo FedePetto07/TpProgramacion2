@@ -550,7 +550,7 @@ public class BDDManager {
 
     }*/
 
-    public static void agregarReservaBDD(Reserva reserva) {
+    public static int agregarReservaBDD(Reserva reserva) {
 
         String query = """
         INSERT INTO reserva
@@ -558,13 +558,8 @@ public class BDDManager {
          fecha_inicio, fecha_fin, estado_reserva)
         VALUES (?, ?, ?, ?, ?, ?)
         """;
-
+        int filasModificadas = 0;
         String matricula = reserva.getEmbarcacion().getID();
-
-        if (!existeMatriculaBDD(matricula)) {
-            System.out.println("La embarcación no existe.");
-            return;
-        }
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)) {
@@ -576,11 +571,12 @@ public class BDDManager {
             ps.setString(5, reserva.getFechaDeFin().toString());
             ps.setString(6, reserva.getEstadoReserva().name());
 
-            ps.executeUpdate();
+            filasModificadas = ps.executeUpdate();
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+        return filasModificadas;
     }
 
     public static boolean agregarEmpleado(Empleado e, String password) {
@@ -762,14 +758,14 @@ public class BDDManager {
 
 /////////////////////////BORRAR///////////////////////////////////////////
 
-public static int eliminarClienteBDD(int dniCliente)
+public static int eliminarClienteBDD(long dniCliente)
 {
     String query = "DELETE FROM clientes WHERE dni=?";
     int filasAfectadas= 0;
     try(Connection connection = DriverManager.getConnection(url))
     {
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setInt(1,dniCliente);
+        preparedStatement.setLong(1,dniCliente);
 
         preparedStatement.executeUpdate();
         filasAfectadas = preparedStatement.executeUpdate();
@@ -846,51 +842,66 @@ public static int borrarReserva(int idReserva)
 
 ///////MODIFICAR////////
 
-public static int  modificarCamposCLienteBDD(int idClientes, Long telefono, String email, Integer cantidadAlquileres)
+public static int modificarCamposClienteBDD(long idClientes, Long telefono, String email, Integer cantidadAlquileres, String nombre, Integer edad, Integer numeroLicencia)
 {
     StringBuilder query = new StringBuilder("UPDATE clientes SET ");
     ArrayList<Object> parametros = new ArrayList<>();
     int filasModificadas = 0;
 
-    if(telefono != null)
-    {
+    if (telefono != null) {
         query.append("telefono = ?, ");
         parametros.add(telefono);
     }
-    if(email != null)
-    {
+
+    if (email != null) {
         query.append("email = ?, ");
         parametros.add(email);
     }
-    if(cantidadAlquileres != null)
-    {
+
+    if (cantidadAlquileres != null) {
         query.append("cantidad_alquileres = ?, ");
         parametros.add(cantidadAlquileres);
     }
+
+    if (nombre != null) {
+        query.append("nombre = ?, ");
+        parametros.add(nombre);
+    }
+
+    if (edad != null) {
+        query.append("edad = ?, ");
+        parametros.add(edad);
+    }
+
+    if (numeroLicencia != null) {
+        query.append("numero_licencia = ?, ");
+        parametros.add(numeroLicencia);
+    }
+
     if (parametros.isEmpty()) {
         return 0;
     }
-    //eliminar comoa
+
+    // Eliminar última coma
     query.setLength(query.length() - 2);
+
     query.append(" WHERE dni = ?");
     parametros.add(idClientes);
 
-    try (Connection connection = DriverManager.getConnection(url))
+    try (Connection connection = DriverManager.getConnection(url);
+         PreparedStatement preparedStatement =
+                 connection.prepareStatement(query.toString()))
     {
-        PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
-
-
         for (int i = 0; i < parametros.size(); i++) {
             preparedStatement.setObject(i + 1, parametros.get(i));
         }
 
         filasModificadas = preparedStatement.executeUpdate();
 
-
-    }catch (SQLException ex)
-    {
+    } catch (SQLException ex) {
         ex.printStackTrace();
     }
+
     return filasModificadas;
 }
 
@@ -950,7 +961,7 @@ public static int  modificarCamposUsuarioBDD(int idEmpleado, Long telefono, Stri
 }
 //////////////////////////////////////////
 
-    public int modificarEstadoReservaBDD(int id, String estado_reserva) {
+    public static int modificarEstadoReservaBDD(int id, String estado_reserva) {
         String query = "UPDATE reserva SET estado_reserva = ? WHERE id = ?";
         int filasAfectadas = 0;
 
@@ -970,4 +981,35 @@ public static int  modificarCamposUsuarioBDD(int idEmpleado, Long telefono, Stri
     }
 
     ///////////////////////////////////
+    public static <T extends Identificable<String>>  int modificarDisponibilidad(T embarcacion, boolean disponibilidadNueva)
+    {
+        String query = "";
+        int filasModificadas = 0;
+        if(embarcacion instanceof Velero)
+        {
+            query = "UPDATE  velero SET disponible where matricula = ?";
+        }
+        if(embarcacion instanceof MotoDeAgua)
+        {
+            query = "UPDATE moto_de_agua  SET disponible where matricula = ?";
+        }
+        if(embarcacion instanceof Lancha)
+        {
+            query = "UPDATE lancha  SET disponible where matricula = ?";
+        }
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+           PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+           preparedStatement.setBoolean(1,disponibilidadNueva);
+           preparedStatement.setString(2,embarcacion.getID());
+
+           filasModificadas = preparedStatement.executeUpdate();
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();;
+        }
+       return filasModificadas;
+    }
 }

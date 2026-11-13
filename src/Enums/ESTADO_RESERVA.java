@@ -5,4 +5,5 @@ public enum ESTADO_RESERVA {
     CONFIRMADA,
     CANCELADA,
     FINALIZADA;
+
 }

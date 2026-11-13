@@ -71,6 +71,10 @@ public class Venta implements Identificable<Integer> {
         return montoBase;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public Reporte iniciarReporte(String descripcion, double coste,
                                   boolean cargoAgencia) throws DatoErroneoEx {
 

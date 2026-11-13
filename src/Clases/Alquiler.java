@@ -45,15 +45,17 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
 
 
     ///
-   public void cambiarDisponibilidad()
+   public boolean cambiarDisponibilidad()
    {
        if(reserva.getEmbarcacion().isDisponible() == true)
        {
            reserva.getEmbarcacion().setDisponible(false);
+           return false;
        }
        else
        {
            reserva.getEmbarcacion().setDisponible(true);
+           return true;
        }
 
    }
