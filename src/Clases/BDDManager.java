@@ -248,7 +248,7 @@ public class BDDManager {
                 int id = resultSet.getInt("id");
                 String descripcion = resultSet.getString("descripcion");
                 double coste = resultSet.getDouble("coste");
-                boolean cargoAgencia = resultSet.getBoolean("cargoAgencia");
+                boolean cargoAgencia = resultSet.getBoolean("cargo_agencia");
 
                 Reporte aux = new Reporte(id,descripcion,coste,cargoAgencia);
                 listaReportes.add(aux);
@@ -264,7 +264,7 @@ public class BDDManager {
     /////
     public static Generica<Venta> listaVenta(Generica<Cliente> c , HashMap<String,Embarcacion>e, ArrayList <Reporte> r)
     {
-        String query = "SELECT * FROM Venta";
+        String query = "SELECT * FROM venta";
         Generica<Venta> listaVenta = new Generica<>();
 
         HashMap<Integer, Reporte> hashReportes = new HashMap<>();
@@ -281,11 +281,11 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idClienteComprador = resultSet.getInt("idClienteComprador");
-                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
-                double montoBase = resultSet.getDouble("montoBase");
-                int idReporteVenta = resultSet.getInt("idReporteVenta");
-                double montoFinal = resultSet.getDouble("montoFinal");
+                int idClienteComprador = resultSet.getInt("dni_cliente_comprador");
+                String matriculaEmbarcacion = resultSet.getString("matricula_embarcacion");
+                double montoBase = resultSet.getDouble("monto_base");
+                int idReporteVenta = resultSet.getInt("id_reporte_venta");
+                double montoFinal = resultSet.getDouble("monto_final");
 
 
                 Embarcacion auxE = e.get(matriculaEmbarcacion);
@@ -305,7 +305,7 @@ public class BDDManager {
     //////////
     public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <String,Embarcacion> e)
     {
-        String query = "SELECT * FROM reservas";
+        String query = "SELECT * FROM reserva";
 
         Generica <Reserva> listaReservas = new Generica<>();
 
@@ -318,12 +318,12 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idCliente = resultSet.getInt("idCLiente");
-                int cantidadPersonas = resultSet.getInt("CantidadPersonas");
-                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
-                LocalDate fechaDeInicio = resultSet.getDate("fechaDeInicio").toLocalDate();
-                LocalDate fechaDeFin = resultSet.getDate("fechaDeFin").toLocalDate();
-                String estadoReserva = resultSet.getString("estadoReserva");
+                int idCliente = resultSet.getInt("dni_cliente");
+                int cantidadPersonas = resultSet.getInt("cantidad_personas");
+                String matriculaEmbarcacion = resultSet.getString("matricula_embarcacion");
+                LocalDate fechaDeInicio = resultSet.getDate("fecha_inicio").toLocalDate();
+                LocalDate fechaDeFin = resultSet.getDate("fecha_fin").toLocalDate();
+                String estadoReserva = resultSet.getString("estado_reserva");
 
                 ESTADO_RESERVA reserva = null;
                 switch (estadoReserva)
@@ -374,8 +374,8 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idReserva = resultSet.getInt("idReserva");
-                Double montoFinal = resultSet.getDouble("montoFinal");
+                int idReserva = resultSet.getInt("id_reserva");
+                Double montoFinal = resultSet.getDouble("monto_final");
 
                 Reserva aux = r.BuscarPorId(idReserva);
 
@@ -968,4 +968,6 @@ public static int  modificarCamposUsuarioBDD(int idEmpleado, Long telefono, Stri
         }
         return filasAfectadas;
     }
+
+    ///////////////////////////////////
 }
