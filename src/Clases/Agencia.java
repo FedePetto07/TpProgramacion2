@@ -303,75 +303,6 @@ public class Agencia {
         throw new AccionImposibleEx("No existe un embarcacion con esa matricula");
     }
 
-    public String actualizarInfoEmbarcacion(String matricula, Embarcacion nuevaInfo) throws ObjetoNoEncontradoEx, DatoErroneoEx {
-
-        if (!embarcaciones.containsKey(matricula)) {
-            throw new ObjetoNoEncontradoEx("No existe una embarcacion con esa matricula");
-        }
-
-        Embarcacion actual = embarcaciones.get(matricula);
-        String re = "";
-
-        if (actual instanceof Lancha && nuevaInfo instanceof Lancha) {
-            Lancha vieja = (Lancha) actual;
-            Lancha nueva = (Lancha) nuevaInfo;
-
-            if (nueva.getNombre() != null && !nueva.getNombre().isBlank()) {
-                vieja.setNombre(nueva.getNombre());
-            }
-
-            if (nueva.getPrecioDiario() > 0) {
-                vieja.setPrecioDiario(nueva.getPrecioDiario());
-            }
-
-            if (nueva.getCapacidadPersonas() > 0) {
-                vieja.setCapacidadPersonas(nueva.getCapacidadPersonas());
-            }
-
-            vieja.setPotenciaMotor(nueva.getPotenciaMotor());
-            vieja.setLongitudMetros(nueva.getLongitudMetros());
-            vieja.setCombustible(nueva.getCombustible());
-
-            re = "\nSe cambio la info de \n" +vieja.toString() + "\na " + nueva.toString();
-
-        } else if (actual instanceof Velero && nuevaInfo instanceof Velero) {
-            Velero vieja = (Velero) actual;
-            Velero nueva = (Velero) nuevaInfo;
-
-            vieja.setNombre(nueva.getNombre());
-            vieja.setPrecioDiario(nueva.getPrecioDiario());
-            vieja.setCapacidadPersonas(nueva.getCapacidadPersonas());
-
-            vieja.setCantidadVelas(nueva.getCantidadVelas());
-            vieja.setLongitudMetros(nueva.getLongitudMetros());
-            vieja.setCantidadCamarotes(nueva.getCantidadCamarotes());
-            vieja.setRequiereCapitan(nueva.isRequiereCapitan());
-
-            re = "\nSe cambio la info de \n" +vieja.toString() + "\na " + nueva.toString();
-
-        } else if (actual instanceof MotoDeAgua && nuevaInfo instanceof MotoDeAgua) {
-            MotoDeAgua vieja = (MotoDeAgua) actual;
-            MotoDeAgua nueva = (MotoDeAgua) nuevaInfo;
-
-            vieja.setNombre(nueva.getNombre());
-            vieja.setPrecioDiario(nueva.getPrecioDiario());
-            vieja.setCapacidadPersonas(nueva.getCapacidadPersonas());
-
-            vieja.setCilindrada(nueva.getCilindrada());
-            vieja.setLimiteVelocidad(nueva.getLimiteVelocidad());
-            vieja.setRequiereLicencia(nueva.isRequiereLicencia());
-
-            re = "\nSe cambio la info de \n" +vieja.toString() + "\na " + nueva.toString();
-
-        } else {
-            throw new DatoErroneoEx(
-                    "El tipo de embarcación nueva no coincide con el tipo registrado."
-            );
-        }
-
-        return re;
-    }
-
     public void actualizarEstadoReserva(int id, ESTADO_RESERVA nuevoEstado)
             throws ObjetoNoEncontradoEx, DatoErroneoEx {
 
@@ -738,4 +669,7 @@ public class Agencia {
         return false;
     }
 
+
+    public Cliente getCliente(long dni) { return clientes.BuscarPorId(dni); }
+    public Embarcacion getEmbarcacion(String matricula) { return embarcaciones.get(matricula); }
 }
