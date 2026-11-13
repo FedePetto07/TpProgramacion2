@@ -674,7 +674,7 @@ public class BDDManager {
 
     public static int agregarReporteABDD(String descripcion, double coste, boolean cargo_agencia)
     {
-        String queryAdd = "INSERT INTO Reporte (descripcion,coste,cargo_agencia) VALUES (?,?,?) ";
+        String queryAdd = "INSERT INTO reporte (descripcion,coste,cargo_agencia) VALUES (?,?,?) ";
         int id = -1;
         try(Connection connection = DriverManager.getConnection(url))
         {
@@ -701,7 +701,7 @@ public class BDDManager {
     /////////////////////////////
     public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double montoBase, Reporte reporteVenta, Double montoFinal)
     {
-        String query = "INSERT INTO Venta (dni_cliente_comprador,matricula_embarcacion,monto_base,id_reporte_venta,monto_final)VALUES(?,?,?,?)";
+        String query = "INSERT INTO venta (dni_cliente_comprador,matricula_embarcacion,monto_base,id_reporte_venta,monto_final)VALUES(?,?,?,?)";
         int id = -1;
         long dni_cliente_comprador = clienteComprador.getID();
         String matricula_embarcacion = embarcacion.getID();
@@ -734,7 +734,7 @@ public class BDDManager {
 
     public static int agregarAlquilerBDD(Reserva reserva, double montoFinal)
     {
-        String query = "INSERT INTO Alquileres (id_reserva,monto_final) VALUES (?,?)";
+        String query = "INSERT INTO alquileres (id_reserva,monto_final) VALUES (?,?)";
         int id = -1;
 
         try(Connection connection = DriverManager.getConnection(url))
@@ -764,7 +764,7 @@ public class BDDManager {
 
 public static int eliminarClienteBDD(int dniCliente)
 {
-    String query = "DELETE FROM Clientes WHERE dni=?";
+    String query = "DELETE FROM clientes WHERE dni=?";
     int filasAfectadas= 0;
     try(Connection connection = DriverManager.getConnection(url))
     {
@@ -782,7 +782,7 @@ public static int eliminarClienteBDD(int dniCliente)
 
 public static int borrarEmpleadoBDD(int dniEmpleado)
 {
-    String query = "DELETE FROM Usuarios WHERE dni=?";
+    String query = "DELETE FROM usuarios WHERE dni=?";
     int filasAfectadas= 0;
     try(Connection connection = DriverManager.getConnection(url))
     {
@@ -803,15 +803,15 @@ public static <T extends Identificable<String>> int borrarEmbarcacion(T embarcac
     int filasAfectadas = -1;
     if(embarcacion instanceof Velero)
     {
-        query = "DELETE FROM Velero WHERE matricula=?";
+        query = "DELETE FROM velero WHERE matricula=?";
     }
     if(embarcacion instanceof Lancha)
     {
-        query = "DELETE FROM Lancha WHERE matricula=?";
+        query = "DELETE FROM lancha WHERE matricula=?";
     }
     if(embarcacion instanceof MotoDeAgua)
     {
-        query = query = "DELETE FROM \"Moto de agua\" WHERE matricula=?";
+        query = query = "DELETE FROM moto_de_agua WHERE matricula=?";
     }
     try (Connection connection = DriverManager.getConnection(url))
     {
@@ -843,5 +843,52 @@ public static int borrarReserva(int idReserva)
     }
     return filasAfectadas;
 }
+
+///////MODIFICAR////////
+
+public static int  modificarCamposCLienteBDD(Long telefono, String email, Integer cantidadAlquileres)
+{
+    StringBuilder query = new StringBuilder("UPDATE clientes SET ");
+    ArrayList<Object> parametros = new ArrayList<>();
+    int filasModificadas = 0;
+    if(telefono != null)
+    {
+        query.append("telefono = ?, ");
+        parametros.add(telefono);
+    }
+    if(email != null)
+    {
+        query.append("email = ?, ");
+        parametros.add(email);
+    }
+    if(cantidadAlquileres != null)
+    {
+        query.append("fecha_ingreso = ?, ");
+        parametros.add(cantidadAlquileres);
+    }
+    //eliminar comoa
+    query.setLength(query.length() - 2);
+    query.append(" WHERE id = ?");
+
+    try (Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
+
+        for (int i = 0; i < parametros.size(); i++) {
+            preparedStatement.setObject(i + 1, parametros.get(i));
+        }
+
+        filasModificadas = preparedStatement.executeUpdate();
+
+
+    }catch (SQLException ex)
+    {
+        ex.printStackTrace();
+    }
+    return filasModificadas;
+}
+
+////////////
+
 
 }
