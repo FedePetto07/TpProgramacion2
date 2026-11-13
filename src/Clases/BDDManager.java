@@ -872,7 +872,7 @@ public static int  modificarCamposCLienteBDD(int idClientes, Long telefono, Stri
     }
     //eliminar comoa
     query.setLength(query.length() - 2);
-    query.append(" WHERE id = ?");
+    query.append(" WHERE dni = ?");
     parametros.add(idClientes);
 
     try (Connection connection = DriverManager.getConnection(url))
@@ -896,5 +896,76 @@ public static int  modificarCamposCLienteBDD(int idClientes, Long telefono, Stri
 
 ////////////
 
+public static int  modificarCamposUsuarioBDD(int idEmpleado, Long telefono, String email, String puesto, Double salario)
+{
+    StringBuilder query = new StringBuilder("UPDATE usuarios SET ");
+    ArrayList<Object> parametros = new ArrayList<>();
+    int filasModificadas = 0;
 
+    if(telefono != null)
+    {
+        query.append("telefono = ?, ");
+        parametros.add(telefono);
+    }
+    if(email != null)
+    {
+        query.append("email = ?, ");
+        parametros.add(email);
+    }
+    if(puesto != null)
+    {
+        query.append("puesto = ?, ");
+        parametros.add(puesto);
+    }
+    if(salario !=  null)
+    {
+        query.append("salario = ?, ");
+        parametros.add(salario);
+    }
+    if (parametros.isEmpty()) {
+        return 0;
+    }
+    //eliminar comoa
+    query.setLength(query.length() - 2);
+    query.append(" WHERE dni = ?");
+    parametros.add(idEmpleado);
+
+    try (Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
+
+
+        for (int i = 0; i < parametros.size(); i++) {
+            preparedStatement.setObject(i + 1, parametros.get(i));
+        }
+
+        filasModificadas = preparedStatement.executeUpdate();
+
+
+    }catch (SQLException ex)
+    {
+        ex.printStackTrace();
+    }
+    return filasModificadas;
+}
+//////////////////////////////////////////
+
+    public int modificarEstadoReservaBDD(int id, String estado_reserva) {
+        String query = "UPDATE reserva SET estado_reserva = ? WHERE id = ?";
+        int filasAfectadas = 0;
+
+        try (Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1,estado_reserva);
+            preparedStatement.setInt(2,id);
+
+           filasAfectadas =  preparedStatement.executeUpdate();
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return filasAfectadas;
+    }
 }
