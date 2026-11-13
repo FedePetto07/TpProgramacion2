@@ -426,7 +426,7 @@ public class Agencia {
                throw new AccionImposibleEx("La reserva no existe");
            }
 
-           Alquiler auxAlquiler = new Alquiler(id, aux);
+           Alquiler auxAlquiler = new Alquiler(aux);
            auxAlquiler.cambiarDisponibilidad();
            listaAlquileres.guardar(auxAlquiler);
            return true;

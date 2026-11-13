@@ -13,12 +13,12 @@ public class Venta implements Identificable<Integer> {
     private Embarcacion embarcacion;
     private double montoBase;
     private Reporte reporteVenta;
-    private double montoFinal;
+    private Double montoFinal;
 
 
     /// CONSTRUCTOR BDD
-    public Venta(int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase, Reporte reporteVenta, double montoFinal) {
-        this.id = id;
+    public Venta(Cliente clienteComprador, Embarcacion embarcacion, double montoBase, Reporte reporteVenta, Double montoFinal) {
+
         this.clienteComprador = clienteComprador;
         this.embarcacion = embarcacion;
         this.montoBase = montoBase;
@@ -79,6 +79,10 @@ public class Venta implements Identificable<Integer> {
 
     public double getMontoBase() {
         return montoBase;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Reporte iniciarReporte(String descripcion, double coste, boolean cargoAgencia)

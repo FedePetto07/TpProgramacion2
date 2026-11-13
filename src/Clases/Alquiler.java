@@ -14,10 +14,9 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
 
     /// CONSTRUCTOR BDD
 
-    public Alquiler(int id, Reserva reserva) {
+    public Alquiler( Reserva reserva, double montoFinal) {
         this.reserva = reserva;
-        this.id = id;
-        this.montoFinal = calcularPrecio();
+        this.montoFinal = montoFinal;
     }
 
     public Alquiler(Reserva reserva) throws DatoErroneoEx {
@@ -43,6 +42,9 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
         return montoFinal;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
     ///
    public void cambiarDisponibilidad()
