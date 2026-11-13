@@ -64,6 +64,18 @@ public class Velero extends Embarcacion {
         this.requiereCapitan = requiereCapitan;
     }
 
+    public void setCantidadVelas(int cantidadVelas) {
+        this.cantidadVelas = cantidadVelas;
+    }
+
+    public void setLongitudMetros(Double longitudMetros) {
+        this.longitudMetros = longitudMetros;
+    }
+
+    public void setCantidadCamarotes(int cantidadCamarotes) {
+        this.cantidadCamarotes = cantidadCamarotes;
+    }
+
     /// ToString
 
     @Override

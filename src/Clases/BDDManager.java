@@ -234,7 +234,7 @@ public class BDDManager {
     /////////////////////////////////////////////////////////////////////
     public static ArrayList<Reporte> getReportesBDD()
     {
-        String query = "SELECT * FROM Reporte";
+        String query = "SELECT * FROM reportes";
         ArrayList<Reporte> listaReportes = new ArrayList<>();
         try(Connection connection = DriverManager.getConnection(url))
         {
@@ -247,7 +247,7 @@ public class BDDManager {
                 int id = resultSet.getInt("id");
                 String descripcion = resultSet.getString("descripcion");
                 double coste = resultSet.getDouble("coste");
-                boolean cargoAgencia = resultSet.getBoolean("cargo_agencia");
+                boolean cargoAgencia = resultSet.getBoolean("cargoAgencia");
 
                 Reporte aux = new Reporte(id,descripcion,coste,cargoAgencia);
                 listaReportes.add(aux);
@@ -280,19 +280,18 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idClienteComprador = resultSet.getInt("dni_cliente_comprador");
-                String matriculaEmbarcacion = resultSet.getString("matricula_embarcacion");
-                double montoBase = resultSet.getDouble("monto_base");
-                int idReporteVenta = resultSet.getInt("id_reporte_venta");
-                double montoFinal = resultSet.getDouble("monto_final");
+                int idClienteComprador = resultSet.getInt("idClienteComprador");
+                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
+                double montoBase = resultSet.getDouble("montoBase");
+                int idReporteVenta = resultSet.getInt("idReporteVenta");
+                double montoFinal = resultSet.getDouble("montoFinal");
 
 
                 Embarcacion auxE = e.get(matriculaEmbarcacion);
                 Cliente auxC = c.BuscarPorId(idClienteComprador);
                 Reporte auxR = hashReportes.get(idReporteVenta);
 
-                Venta aux = new Venta(auxC,auxE,montoBase,auxR,montoFinal);
-                aux.setId(id);
+                Venta aux = new Venta(id,auxC,auxE,montoBase,auxR,montoFinal);
                 listaVenta.guardar(aux);
             }
         }
@@ -318,12 +317,12 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idCliente = resultSet.getInt("dni_cliente");
-                int cantidadPersonas = resultSet.getInt("cantidad_personas");
-                String matriculaEmbarcacion = resultSet.getString("matricula_embarcacion");
-                LocalDate fechaDeInicio = resultSet.getDate("fecha_inicio").toLocalDate();
-                LocalDate fechaDeFin = resultSet.getDate("fecha_fin").toLocalDate();
-                String estadoReserva = resultSet.getString("estado_reserva");
+                int idCliente = resultSet.getInt("idCLiente");
+                int cantidadPersonas = resultSet.getInt("CantidadPersonas");
+                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
+                LocalDate fechaDeInicio = resultSet.getDate("fechaDeInicio").toLocalDate();
+                LocalDate fechaDeFin = resultSet.getDate("fechaDeFin").toLocalDate();
+                String estadoReserva = resultSet.getString("estadoReserva");
 
                 ESTADO_RESERVA reserva = null;
                 switch (estadoReserva)
@@ -374,12 +373,12 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idReserva = resultSet.getInt("id_reserva");
-                double montoFinal = resultSet.getDouble("monto_final");
+                int idReserva = resultSet.getInt("idReserva");
+                Double montoFinal = resultSet.getDouble("montoFinal");
+
                 Reserva aux = r.BuscarPorId(idReserva);
 
-                Alquiler auxA = new Alquiler(aux,montoFinal);
-                auxA.setId(idReserva);
+                Alquiler auxA = new Alquiler(id, aux, montoFinal);
                 listaAlquileres.guardar(auxA);
             }
         }
@@ -669,98 +668,6 @@ public class BDDManager {
         }
         return password;
     }
-
-////////////////////////////////
-
-    public static int agregarReporteABDD(String descripcion, double coste, boolean cargo_agencia)
-    {
-        String queryAdd = "INSERT INTO Reporte (descripcion,coste,cargo_agencia) VALUES (?,?,?) ";
-        int id = -1;
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(queryAdd, Statement.RETURN_GENERATED_KEYS);
-
-            preparedStatement.setString(1,descripcion);
-            preparedStatement.setDouble(2,coste);
-            preparedStatement.setBoolean(3,cargo_agencia);
-
-            preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-            if(resultSet.next())
-            {
-                id = resultSet.getInt(1);
-            }
-        }
-        catch (SQLException ex)
-        {
-            ex.printStackTrace();
-        }
-        return id;
-    }
-
-/////////////////////////////
-    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double montoBase, Reporte reporteVenta, Double montoFinal)
-    {
-        String query = "INSERT INTO Venta (dni_cliente_comprador,matricula_embarcacion,monto_base,id_reporte_venta,monto_final)VALUES(?,?,?,?)";
-        int id = -1;
-        long dni_cliente_comprador = clienteComprador.getID();
-        String matricula_embarcacion = embarcacion.getID();
-        int idReporte = reporteVenta.getId();
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-            preparedStatement.setLong(1,dni_cliente_comprador);
-            preparedStatement.setString(2,matricula_embarcacion);
-            preparedStatement.setDouble(3,montoBase);
-            preparedStatement.setInt(4,idReporte);
-            preparedStatement.setDouble(5,montoFinal);
-
-            preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-
-            if(resultSet.next())
-            {
-                id = resultSet.getInt(1);
-            }
-
-        }
-        catch (SQLException ex)
-        {
-            ex.printStackTrace();
-        }
-        return id;
-    }
-
-public static int agregarAlquilarBDD(Reserva reserva, double montoFinal)
-{
-    String query = "INSERT INTO Alquileres (id_reserva,monto_final) VALUES (?,?)";
-    int id = -1;
-
-    try(Connection connection = DriverManager.getConnection(url))
-    {
-       PreparedStatement preparedStatement = connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS) ;
-
-       preparedStatement.setInt(1,reserva.getID());
-       preparedStatement.setDouble(2,montoFinal);
-
-       preparedStatement.executeUpdate();
-       ResultSet resultSet = preparedStatement.getGeneratedKeys();
-
-       if(resultSet.next())
-       {
-           id = resultSet.getInt(1);
-       }
-
-    }
-    catch (SQLException ex)
-    {
-        ex.printStackTrace();
-    }
-    return id;
-}
-
-/////////////////////////BORRAR///////////////////////////////////////////
 
 
 }

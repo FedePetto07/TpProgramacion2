@@ -54,6 +54,18 @@ public class Generica <T extends Identificable>{
         }
         return false;
     }
+
+    public boolean eliminar(int id) {
+        Iterator<T> it = lista.iterator();
+        while (it.hasNext()) {
+            if (it.next().getID().equals(id)) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String listarElementos()
     {
         String rta ="";
