@@ -374,10 +374,11 @@ public class BDDManager {
             {
                 int id = resultSet.getInt("id");
                 int idReserva = resultSet.getInt("idReserva");
+                Double montoFinal = resultSet.getDouble("montoFinal");
 
                 Reserva aux = r.BuscarPorId(idReserva);
 
-                Alquiler auxA = new Alquiler(id, aux);
+                Alquiler auxA = new Alquiler(id, aux, montoFinal);
                 listaAlquileres.guardar(auxA);
             }
         }
