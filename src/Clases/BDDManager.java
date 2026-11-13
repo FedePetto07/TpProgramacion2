@@ -4,6 +4,7 @@ import Enums.ESTADO_RESERVA;
 import Enums.Puesto;
 import Enums.TipoCombustible;
 import Excepciones.DatoErroneoEx;
+import Interfaces.Identificable;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -731,7 +732,7 @@ public class BDDManager {
         return id;
     }
 
-    public static int agregarAlquilarBDD(Reserva reserva, double montoFinal)
+    public static int agregarAlquilerBDD(Reserva reserva, double montoFinal)
     {
         String query = "INSERT INTO Alquileres (id_reserva,monto_final) VALUES (?,?)";
         int id = -1;
@@ -770,6 +771,7 @@ public static int eliminarClienteBDD(int dniCliente)
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.setInt(1,dniCliente);
 
+        preparedStatement.executeUpdate();
         filasAfectadas = preparedStatement.executeUpdate();
     }catch (SQLException ex)
     {
@@ -778,5 +780,68 @@ public static int eliminarClienteBDD(int dniCliente)
     return filasAfectadas;
 }
 
+public static int borrarEmpleadoBDD(int dniEmpleado)
+{
+    String query = "DELETE FROM Usuarios WHERE dni=?";
+    int filasAfectadas= 0;
+    try(Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1,dniEmpleado);
+
+        filasAfectadas = preparedStatement.executeUpdate();
+    }catch (SQLException ex)
+    {
+        ex.printStackTrace();;
+    }
+    return filasAfectadas;
+}
+
+public static <T extends Identificable<String>> int borrarEmbarcacion(T embarcacion )
+{
+    String query = "";
+    int filasAfectadas = -1;
+    if(embarcacion instanceof Velero)
+    {
+        query = "DELETE FROM Velero WHERE matricula=?";
+    }
+    if(embarcacion instanceof Lancha)
+    {
+        query = "DELETE FROM Lancha WHERE matricula=?";
+    }
+    if(embarcacion instanceof MotoDeAgua)
+    {
+        query = query = "DELETE FROM \"Moto de agua\" WHERE matricula=?";
+    }
+    try (Connection connection = DriverManager.getConnection(url))
+    {
+      PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+      preparedStatement.setString(1,embarcacion.getID());
+      filasAfectadas = preparedStatement.executeUpdate();
+    }catch (SQLException ex)
+    {
+        ex.printStackTrace();;
+    }
+    return filasAfectadas;
+}
+
+public static int borrarReserva(int idReserva)
+{
+    String query = "DELETE FROM Reserva WHERE id = ? ";
+    int filasAfectadas= 0;
+    try(Connection connection = DriverManager.getConnection(url))
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1,idReserva);
+
+        preparedStatement.executeUpdate();
+        filasAfectadas = preparedStatement.executeUpdate();
+    }catch (SQLException ex)
+    {
+        ex.printStackTrace();;
+    }
+    return filasAfectadas;
+}
 
 }
