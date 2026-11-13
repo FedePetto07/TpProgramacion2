@@ -669,5 +669,97 @@ public class BDDManager {
         return password;
     }
 
+    ///////////
+
+    public static int agregarReporteABDD(String descripcion, double coste, boolean cargo_agencia)
+    {
+        String queryAdd = "INSERT INTO Reporte (descripcion,coste,cargo_agencia) VALUES (?,?,?) ";
+        int id = -1;
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(queryAdd, Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1,descripcion);
+            preparedStatement.setDouble(2,coste);
+            preparedStatement.setBoolean(3,cargo_agencia);
+
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            if(resultSet.next())
+            {
+                id = resultSet.getInt(1);
+            }
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return id;
+    }
+
+    /////////////////////////////
+    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double montoBase, Reporte reporteVenta, Double montoFinal)
+    {
+        String query = "INSERT INTO Venta (dni_cliente_comprador,matricula_embarcacion,monto_base,id_reporte_venta,monto_final)VALUES(?,?,?,?)";
+        int id = -1;
+        long dni_cliente_comprador = clienteComprador.getID();
+        String matricula_embarcacion = embarcacion.getID();
+        int idReporte = reporteVenta.getId();
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setLong(1,dni_cliente_comprador);
+            preparedStatement.setString(2,matricula_embarcacion);
+            preparedStatement.setDouble(3,montoBase);
+            preparedStatement.setInt(4,idReporte);
+            preparedStatement.setDouble(5,montoFinal);
+
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+
+            if(resultSet.next())
+            {
+                id = resultSet.getInt(1);
+            }
+
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return id;
+    }
+
+    public static int agregarAlquilarBDD(Reserva reserva, double montoFinal)
+    {
+        String query = "INSERT INTO Alquileres (id_reserva,monto_final) VALUES (?,?)";
+        int id = -1;
+
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS) ;
+
+            preparedStatement.setInt(1,reserva.getID());
+            preparedStatement.setDouble(2,montoFinal);
+
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+
+            if(resultSet.next())
+            {
+                id = resultSet.getInt(1);
+            }
+
+        }
+        catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return id;
+    }
+
+/////////////////////////BORRAR///////////////////////////////////////////
+
 
 }
