@@ -43,6 +43,18 @@ public class Lancha extends Embarcacion {
         return combustible;
     }
 
+    public void setPotenciaMotor(int potenciaMotor) {
+        this.potenciaMotor = potenciaMotor;
+    }
+
+    public void setLongitudMetros(double longitudMetros) {
+        this.longitudMetros = longitudMetros;
+    }
+
+    public void setCombustible(TipoCombustible combustible) {
+        this.combustible = combustible;
+    }
+
     /// ToString
 
     @Override

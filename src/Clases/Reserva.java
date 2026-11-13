@@ -104,6 +104,9 @@ public class Reserva implements Identificable<Integer> {
 
     public int getCantidadPersonas() {return cantidadPersonas;}
 
+    public void setEstadoReserva(ESTADO_RESERVA estadoReserva) {
+        this.estadoReserva = estadoReserva;
+    }
 
     ////////////////////
 

@@ -50,6 +50,18 @@ public class MotoDeAgua extends Embarcacion {
         return requiereLicencia;
     }
 
+    public void setCilindrada(int cilindrada) {
+        this.cilindrada = cilindrada;
+    }
+
+    public void setLimiteVelocidad(double limiteVelocidad) {
+        this.limiteVelocidad = limiteVelocidad;
+    }
+
+    public void setRequiereLicencia(boolean requiereLicencia) {
+        this.requiereLicencia = requiereLicencia;
+    }
+
     /// ToString
 
     @Override

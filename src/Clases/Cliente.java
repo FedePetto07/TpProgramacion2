@@ -36,6 +36,10 @@ public class Cliente extends Persona {
         this.numeroLicencia = numeroLicencia;
     }
 
+    public void agregarAlquiler() {
+        this.cantidadAlquileres = cantidadAlquileres + 1;
+    }
+
     public int getNumeroLicencia() {
         return numeroLicencia;
     }

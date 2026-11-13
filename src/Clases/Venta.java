@@ -27,7 +27,8 @@ public class Venta implements Identificable<Integer> {
     }
 
 
-    public Venta(Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws DatoErroneoEx {
+    public Venta(Cliente clienteComprador, Embarcacion embarcacion,
+                 double montoBase) throws DatoErroneoEx {
 
         if (clienteComprador == null) {
             throw new DatoErroneoEx("La venta debe tener un cliente comprador.");
@@ -41,21 +42,10 @@ public class Venta implements Identificable<Integer> {
             throw new DatoErroneoEx("El monto base debe ser mayor a 0.");
         }
 
-        if (reporteVenta == null) {
-            throw new DatoErroneoEx("La venta debe tener un reporte asociado.");
-        }
-
-        if (montoFinal <= 0 || !Double.isFinite(montoFinal)) {
-            throw new DatoErroneoEx("El monto final debe ser mayor a 0.");
-        }
-
-        if (montoFinal < montoBase) {
-            throw new DatoErroneoEx("El monto final no puede ser menor al monto base.");
-        }
-
         this.clienteComprador = clienteComprador;
         this.embarcacion = embarcacion;
         this.montoBase = montoBase;
+        this.montoFinal = montoBase;
         this.reporteVenta = null;
     }
 
@@ -81,9 +71,13 @@ public class Venta implements Identificable<Integer> {
         return montoBase;
     }
 
-    public Reporte iniciarReporte(String descripcion, double coste, boolean cargoAgencia)
-    {
-       return this.reporteVenta = new Reporte(this.id, descripcion, coste, cargoAgencia);
+    public Reporte iniciarReporte(String descripcion, double coste,
+                                  boolean cargoAgencia) throws DatoErroneoEx {
+
+        this.reporteVenta = new Reporte(this.id, descripcion, coste, cargoAgencia);
+        calcularPrecio();
+
+        return this.reporteVenta;
     }
 
     public void setMontoFinal(double montoFinal) {
@@ -91,13 +85,13 @@ public class Venta implements Identificable<Integer> {
     }
 
     public void calcularPrecio() {
-        double monto = montoFinal;
-        if (reporteVenta != null){
-            if (reporteVenta.isCargoAgencia()){
-                monto = monto - reporteVenta.getCoste();
-            }
-            else {
-                monto = monto + reporteVenta.getCoste();
+        double monto = montoBase;
+
+        if (reporteVenta != null) {
+            if (reporteVenta.isCargoAgencia()) {
+                monto -= reporteVenta.getCoste();
+            } else {
+                monto += reporteVenta.getCoste();
             }
         }
 
