@@ -846,11 +846,12 @@ public static int borrarReserva(int idReserva)
 
 ///////MODIFICAR////////
 
-public static int  modificarCamposCLienteBDD(Long telefono, String email, Integer cantidadAlquileres)
+public static int  modificarCamposCLienteBDD(int idClientes, Long telefono, String email, Integer cantidadAlquileres)
 {
     StringBuilder query = new StringBuilder("UPDATE clientes SET ");
     ArrayList<Object> parametros = new ArrayList<>();
     int filasModificadas = 0;
+
     if(telefono != null)
     {
         query.append("telefono = ?, ");
@@ -863,16 +864,21 @@ public static int  modificarCamposCLienteBDD(Long telefono, String email, Intege
     }
     if(cantidadAlquileres != null)
     {
-        query.append("fecha_ingreso = ?, ");
+        query.append("cantidad_alquileres = ?, ");
         parametros.add(cantidadAlquileres);
+    }
+    if (parametros.isEmpty()) {
+        return 0;
     }
     //eliminar comoa
     query.setLength(query.length() - 2);
     query.append(" WHERE id = ?");
+    parametros.add(idClientes);
 
     try (Connection connection = DriverManager.getConnection(url))
     {
         PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
+
 
         for (int i = 0; i < parametros.size(); i++) {
             preparedStatement.setObject(i + 1, parametros.get(i));
