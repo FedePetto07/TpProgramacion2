@@ -16,7 +16,9 @@ import java.util.Iterator;
 
 public class Agencia {
 
-    /// ATRIBUTOS
+
+    //  ATRIBUTOS
+
 
     private HashMap<String, Embarcacion>embarcaciones;
     private Generica<Cliente> clientes;
@@ -27,8 +29,7 @@ public class Agencia {
     private ArrayList <Reporte>listaReportes;
     private Empleado empleadoLogueado;
 
-
-    /// CONSTRUCTOR
+    //  CONSTRUCTOR
 
     public Agencia() {
         this.embarcaciones = BDDManager.getEmbarcacionesBDD();
@@ -41,7 +42,37 @@ public class Agencia {
         this.empleadoLogueado = null;
     }
 
-    /// EMPLEADOS
+
+    ///  SESIÓN
+
+
+    public Empleado iniciarSesion(int dni, String passwordIngresada) throws AccionImposibleEx {
+
+        String passwordGuardada = BDDManager.getPassword(dni);
+
+        if (passwordGuardada == null || !passwordGuardada.equals(passwordIngresada)) {
+            throw new AccionImposibleEx("DNI o contraseña incorrectos");
+        }
+
+        Empleado empleado = BDDManager.getEmpleado((long) dni);
+
+        if (empleado == null) {
+            throw new AccionImposibleEx("DNI o contraseña incorrectos");
+        }
+
+        empleadoLogueado = empleado;
+        return empleado;
+    }
+
+    public void cerrarSesion() {
+        empleadoLogueado = null;
+    }
+
+    public Empleado getEmpleadoLogueado() {
+        return empleadoLogueado;
+    }
+
+    ///  EMPLEADOS
 
     // AGREGAR Y ELIMINAR EMPLEADOS
 
@@ -98,7 +129,7 @@ public class Agencia {
         throw new AccionImposibleEx("No existe un empleado con ese DNI");
     }
 
-    /// CLIENTES
+    ///  CLIENTES
 
 // AGREGAR Y ELIMINAR CLIENTES
 
@@ -142,27 +173,9 @@ public class Agencia {
         return "Lista de clientes:\n" + clientes.listarElementos();
     }
 
-// LIMPIAR CLIENTES NO RECURRENTES
+    public Cliente getCliente(long dni) { return clientes.BuscarPorId(dni); }
 
-    public int limpiarClientes(int mesesMinimos, int alquileresMinimos) throws ObjetoNoEncontradoEx {
-        if (clientes.getLista().isEmpty()) {
-            throw new ObjetoNoEncontradoEx("La lista está vacía");
-        }
-
-        int eliminados = 0;
-
-        Iterator<Cliente> it = clientes.getLista().iterator();
-        while (it.hasNext()) {
-            Cliente c = it.next();
-            if (!c.esRecurrente(mesesMinimos, alquileresMinimos) && !tieneReservas(c)
-                    && !tieneAlquileres(c)) {
-                it.remove();
-                eliminados++;
-            }
-        }
-
-        return eliminados;
-    }
+// MODIFICAR CLIENTES
 
     public StringBuilder modificarDatosCliente(long dni, String nombreNuevo, int edadNueva, Long telefonoNuevo, String emailNuevo, int numeroLicenciaNuevo) throws DatoErroneoEx
     {
@@ -194,6 +207,30 @@ public class Agencia {
 
         return informacionNueva;
     }
+
+// LIMPIAR CLIENTES NO RECURRENTES
+
+    public int limpiarClientes(int mesesMinimos, int alquileresMinimos) throws ObjetoNoEncontradoEx {
+        if (clientes.getLista().isEmpty()) {
+            throw new ObjetoNoEncontradoEx("La lista está vacía");
+        }
+
+        int eliminados = 0;
+
+        Iterator<Cliente> it = clientes.getLista().iterator();
+        while (it.hasNext()) {
+            Cliente c = it.next();
+            if (!c.esRecurrente(mesesMinimos, alquileresMinimos) && !tieneReservas(c)
+                    && !tieneAlquileres(c)) {
+                it.remove();
+                eliminados++;
+            }
+        }
+
+        return eliminados;
+    }
+
+// HISTORIAL DEL CLIENTE
 
     public ArrayList<Reserva> getReservasCliente(long dni)
             throws ObjetoNoEncontradoEx {
@@ -249,7 +286,9 @@ public class Agencia {
         return resultado;
     }
 
-    /// EMBARCACIONES
+
+    ///  EMBARCACIONES
+
 
     // AGREGAR Y ELIMINAR EMBARCACIONES
 
@@ -303,18 +342,6 @@ public class Agencia {
         throw new AccionImposibleEx("No existe un embarcacion con esa matricula");
     }
 
-    public void actualizarEstadoReserva(int id, ESTADO_RESERVA nuevoEstado)
-            throws ObjetoNoEncontradoEx, DatoErroneoEx {
-
-        Reserva reserva = listaReservas.BuscarPorId(id);
-
-        if (nuevoEstado == null) {
-            throw new DatoErroneoEx("El estado de la reserva no puede ser nulo.");
-        }
-
-        reserva.setEstadoReserva(nuevoEstado);
-    }
-
     // VER EMBARCACIONES
 
     public StringBuilder listarEmbarcaciones() throws AccionImposibleEx
@@ -340,204 +367,232 @@ public class Agencia {
 
         throw new AccionImposibleEx("No existe un embarcacion con esa matricula");
     }
-    //////////CREAR RESERVA
 
-       public boolean agregarUnaReserva(int id, Cliente cliente, int cantidadPersonas, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) throws AccionImposibleEx, ElementoDuplicadoEx, DatoErroneoEx
-       {
-           if (listaReservas.BuscarPorId(id) != null) {
-               throw new ElementoDuplicadoEx(
-                       "Ya existe una reserva con este identificador."
-               );
-           }
+    public Embarcacion getEmbarcacion(String matricula) { return embarcaciones.get(matricula); }
 
-           if (embarcacion == null ||
-                   !embarcaciones.containsKey(embarcacion.getID())) {
-               throw new AccionImposibleEx(
-                       "La embarcación ingresada no existe."
-               );
-           }
+    ///  RESERVAS
 
-           if (cliente == null || !clientes.getLista().contains(cliente)) {
-               throw new AccionImposibleEx(
-                       "El cliente ingresado no existe."
-               );
-           }
+    // CREAR RESERVA
 
-           LocalDate inicio = LocalDate.of(añoInicio, mesInicio, diaInicio);
-           LocalDate fin = LocalDate.of(añoFin, mesFin, diaFin);
+    public boolean agregarUnaReserva(int id, Cliente cliente, int cantidadPersonas, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) throws AccionImposibleEx, ElementoDuplicadoEx, DatoErroneoEx
+    {
+        if (listaReservas.BuscarPorId(id) != null) {
+            throw new ElementoDuplicadoEx(
+                    "Ya existe una reserva con este identificador."
+            );
+        }
 
-           if (!embarcacionDisponible(embarcacion, inicio, fin)) {
-               throw new AccionImposibleEx(
-                       "La embarcación no está disponible para esas fechas."
-               );
-           }
+        if (embarcacion == null ||
+                !embarcaciones.containsKey(embarcacion.getID())) {
+            throw new AccionImposibleEx(
+                    "La embarcación ingresada no existe."
+            );
+        }
 
-           Reserva aux = new Reserva(
-                   id, cliente, cantidadPersonas, embarcacion,
-                   añoInicio, mesInicio, diaInicio,
-                   añoFin, mesFin, diaFin, estadoReserva
-           );
+        if (cliente == null || !clientes.getLista().contains(cliente)) {
+            throw new AccionImposibleEx(
+                    "El cliente ingresado no existe."
+            );
+        }
 
-           return listaReservas.guardar(aux);
-       }
+        LocalDate inicio = LocalDate.of(añoInicio, mesInicio, diaInicio);
+        LocalDate fin = LocalDate.of(añoFin, mesFin, diaFin);
 
-     ///////cancelar reserva
-     public String cancelarReserva(int idReserva) throws ObjetoNoEncontradoEx,AccionImposibleEx
-     {
-         if(listaReservas.BuscarPorId(idReserva) == null)
-         {
-             throw new ObjetoNoEncontradoEx( "ERROR. No existe el id ingresado de la reserva.");
-         }
-         Reserva aux = listaReservas.BuscarPorId(idReserva);
-         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CANCELADA))
-         {
+        if (!embarcacionDisponible(embarcacion, inicio, fin)) {
+            throw new AccionImposibleEx(
+                    "La embarcación no está disponible para esas fechas."
+            );
+        }
+
+        Reserva aux = new Reserva(
+                id, cliente, cantidadPersonas, embarcacion,
+                añoInicio, mesInicio, diaInicio,
+                añoFin, mesFin, diaFin, estadoReserva
+        );
+
+        return listaReservas.guardar(aux);
+    }
+
+    // CANCELAR RESERVA
+
+    public String cancelarReserva(int idReserva) throws ObjetoNoEncontradoEx,AccionImposibleEx
+    {
+        if(listaReservas.BuscarPorId(idReserva) == null)
+        {
+            throw new ObjetoNoEncontradoEx( "ERROR. No existe el id ingresado de la reserva.");
+        }
+        Reserva aux = listaReservas.BuscarPorId(idReserva);
+        if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CANCELADA))
+        {
             throw new AccionImposibleEx ( "ERROR.No se pudo canclear la reserva. Ya esta cancelda...");
-         }
-         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.FINALIZADA))
-         {
-             throw new AccionImposibleEx("ERROR. la reserva ya esta finalizada, no se puede cancelar...");
-         }
-         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CONFIRMADA))
-         {
-             LocalDate fechaActual = LocalDate.now();
-             if(aux.getFechaDeInicio().isAfter(fechaActual))
-             {
-                 throw new AccionImposibleEx("ERROR. no se puede cancelar la reserva porque esta confirmada en la fecha determinada.");
-             }
-         }
-         aux.cancelar();
+        }
+        if(aux.getEstadoReserva().equals(ESTADO_RESERVA.FINALIZADA))
+        {
+            throw new AccionImposibleEx("ERROR. la reserva ya esta finalizada, no se puede cancelar...");
+        }
+        if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CONFIRMADA))
+        {
+            LocalDate fechaActual = LocalDate.now();
+            if(aux.getFechaDeInicio().isAfter(fechaActual))
+            {
+                throw new AccionImposibleEx("ERROR. no se puede cancelar la reserva porque esta confirmada en la fecha determinada.");
+            }
+        }
+        aux.cancelar();
         return "Cancelado correctamente";
-     }
-     ////////Listar por id
-     public String listarReservaPorID(int idBusqueda) throws ObjetoNoEncontradoEx
-     {
-         if(listaReservas.BuscarPorId(idBusqueda) == null)
-         {
-             throw new ObjetoNoEncontradoEx( "ERROR. No existe el id ingresado de la reserva.");
-         }
-         Reserva aux = listaReservas.BuscarPorId(idBusqueda);
-         return aux.toString();
-     }
+    }
 
-     ////ver todas las reservas
-     public String listarTodasLasReservas() throws ObjetoNoEncontradoEx
-     {
-         if (listaReservas.getLista().isEmpty()){
-             throw new ObjetoNoEncontradoEx("La lista está vacía");
-         }
+    // MODIFICAR ESTADO
 
-         String rta = "";
-         rta += "Lista de reservas:\n";
-         rta += listaReservas.listarElementos();
+    public void actualizarEstadoReserva(int id, ESTADO_RESERVA nuevoEstado)
+            throws ObjetoNoEncontradoEx, DatoErroneoEx {
 
-         return rta;
-     }
-///////////////////////////////////////////////////////////////
-        public boolean IniciarAlquiler(int id, int idReserva)
-                throws AccionImposibleEx, DatoErroneoEx {
+        Reserva reserva = listaReservas.BuscarPorId(id);
 
-            Reserva aux = listaReservas.BuscarPorId(idReserva);
-
-            if (aux == null) {
-                throw new AccionImposibleEx("La reserva no existe.");
-            }
-
-            if (aux.getEstadoReserva() != ESTADO_RESERVA.CONFIRMADA) {
-                throw new AccionImposibleEx("La reserva no está confirmada.");
-            }
-
-            if (listaAlquileres.BuscarPorId(id) != null) {
-                throw new AccionImposibleEx("Ya existe un alquiler con ese identificador.");
-            }
-
-            aux.getCliente().agregarAlquiler();
-
-            Alquiler auxAlquiler = new Alquiler(aux);
-
-            if (!listaAlquileres.guardar(auxAlquiler)) {
-                return false;
-            }
-
-            auxAlquiler.cambiarDisponibilidad();
-
-            listaReservas.eliminar(idReserva);
-
-            return true;
+        if (nuevoEstado == null) {
+            throw new DatoErroneoEx("El estado de la reserva no puede ser nulo.");
         }
 
-        public boolean iniciarVenta(int idAlquiler)
-                throws AccionImposibleEx, DatoErroneoEx {
+        reserva.setEstadoReserva(nuevoEstado);
+    }
 
-            Alquiler aux = listaAlquileres.BuscarPorId(idAlquiler);
+    // LISTAR RESERVA POR ID
 
-            if (aux == null) {
-                throw new AccionImposibleEx("El alquiler no existe.");
-            }
+    public String listarReservaPorID(int idBusqueda) throws ObjetoNoEncontradoEx
+    {
+        if(listaReservas.BuscarPorId(idBusqueda) == null)
+        {
+            throw new ObjetoNoEncontradoEx( "ERROR. No existe el id ingresado de la reserva.");
+        }
+        Reserva aux = listaReservas.BuscarPorId(idBusqueda);
+        return aux.toString();
+    }
 
-            if (alquilerFinalizado(aux)) {
-                throw new AccionImposibleEx("El alquiler ya fue finalizado.");
-            }
+    // VER TODAS LAS RESERVAS
 
-            double montoBase = aux.calcularPrecio();
-
-            Venta nuevaVenta = new Venta(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion(), montoBase);
-
-            if (!listaVentas.guardar(nuevaVenta)) {
-                return false;
-            }
-
-            aux.getReserva().getEmbarcacion().setDisponible(true);
-
-            return true;
+    public String listarTodasLasReservas() throws ObjetoNoEncontradoEx
+    {
+        if (listaReservas.getLista().isEmpty()){
+            throw new ObjetoNoEncontradoEx("La lista está vacía");
         }
 
+        String rta = "";
+        rta += "Lista de reservas:\n";
+        rta += listaReservas.listarElementos();
 
-       public String listarAlquileres() throws ObjetoNoEncontradoEx
-       {
-           if (listaAlquileres.getLista().isEmpty()){
-               throw new ObjetoNoEncontradoEx("La lista está vacía");
-           }
-
-           String rta = "";
-           rta += "Lista de alquileres:\n";
-           rta += listaAlquileres.listarElementos();
-
-           return rta;
-       }
-
-       public String verAlquiler(int id) throws ObjetoNoEncontradoEx
-       {
-           if  (listaAlquileres.BuscarPorId(id) == null){
-               throw new ObjetoNoEncontradoEx("El alquiler no existe");
-           }
-
-           Alquiler auxAlquiler = listaAlquileres.BuscarPorId(id);
-
-           return auxAlquiler.toString();
-       }
+        return rta;
+    }
 
 
+    ///  ALQUILERES
 
 
-      //////registrar Venta
-     public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws AccionImposibleEx, DatoErroneoEx
-     {
-         if(!clientes.getLista().contains(clienteComprador))
-         {
-             throw new AccionImposibleEx("ERROR. el identificador del comprador ingresado no existe...");
-         }
-         if(embarcaciones.containsKey(embarcacion.getID()) == false)
-         {
-             throw new AccionImposibleEx("ERROR. la matricula ingresada no existe...");
-         }
-         if(montoBase<0)
-         {
-             throw new AccionImposibleEx("ERROR. el monto base debe ser mayor a 0");
-         }
-         Venta aux = new Venta(clienteComprador, embarcacion, montoBase);
-         return listaVentas.guardar(aux);
-     }
-     //////verVentas
+    public boolean IniciarAlquiler(int id, int idReserva)
+            throws AccionImposibleEx, DatoErroneoEx {
+
+        Reserva aux = listaReservas.BuscarPorId(idReserva);
+
+        if (aux == null) {
+            throw new AccionImposibleEx("La reserva no existe.");
+        }
+
+        if (aux.getEstadoReserva() != ESTADO_RESERVA.CONFIRMADA) {
+            throw new AccionImposibleEx("La reserva no está confirmada.");
+        }
+
+        if (listaAlquileres.BuscarPorId(id) != null) {
+            throw new AccionImposibleEx("Ya existe un alquiler con ese identificador.");
+        }
+
+        aux.getCliente().agregarAlquiler();
+
+        Alquiler auxAlquiler = new Alquiler(aux);
+
+        if (!listaAlquileres.guardar(auxAlquiler)) {
+            return false;
+        }
+
+        auxAlquiler.cambiarDisponibilidad();
+
+        listaReservas.eliminar(idReserva);
+
+        return true;
+    }
+
+    public String listarAlquileres() throws ObjetoNoEncontradoEx
+    {
+        if (listaAlquileres.getLista().isEmpty()){
+            throw new ObjetoNoEncontradoEx("La lista está vacía");
+        }
+
+        String rta = "";
+        rta += "Lista de alquileres:\n";
+        rta += listaAlquileres.listarElementos();
+
+        return rta;
+    }
+
+    public String verAlquiler(int id) throws ObjetoNoEncontradoEx
+    {
+        if  (listaAlquileres.BuscarPorId(id) == null){
+            throw new ObjetoNoEncontradoEx("El alquiler no existe");
+        }
+
+        Alquiler auxAlquiler = listaAlquileres.BuscarPorId(id);
+
+        return auxAlquiler.toString();
+    }
+
+    ///  VENTAS
+
+    public boolean iniciarVenta(int idAlquiler)
+            throws AccionImposibleEx, DatoErroneoEx {
+
+        Alquiler aux = listaAlquileres.BuscarPorId(idAlquiler);
+
+        if (aux == null) {
+            throw new AccionImposibleEx("El alquiler no existe.");
+        }
+
+        if (alquilerFinalizado(aux)) {
+            throw new AccionImposibleEx("El alquiler ya fue finalizado.");
+        }
+
+        double montoBase = aux.calcularPrecio();
+
+        Venta nuevaVenta = new Venta(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion(), montoBase);
+
+        if (!listaVentas.guardar(nuevaVenta)) {
+            return false;
+        }
+
+        aux.getReserva().getEmbarcacion().setDisponible(true);
+
+        return true;
+    }
+
+    // REGISTRAR VENTA
+
+    public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws AccionImposibleEx, DatoErroneoEx
+    {
+        if(!clientes.getLista().contains(clienteComprador))
+        {
+            throw new AccionImposibleEx("ERROR. el identificador del comprador ingresado no existe...");
+        }
+        if(embarcaciones.containsKey(embarcacion.getID()) == false)
+        {
+            throw new AccionImposibleEx("ERROR. la matricula ingresada no existe...");
+        }
+        if(montoBase<0)
+        {
+            throw new AccionImposibleEx("ERROR. el monto base debe ser mayor a 0");
+        }
+        Venta aux = new Venta(clienteComprador, embarcacion, montoBase);
+        return listaVentas.guardar(aux);
+    }
+
+    // VER TODAS LAS VENTAS
+
     public String listarVentas() throws ObjetoNoEncontradoEx
     {
 
@@ -551,7 +606,9 @@ public class Agencia {
 
         return rta;
     }
-    //////verVentaid
+
+    // VER VENTAS POR ID
+
     public String verVentaId(int idVenta) throws ObjetoNoEncontradoEx
     {
 
@@ -564,7 +621,7 @@ public class Agencia {
         return aux.toString();
     }
 
-    /// Comprobaciones
+    //  COMPROBACIONES (MÉTODOS PRIVADOS)
 
     private boolean tieneReservas(Cliente cliente) {
         for (Reserva r : listaReservas.getLista()) {
@@ -600,33 +657,6 @@ public class Agencia {
             }
         }
         return false;
-    }
-
-
-    public Empleado iniciarSesion(int dni, String passwordIngresada) throws AccionImposibleEx {
-
-        String passwordGuardada = BDDManager.getPassword(dni);
-
-        if (passwordGuardada == null || !passwordGuardada.equals(passwordIngresada)) {
-            throw new AccionImposibleEx("DNI o contraseña incorrectos");
-        }
-
-        Empleado empleado = BDDManager.getEmpleado((long) dni);
-
-        if (empleado == null) {
-            throw new AccionImposibleEx("DNI o contraseña incorrectos");
-        }
-
-        empleadoLogueado = empleado;
-        return empleado;
-    }
-
-    public void cerrarSesion() {
-        empleadoLogueado = null;
-    }
-
-    public Empleado getEmpleadoLogueado() {
-        return empleadoLogueado;
     }
 
     private boolean embarcacionDisponible(Embarcacion embarcacion,
@@ -668,8 +698,4 @@ public class Agencia {
 
         return false;
     }
-
-
-    public Cliente getCliente(long dni) { return clientes.BuscarPorId(dni); }
-    public Embarcacion getEmbarcacion(String matricula) { return embarcaciones.get(matricula); }
 }
