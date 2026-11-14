@@ -50,16 +50,15 @@ public class MotoDeAgua extends Embarcacion {
         return requiereLicencia;
     }
 
-    public void setCilindrada(int cilindrada) {
-        this.cilindrada = cilindrada;
-    }
+    @Override
+    public double calcularPrecio() {
+        Double precio = 0.0;
 
-    public void setLimiteVelocidad(double limiteVelocidad) {
-        this.limiteVelocidad = limiteVelocidad;
-    }
+        precio += cilindrada*10.0;
+        precio += limiteVelocidad*100;
+        precio += getCapacidadPersonas()*50;
 
-    public void setRequiereLicencia(boolean requiereLicencia) {
-        this.requiereLicencia = requiereLicencia;
+        return precio;
     }
 
     /// ToString

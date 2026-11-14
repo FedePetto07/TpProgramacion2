@@ -26,7 +26,6 @@ public class Agencia {
     private Generica<Reserva> listaReservas;
     private Generica<Alquiler> listaAlquileres;
     private Generica<Venta> listaVentas;
-    private ArrayList <Reporte>listaReportes;
     private Empleado empleadoLogueado;
 
     //  CONSTRUCTOR
@@ -35,8 +34,7 @@ public class Agencia {
         this.embarcaciones = BDDManager.getEmbarcacionesBDD();
         this.clientes = BDDManager.getClientesBDD();
         this.empleados = BDDManager.getEmpleados();
-        this.listaReportes = BDDManager.getReportesBDD();
-        this.listaVentas = BDDManager.listaVenta(clientes,embarcaciones,listaReportes);
+        this.listaVentas = BDDManager.listaVenta(clientes,embarcaciones);
         this.listaReservas = BDDManager.getReservasBDD(clientes,embarcaciones);
         this.listaAlquileres = BDDManager.getAlquileresBDD(listaReservas);
         this.empleadoLogueado = null;
@@ -560,7 +558,7 @@ public class Agencia {
 
         double montoBase = aux.calcularPrecio();
 
-        Venta nuevaVenta = new Venta(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion(), montoBase);
+        Venta nuevaVenta = new Venta(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion());
 
         if (!listaVentas.guardar(nuevaVenta)) {
             return false;
@@ -573,7 +571,7 @@ public class Agencia {
 
     // REGISTRAR VENTA
 
-    public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion, double montoBase) throws AccionImposibleEx, DatoErroneoEx
+    public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion) throws AccionImposibleEx, DatoErroneoEx
     {
         if(!clientes.getLista().contains(clienteComprador))
         {
@@ -583,11 +581,8 @@ public class Agencia {
         {
             throw new AccionImposibleEx("ERROR. la matricula ingresada no existe...");
         }
-        if(montoBase<0)
-        {
-            throw new AccionImposibleEx("ERROR. el monto base debe ser mayor a 0");
-        }
-        Venta aux = new Venta(clienteComprador, embarcacion, montoBase);
+
+        Venta aux = new Venta(clienteComprador, embarcacion);
         return listaVentas.guardar(aux);
     }
 

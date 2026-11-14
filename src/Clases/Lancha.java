@@ -43,16 +43,15 @@ public class Lancha extends Embarcacion {
         return combustible;
     }
 
-    public void setPotenciaMotor(int potenciaMotor) {
-        this.potenciaMotor = potenciaMotor;
-    }
+    @Override
+    public double calcularPrecio() {
+        Double precio = 0.0;
 
-    public void setLongitudMetros(double longitudMetros) {
-        this.longitudMetros = longitudMetros;
-    }
+        precio += getCapacidadPersonas()*500;
+        precio += longitudMetros*1000;
+        precio += potenciaMotor*100;
 
-    public void setCombustible(TipoCombustible combustible) {
-        this.combustible = combustible;
+        return precio;
     }
 
     /// ToString

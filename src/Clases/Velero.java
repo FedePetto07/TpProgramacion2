@@ -60,20 +60,22 @@ public class Velero extends Embarcacion {
         return requiereCapitan;
     }
 
+    /// SETTER Y METODOS
+
     public void setRequiereCapitan(boolean requiereCapitan) {
         this.requiereCapitan = requiereCapitan;
     }
 
-    public void setCantidadVelas(int cantidadVelas) {
-        this.cantidadVelas = cantidadVelas;
-    }
+    @Override
+    public double calcularPrecio() {
+        Double precio = 0.0;
 
-    public void setLongitudMetros(Double longitudMetros) {
-        this.longitudMetros = longitudMetros;
-    }
+        precio += cantidadVelas*1500.0;
+        precio += longitudMetros*18000.0;
+        precio += cantidadCamarotes*4000.0;
+        precio += getCapacidadPersonas()*2000.0;
 
-    public void setCantidadCamarotes(int cantidadCamarotes) {
-        this.cantidadCamarotes = cantidadCamarotes;
+        return precio;
     }
 
     /// ToString

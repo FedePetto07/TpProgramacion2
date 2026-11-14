@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class BDDManager {
 
-    static final String url = "jdbc:mysql://localhost/";
+    static final String url = "jdbc:sqlite:src/SQLite (5).db";
 
 
     /// EMBARCACIONES
@@ -210,7 +210,6 @@ public class BDDManager {
             ps.setInt(6, cilindrada);
             ps.setDouble(7, limiteVelocidad);
             ps.setBoolean(8, requiereLicencia);
-
             ps.executeUpdate();
 
         }catch (SQLException ex){
@@ -432,12 +431,8 @@ public class BDDManager {
     //CONSULTAS
 
     public static Generica<Empleado> getEmpleados() {
-        String query = """
-        SELECT p.dni, p.nombre, p.edad, p.telefono, p.email,
-               p.fecha_ingreso, e.puesto, e.salario
-        FROM persona p
-        INNER JOIN empleado e ON p.dni = e.dni
-        """;
+        String query =
+        "SELECT * FROM usuarios";
 
         Generica<Empleado> empleados = new Generica<>();
 
@@ -456,9 +451,7 @@ public class BDDManager {
                             rs.getLong("telefono"),
                             rs.getString("email"),
                             Puesto.valueOf(rs.getString("puesto")),
-                            rs.getDouble("salario"),
-                            LocalDate.parse(rs.getString("fecha_ingreso"))
-                    );
+                            rs.getDouble("salario"));
 
                     empleados.guardar(empleado);
                 }catch (DatoErroneoEx ex){
@@ -489,11 +482,10 @@ public class BDDManager {
                     int edad = rs.getInt("edad");
                     long telefono = rs.getLong("telefono");
                     String email = rs.getString("email");
-                    LocalDate fechaIngreso = rs.getDate("fecha_ingreso").toLocalDate();
                     Puesto puesto = Puesto.valueOf(rs.getString("puesto"));
                     double salario = rs.getDouble("salario");
                     try {
-                        empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario, fechaIngreso);
+                        empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario);
                     }catch (DatoErroneoEx ex){
                         ex.getMessage();
                     }
@@ -829,15 +821,16 @@ public class BDDManager {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (resultSet.next())
-            {
+            while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 int idReserva = resultSet.getInt("id_reserva");
                 Double montoFinal = resultSet.getDouble("monto_final");
+                Boolean isFinalizado = resultSet.getBoolean("is_finalizado");
+
 
                 Reserva aux = r.BuscarPorId(idReserva);
 
-                Alquiler auxA = new Alquiler(id, aux, montoFinal);
+                Alquiler auxA = new Alquiler(id, aux, montoFinal, isFinalizado);
                 listaAlquileres.guardar(auxA);
             }
         }
@@ -878,81 +871,14 @@ public class BDDManager {
         return id;
     }
 
-    ///  REPORTES
-
-    //CONSULTAS
-
-    public static ArrayList<Reporte> getReportesBDD()
-    {
-        String query = "SELECT * FROM reportes";
-        ArrayList<Reporte> listaReportes = new ArrayList<>();
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next())
-            {
-                int id = resultSet.getInt("id");
-                String descripcion = resultSet.getString("descripcion");
-                double coste = resultSet.getDouble("coste");
-                boolean cargoAgencia = resultSet.getBoolean("cargo_agencia");
-
-                Reporte aux = new Reporte(id,descripcion,coste,cargoAgencia);
-                listaReportes.add(aux);
-            }
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
-        return  listaReportes;
-    }
-
-    //ALTAS
-
-    public static int agregarReporteABDD(String descripcion, double coste, boolean cargo_agencia)
-    {
-        String queryAdd = "INSERT INTO reporte (descripcion,coste,cargo_agencia) VALUES (?,?,?) ";
-        int id = -1;
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(queryAdd, Statement.RETURN_GENERATED_KEYS);
-
-            preparedStatement.setString(1,descripcion);
-            preparedStatement.setDouble(2,coste);
-            preparedStatement.setBoolean(3,cargo_agencia);
-
-            preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-            if(resultSet.next())
-            {
-                id = resultSet.getInt(1);
-            }
-        }
-        catch (SQLException ex)
-        {
-            ex.printStackTrace();
-        }
-        return id;
-    }
-
-
     ///  VENTAS
 
     //CONSULTAS
 
-    public static Generica<Venta> listaVenta(Generica<Cliente> c , HashMap<String,Embarcacion>e, ArrayList <Reporte> r)
+    public static Generica<Venta> listaVenta(Generica<Cliente> c , HashMap<String,Embarcacion>e)
     {
         String query = "SELECT * FROM venta";
         Generica<Venta> listaVenta = new Generica<>();
-
-        HashMap<Integer, Reporte> hashReportes = new HashMap<>();
-        for(Reporte contador : r)
-        {
-            hashReportes.put(contador.getId(),contador);
-        }
 
         try(Connection connection = DriverManager.getConnection(url))
         {
@@ -964,16 +890,12 @@ public class BDDManager {
                 int id = resultSet.getInt("id");
                 int idClienteComprador = resultSet.getInt("dni_cliente_comprador");
                 String matriculaEmbarcacion = resultSet.getString("matricula_embarcacion");
-                double montoBase = resultSet.getDouble("monto_base");
-                int idReporteVenta = resultSet.getInt("id_reporte_venta");
-                double montoFinal = resultSet.getDouble("monto_final");
-
+                double monto = resultSet.getDouble("monto");
 
                 Embarcacion auxE = e.get(matriculaEmbarcacion);
                 Cliente auxC = c.BuscarPorId(idClienteComprador);
-                Reporte auxR = hashReportes.get(idReporteVenta);
 
-                Venta aux = new Venta(id,auxC,auxE,montoBase,auxR,montoFinal);
+                Venta aux = new Venta(id,auxC,auxE,monto);
                 listaVenta.guardar(aux);
             }
         }
@@ -987,22 +909,19 @@ public class BDDManager {
     // ALTAS
 
 
-    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double montoBase, Reporte reporteVenta, Double montoFinal)
+    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double monto, Double montoFinal)
     {
-        String query = "INSERT INTO venta (dni_cliente_comprador,matricula_embarcacion,monto_base,id_reporte_venta,monto_final)VALUES(?,?,?,?)";
+        String query = "INSERT INTO venta (dni_cliente_comprador,matricula_embarcacion,monto)VALUES(?,?,?)";
         int id = -1;
         long dni_cliente_comprador = clienteComprador.getID();
         String matricula_embarcacion = embarcacion.getID();
-        int idReporte = reporteVenta.getId();
         try(Connection connection = DriverManager.getConnection(url))
         {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
 
             preparedStatement.setLong(1,dni_cliente_comprador);
             preparedStatement.setString(2,matricula_embarcacion);
-            preparedStatement.setDouble(3,montoBase);
-            preparedStatement.setInt(4,idReporte);
-            preparedStatement.setDouble(5,montoFinal);
+            preparedStatement.setDouble(3,monto);
 
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();

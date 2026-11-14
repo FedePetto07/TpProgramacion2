@@ -6,7 +6,7 @@ import Interfaces.Identificable;
 
 import java.util.Objects;
 
-public abstract class Embarcacion implements Identificable<String> {
+public abstract class Embarcacion implements Identificable<String>, CalcularPrecio {
 
     /// ATRIBUTOS
 
