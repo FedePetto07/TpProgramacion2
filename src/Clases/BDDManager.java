@@ -197,7 +197,7 @@ public class BDDManager {
             System.out.println("\nEJECUTADO MOSTRAR");
 
             while (rs.next()) {
-                System.out.println(rs.getString("name"));
+                System.out.println(rs.getString("nombre"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -210,7 +210,7 @@ public class BDDManager {
 
     public static boolean existeMatriculaBDD(String matricula) {
 
-        String[] tablas = {"lancha", "velero", "moto_de_agua"};
+        String[] tablas = {"lanchas", "veleros", "motos_agua"};
 
         try (Connection c = DriverManager.getConnection(url)) {
 
@@ -263,7 +263,7 @@ public class BDDManager {
                         Embarcacion embarcacion = new Velero(
                                 rs.getString("nombre"),
                                 matricula,
-                                rs.getDouble("precio_diario"),
+                                rs.getDouble("precioDiario"),
                                 rs.getBoolean("disponible"),
                                 rs.getInt("cantidadVelas"),
                                 rs.getDouble("longitudMetros"),
@@ -275,7 +275,7 @@ public class BDDManager {
                         listaEmbarcacion.put(matricula, embarcacion);
 
                     }catch (DatoErroneoEx ex){
-                        System.out.println("ERROR: Obtener embarcaciones");
+                        System.out.println("ERROR BDD: velero " + matricula + ": " + ex.getMessage());
                     }
                 }
             }
@@ -303,7 +303,7 @@ public class BDDManager {
 
                         listaEmbarcacion.put(matricula, embarcacion);
                     }catch (DatoErroneoEx ex){
-                        ex.getMessage();
+                        System.out.println("ERROR BDD: moto de agua " + matricula + ": " + ex.getMessage());
                     }
                 }
             }
@@ -330,21 +330,18 @@ public class BDDManager {
                         );
 
                         listaEmbarcacion.put(matricula, embarcacion);
-                    }catch (DatoErroneoEx ex){
-                        System.out.println("ERROR BDD: " + ex.getMessage());
+                    }catch (DatoErroneoEx | IllegalArgumentException ex){
+                        System.out.println("ERROR BDD: lancha " + matricula + ": " + ex.getMessage());
                     }
                 }
             }
 
         } catch (SQLException ex) {
-            System.out.println("ERROR BDD: No se pudo descargar las embarcaciones");
+            System.out.println("ERROR BDD: No se pudo descargar las embarcaciones:\n" + ex.getMessage());
         }
-
-        System.out.println("Se han descargado las embarcaciones");
 
         return listaEmbarcacion;
     }
-
     //ALTAS
 
     /// VELERO
@@ -352,7 +349,7 @@ public class BDDManager {
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
     {
         String query = """
-    INSERT INTO velero
+    INSERT INTO veleros
     (nombre, matricula, precioDiario, disponible, capacidadPersonas, cantidadVelas, longitudMetros, cantidadCamarotes, requiereCapitan)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
@@ -365,7 +362,7 @@ public class BDDManager {
             ps.setDouble(3, precioDiario);
             ps.setBoolean(4, disponible);
             ps.setInt(5, capacidadPersonas);
-            ps.setDouble(6, cantidadVelas);
+            ps.setInt(6, cantidadVelas);
             ps.setDouble(7, longitudMetros);
             ps.setInt(8, cantidadCamarotes);
             ps.setBoolean(9, requiereCapitan);
@@ -382,7 +379,7 @@ public class BDDManager {
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
     {
         String query = """
-    INSERT INTO moto_de_agua
+    INSERT INTO motos_agua
     (nombre, matricula, precioDiario, disponible,
      capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -411,7 +408,7 @@ public class BDDManager {
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
     {
         String query = """
-    INSERT INTO lancha
+    INSERT INTO lanchas
     (nombre, matricula, precioDiario, disponible,
      potenciaMotor, longitudMetros, capacidadPersonas, combustible)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -444,15 +441,15 @@ public class BDDManager {
         int filasAfectadas = -1;
         if(embarcacion instanceof Velero)
         {
-            query = "DELETE FROM velero WHERE matricula=?";
+            query = "DELETE FROM veleros WHERE matricula=?";
         }
         if(embarcacion instanceof Lancha)
         {
-            query = "DELETE FROM lancha WHERE matricula=?";
+            query = "DELETE FROM lanchas WHERE matricula=?";
         }
         if(embarcacion instanceof MotoDeAgua)
         {
-            query = query = "DELETE FROM moto_de_agua WHERE matricula=?";
+            query = query = "DELETE FROM motos_agua WHERE matricula=?";
         }
         try (Connection connection = DriverManager.getConnection(url))
         {
@@ -495,8 +492,8 @@ public class BDDManager {
                     );
 
                     listaClientes.guardar(cliente);
-                }catch (DatoErroneoEx ex){
-                    System.out.println("ERROR BDD:" + ex.getMessage());
+                }catch (DatoErroneoEx | RuntimeException ex){
+                    System.out.println("ERROR BDD: cliente: " + ex.getMessage());
                 }
             }
 
@@ -517,7 +514,7 @@ public class BDDManager {
     public static void agregarCliente(Cliente c){
 
         String query = """
-    INSERT INTO clientes
+    INSERT INTO clientes 
     (dni, nombre, edad, telefono, email, fechaIngreso,
      numeroLicencia, cantidadAlquileres)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -531,7 +528,7 @@ public class BDDManager {
             ps.setInt(3, c.getEdad());
             ps.setLong(4, c.getTelefono());
             ps.setString(5, c.getEmail());
-            ps.setDate(6, java.sql.Date.valueOf(LocalDate.now()));
+            ps.setString(6, c.getFechaIngreso().toString());
             ps.setInt(7, c.getNumeroLicencia());
             ps.setInt(8, c.getCantidadAlquileres());
             ps.executeUpdate();
@@ -581,7 +578,7 @@ public class BDDManager {
         }
         if(cantidadAlquileres != null)
         {
-            query.append("cantidad_alquileres = ?, ");
+            query.append("cantidadAlquileres = ?, ");
             parametros.add(cantidadAlquileres);
         }
         if (parametros.isEmpty()) {
@@ -617,8 +614,7 @@ public class BDDManager {
     //CONSULTAS
 
     public static Generica<Empleado> getEmpleados() {
-        String query =
-        "SELECT * FROM usuarios";
+        String query = "SELECT * FROM usuarios";
 
         Generica<Empleado> empleados = new Generica<>();
 
@@ -646,10 +642,9 @@ public class BDDManager {
             }
 
         } catch (SQLException ex) {
-            System.out.println("ERROR BDD: No se pudo descargar empleados");
+            System.out.println("ERROR BDD: No se pudo descargar empleados:\n" + ex.getMessage());
         }
 
-        System.out.println("Se han descargado los empleados");
         return empleados;
     }
 
@@ -674,7 +669,7 @@ public class BDDManager {
                     try {
                         empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario);
                     }catch (DatoErroneoEx ex){
-                        ex.getMessage();
+                        System.out.println("ERROR BDD: empleado " + dni + ": " + ex.getMessage());
                     }
                 }
             }
@@ -688,7 +683,7 @@ public class BDDManager {
     //Conseguir Contraseña
     public static String getPassword(int dni){
         String password = null;
-        String getPassQuery = "SELECT * from password where dni_empleado = ?";
+        String getPassQuery = "SELECT contrasena from usuarios where dni = ?";
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(getPassQuery)) {
@@ -696,7 +691,7 @@ public class BDDManager {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    password = rs.getString("password_hash");
+                    password = rs.getString("contrasena");
                 }
             }
         }catch (SQLException e){
@@ -709,13 +704,11 @@ public class BDDManager {
 
     public static boolean agregarEmpleado(Empleado e, String password) {
 
-        String sqlUsuario = "INSERT INTO usuarios (dni, nombre, edad, telefono, email, puesto, salario, fecha_ingreso) " +
+        String sqlUsuario = "INSERT INTO usuarios (dni, nombre, edad, telefono, email, puesto, salario, contrasena) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        String sqlPassword = "INSERT INTO password (dni_usuario, password) VALUES (?, ?)";
 
         try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement psUsuario = c.prepareStatement(sqlUsuario);
-             PreparedStatement psPassword = c.prepareStatement(sqlPassword)) {
+             PreparedStatement psUsuario = c.prepareStatement(sqlUsuario)) {
 
             psUsuario.setLong(1, e.getID());
             psUsuario.setString(2, e.getNombre());
@@ -724,14 +717,9 @@ public class BDDManager {
             psUsuario.setString(5, e.getEmail());
             psUsuario.setString(6, e.getPuesto().name());
             psUsuario.setDouble(7, e.getSalario());
-            psUsuario.setString(8, LocalDate.now().toString());
+            psUsuario.setString(8, password);
 
             psUsuario.executeUpdate();
-
-            psPassword.setLong(1, e.getID());
-            psPassword.setString(2, password);
-
-            psPassword.executeUpdate();
 
             return true;
 
@@ -836,11 +824,11 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idCliente = resultSet.getInt("dniCliente");
+                Long idCliente = resultSet.getLong("dniCliente");
                 int cantidadPersonas = resultSet.getInt("cantidadPersonas");
                 String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
-                LocalDate fechaDeInicio = resultSet.getDate("fechaInicio").toLocalDate();
-                LocalDate fechaDeFin = resultSet.getDate("fechaFin").toLocalDate();
+                LocalDate fechaDeInicio = LocalDate.parse(resultSet.getString("fechaDeInicio"));
+                LocalDate fechaDeFin = LocalDate.parse(resultSet.getString("fechaDeFin"));
                 String estadoReserva = resultSet.getString("estadoReserva");
 
                 ESTADO_RESERVA reserva = null;
@@ -859,7 +847,6 @@ public class BDDManager {
                         reserva = ESTADO_RESERVA.FINALIZADA;
                         break;
                 }
-                ////////
 
                 Cliente aux = c.BuscarPorId(idCliente);
                 Embarcacion auxE = e.get(matriculaEmbarcacion);
@@ -885,9 +872,9 @@ public class BDDManager {
     public static void agregarReservaBDD(Reserva reserva) {
 
         String query = """
-        INSERT INTO reserva
+        INSERT INTO reservas
         (dniCliente, cantidadPersonas, matriculaEmbarcacion,
-         fechaInicio, fechaFin, estadoReserva)
+         fechaDeInicio, fechaDeFin, estadoReserva)
         VALUES (?, ?, ?, ?, ?, ?)
         """;
 
@@ -910,8 +897,6 @@ public class BDDManager {
 
             ps.executeUpdate();
 
-            System.out.println("Se han descargado las reservas");
-
         } catch (SQLException ex) {
             System.out.println("ERROR BDD: No se han descargado las reservas: \n" + ex.getMessage());
         }
@@ -921,7 +906,7 @@ public class BDDManager {
 
     public static int borrarReserva(int idReserva)
     {
-        String query = "DELETE FROM Reserva WHERE id = ? ";
+        String query = "DELETE FROM reservas WHERE id = ? ";
         int filasAfectadas= 0;
         try(Connection connection = DriverManager.getConnection(url))
         {
@@ -939,7 +924,7 @@ public class BDDManager {
     //MODIFICACIONES
 
     public static int modificarEstadoReservaBDD(int id, String estado_reserva){
-        String query = "UPDATE reserva SET estado_reserva = ? WHERE id = ?";
+        String query = "UPDATE reservas SET estadoReserva = ? WHERE id = ?";
         int filasAfectadas = 0;
 
         try (Connection connection = DriverManager.getConnection(url))
@@ -998,7 +983,7 @@ public class BDDManager {
 
     public static int agregarAlquilerBDD(Reserva reserva, double montoFinal)
     {
-        String query = "INSERT INTO alquileres (idReserva,montoFinal) VALUES (?,?)";
+        String query = "INSERT INTO alquileres (idReserva,montoFinal,isFinalizado) VALUES (?,?,0)";
         int id = -1;
 
         try(Connection connection = DriverManager.getConnection(url))
@@ -1041,7 +1026,7 @@ public class BDDManager {
             while (resultSet.next())
             {
                 int id = resultSet.getInt("id");
-                int idClienteComprador = resultSet.getInt("dniCliente");
+                long idClienteComprador = resultSet.getInt("dniCliente");
                 String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
                 double monto = resultSet.getDouble("monto");
 
@@ -1067,7 +1052,7 @@ public class BDDManager {
 
     public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double monto)
     {
-        String query = "INSERT INTO venta (dniCliente,matriculaEmbarcacion,monto)VALUES(?,?,?)";
+        String query = "INSERT INTO ventas (dniCliente,matriculaEmbarcacion,monto)VALUES(?,?,?)";
         int id = -1;
         long dni_cliente_comprador = clienteComprador.getID();
         String matricula_embarcacion = embarcacion.getID();
