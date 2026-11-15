@@ -553,7 +553,6 @@ public class BDDManager {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1,dniCliente);
 
-            preparedStatement.executeUpdate();
             filasAfectadas = preparedStatement.executeUpdate();
         }catch (SQLException ex)
         {
@@ -707,44 +706,6 @@ public class BDDManager {
     }
 
     //ALTAS
-
-    /*public static void agregarEmpleado(Empleado e, String password){
-
-            String query = "INSERT INTO usuarios (dni, nombre, edad, telefono, email, fecha_ingreso,puesto, salario) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            String sqlPassword = "INSERT INTO password (dni_empleado, password_hash) VALUES (?, ?)";
-
-            try (Connection c = DriverManager.getConnection(url);
-                 PreparedStatement ps = c.prepareStatement(query)){
-
-                ps.setLong(1, e.getID());
-                ps.setString(2, e.getNombre());
-                ps.setInt(3, e.getEdad());
-                ps.setLong(4, e.getTelefono());
-                ps.setString(5, e.getEmail());
-                ps.setString(6, e.getPuesto().name());
-                ps.setDouble(7, e.getSalario());
-                ps.setDate(8, java.sql.Date.valueOf(LocalDate.now()));
-
-                ps.executeUpdate();
-
-                try(ResultSet rs = addUserStatement.getGeneratedKeys();) {
-                    if (rs.next()) {
-                        idAgregado = rs.getInt(1);
-                        try (PreparedStatement addPasswordStatement = c.prepareStatement(sqlPassword)) {
-                            addPasswordStatement.setInt(1, idAgregado);
-                            addPasswordStatement.setString(2, password);
-
-                            addPasswordStatement.executeUpdate();
-
-                        }
-                    }
-                }
-            }
-        }catch (SQLException ex){
-            ex.printStackTrace();
-        }
-
-    }*/
 
     public static boolean agregarEmpleado(Empleado e, String password) {
 
@@ -967,7 +928,6 @@ public class BDDManager {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1,idReserva);
 
-            preparedStatement.executeUpdate();
             filasAfectadas = preparedStatement.executeUpdate();
         }catch (SQLException ex)
         {
