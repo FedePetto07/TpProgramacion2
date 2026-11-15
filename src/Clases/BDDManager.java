@@ -437,44 +437,7 @@ public class BDDManager {
         }
     }
 
-    //BAJAS
-
-    public static <T extends Identificable<String>> int borrarEmbarcacion(T embarcacion )
-    {
-        String query;
-        int filasAfectadas = -1;
-        if(embarcacion instanceof Velero)
-        {
-            query = "DELETE FROM veleros WHERE matricula=?";
-        }
-        else if(embarcacion instanceof Lancha)
-        {
-            query = "DELETE FROM lanchas WHERE matricula=?";
-        }
-        else if(embarcacion instanceof MotoDeAgua)
-        {
-            query = "DELETE FROM motos_agua WHERE matricula=?";
-        }
-        else
-        {
-            return filasAfectadas;
-        }
-
-        try (Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-            preparedStatement.setString(1,embarcacion.getID());
-            filasAfectadas = preparedStatement.executeUpdate();
-        }catch (SQLException ex)
-        {
-            ex.printStackTrace();;
-        }
-        return filasAfectadas;
-    }
-
     ///CLIENTES
-
 
     //CONSULTAS
 
@@ -546,25 +509,6 @@ public class BDDManager {
             ex.printStackTrace();
         }
 
-    }
-
-    //BAJAS
-
-    public static int eliminarClienteBDD(int dniCliente)
-    {
-        String query = "DELETE FROM clientes WHERE dni=?";
-        int filasAfectadas= 0;
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1,dniCliente);
-
-            filasAfectadas = preparedStatement.executeUpdate();
-        }catch (SQLException ex)
-        {
-            ex.printStackTrace();;
-        }
-        return filasAfectadas;
     }
 
     //MODIFICACIONES
