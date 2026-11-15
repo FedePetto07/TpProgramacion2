@@ -938,7 +938,7 @@ public class BDDManager {
 
     //MODIFICACIONES
 
-    public int modificarEstadoReservaBDD(int id, String estado_reserva) {
+    public static int modificarEstadoReservaBDD(int id, String estado_reserva){
         String query = "UPDATE reserva SET estado_reserva = ? WHERE id = ?";
         int filasAfectadas = 0;
 
@@ -1065,7 +1065,7 @@ public class BDDManager {
     // ALTAS
 
 
-    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double monto, Double montoFinal)
+    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double monto)
     {
         String query = "INSERT INTO venta (dniCliente,matriculaEmbarcacion,monto)VALUES(?,?,?)";
         int id = -1;
