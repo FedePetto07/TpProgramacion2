@@ -363,7 +363,11 @@ public class BDDManager {
             ps.setBoolean(4, disponible);
             ps.setInt(5, capacidadPersonas);
             ps.setInt(6, cantidadVelas);
-            ps.setDouble(7, longitudMetros);
+            if (longitudMetros == null) {
+                ps.setNull(7, Types.REAL);
+            } else {
+                ps.setDouble(7, longitudMetros);
+            }
             ps.setInt(8, cantidadCamarotes);
             ps.setBoolean(9, requiereCapitan);
 
@@ -437,20 +441,25 @@ public class BDDManager {
 
     public static <T extends Identificable<String>> int borrarEmbarcacion(T embarcacion )
     {
-        String query = "";
+        String query;
         int filasAfectadas = -1;
         if(embarcacion instanceof Velero)
         {
             query = "DELETE FROM veleros WHERE matricula=?";
         }
-        if(embarcacion instanceof Lancha)
+        else if(embarcacion instanceof Lancha)
         {
             query = "DELETE FROM lanchas WHERE matricula=?";
         }
-        if(embarcacion instanceof MotoDeAgua)
+        else if(embarcacion instanceof MotoDeAgua)
         {
-            query = query = "DELETE FROM motos_agua WHERE matricula=?";
+            query = "DELETE FROM motos_agua WHERE matricula=?";
         }
+        else
+        {
+            return filasAfectadas;
+        }
+
         try (Connection connection = DriverManager.getConnection(url))
         {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -898,7 +907,7 @@ public class BDDManager {
             ps.executeUpdate();
 
         } catch (SQLException ex) {
-            System.out.println("ERROR BDD: No se han descargado las reservas: \n" + ex.getMessage());
+            System.out.println("ERROR BDD: No se pudo guardar la reserva: \n" + ex.getMessage());
         }
     }
 
@@ -965,6 +974,11 @@ public class BDDManager {
 
 
                 Reserva aux = r.BuscarPorId(idReserva);
+
+                if (aux == null) {
+                    System.out.println("ERROR BDD: el alquiler " + id + " referencia la reserva " + idReserva + ", que no se pudo cargar.");
+                    continue;
+                }
 
                 Alquiler auxA = new Alquiler(id, aux, montoFinal, isFinalizado);
                 listaAlquileres.guardar(auxA);
@@ -1033,6 +1047,10 @@ public class BDDManager {
                 Embarcacion auxE = e.get(matriculaEmbarcacion);
                 Cliente auxC = c.BuscarPorId(idClienteComprador);
 
+                if (auxC == null || auxE == null) {
+                    System.out.println("ERROR BDD: la venta " + id + " referencia un cliente o una embarcación que no se pudo cargar.");
+                    continue;
+                }
                 Venta aux = new Venta(id,auxC,auxE,monto);
                 listaVenta.guardar(aux);
             }
