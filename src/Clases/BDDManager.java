@@ -364,10 +364,10 @@ public class BDDManager {
             ps.setString(2, matricula);
             ps.setDouble(3, precioDiario);
             ps.setBoolean(4, disponible);
-            ps.setInt(5, cantidadVelas);
-            ps.setDouble(6, longitudMetros);
-            ps.setInt(7, cantidadCamarotes);
-            ps.setInt(8, capacidadPersonas);
+            ps.setInt(5, capacidadPersonas);
+            ps.setDouble(6, cantidadVelas);
+            ps.setDouble(7, longitudMetros);
+            ps.setInt(8, cantidadCamarotes);
             ps.setBoolean(9, requiereCapitan);
 
             ps.executeUpdate();
@@ -976,7 +976,7 @@ public class BDDManager {
                 int id = resultSet.getInt("id");
                 int idReserva = resultSet.getInt("idReserva");
                 Double montoFinal = resultSet.getDouble("montoFinal");
-                Boolean isFinalizado = resultSet.getBoolean("isFinalizado");
+                boolean isFinalizado = resultSet.getBoolean("isFinalizado");
 
 
                 Reserva aux = r.BuscarPorId(idReserva);
@@ -987,14 +987,10 @@ public class BDDManager {
 
             System.out.println("Se han descargado los alquileres");
 
-        }
-
-
-
-        catch (SQLException ex)
-        {
+        }catch (SQLException ex) {
             System.out.println("ERROR BDD: No se han descargado los alquileres: \n" + ex.getMessage());
         }
+
         return listaAlquileres;
     }
 
