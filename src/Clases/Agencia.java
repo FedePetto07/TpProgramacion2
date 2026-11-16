@@ -549,7 +549,7 @@ public class Agencia {
         auxAlquiler.setId(id);
 
         auxAlquiler.cambiarDisponibilidad();
-        BDDManager.
+        ///falta modificar disponibilidad en bdd
         listaReservas.eliminar(idReserva);
 
         return true;
