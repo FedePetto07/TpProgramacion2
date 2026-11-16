@@ -64,6 +64,10 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
 
    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setMontoFinal(double montoFinal) throws AccionImposibleEx {
         if(isFinalizado){
             throw new AccionImposibleEx("El alquiler esta finalizado, por ende no se puede cambiar el monto");

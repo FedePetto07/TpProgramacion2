@@ -346,14 +346,14 @@ public class BDDManager {
 
     /// VELERO
 
-    public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
+    public static int agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
     {
         String query = """
     INSERT INTO veleros
     (nombre, matricula, precioDiario, disponible, capacidadPersonas, cantidadVelas, longitudMetros, cantidadCamarotes, requiereCapitan)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
-
+     int filasAgregadas = 0;
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
 
@@ -371,16 +371,17 @@ public class BDDManager {
             ps.setInt(8, cantidadCamarotes);
             ps.setBoolean(9, requiereCapitan);
 
-            ps.executeUpdate();
+           filasAgregadas =  ps.executeUpdate();
 
         }catch (SQLException ex){
             ex.printStackTrace();
         }
+        return filasAgregadas;
     }
 
     /// MOTO DE AGUA
 
-    public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
+    public static int agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
     {
         String query = """
     INSERT INTO motos_agua
@@ -388,7 +389,7 @@ public class BDDManager {
      capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """;
-
+      int filasGuardadas = 0;
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
 
@@ -400,16 +401,17 @@ public class BDDManager {
             ps.setInt(6, cilindrada);
             ps.setDouble(7, limiteVelocidad);
             ps.setBoolean(8, requiereLicencia);
-            ps.executeUpdate();
+            filasGuardadas  = ps.executeUpdate();
 
         }catch (SQLException ex){
             ex.printStackTrace();
         }
+        return filasGuardadas;
     }
 
     /// LANCHA
 
-    public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
+    public static int agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
     {
         String query = """
     INSERT INTO lanchas
@@ -417,7 +419,7 @@ public class BDDManager {
      potenciaMotor, longitudMetros, capacidadPersonas, combustible)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """;
-
+    int filasAgregadas = 0;
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
 
@@ -430,11 +432,12 @@ public class BDDManager {
             ps.setInt(7, capacidadPersonas);
             ps.setString(8, combustible.name());
 
-            ps.executeUpdate();
+            filasAgregadas = ps.executeUpdate();
 
         }catch (SQLException ex){
             ex.printStackTrace();
         }
+        return  filasAgregadas;
     }
 
     ///CLIENTES
@@ -684,14 +687,14 @@ public class BDDManager {
 
     //BAJAS
 
-    public static int borrarEmpleadoBDD(int dniEmpleado)
+    public static int borrarEmpleadoBDD(long dniEmpleado)
     {
         String query = "DELETE FROM usuarios WHERE dni=?";
         int filasAfectadas= 0;
         try(Connection connection = DriverManager.getConnection(url))
         {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1,dniEmpleado);
+            preparedStatement.setLong(1,dniEmpleado);
 
             filasAfectadas = preparedStatement.executeUpdate();
         }catch (SQLException ex)
@@ -822,7 +825,7 @@ public class BDDManager {
 
     //ALTAS
 
-    public static void agregarReservaBDD(Reserva reserva) {
+    public static int agregarReservaBDD(Reserva reserva) {
 
         String query = """
         INSERT INTO reservas
@@ -832,10 +835,9 @@ public class BDDManager {
         """;
 
         String matricula = reserva.getEmbarcacion().getID();
-
+        int filasCreadas = 0;
         if (!existeMatriculaBDD(matricula)) {
             System.out.println("La embarcación no existe.");
-            return;
         }
 
         try (Connection c = DriverManager.getConnection(url);
@@ -848,11 +850,12 @@ public class BDDManager {
             ps.setString(5, reserva.getFechaDeFin().toString());
             ps.setString(6, reserva.getEstadoReserva().name());
 
-            ps.executeUpdate();
+           filasCreadas = ps.executeUpdate();
 
         } catch (SQLException ex) {
             System.out.println("ERROR BDD: No se pudo guardar la reserva: \n" + ex.getMessage());
         }
+        return filasCreadas;
     }
 
     //BAJAS
