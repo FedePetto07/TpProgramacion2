@@ -396,8 +396,10 @@ public class Agencia {
             throw new ElementoDuplicadoEx("Ya existe un velero con esa matricula");
         }
 
-        embarcaciones.put(matricula, new Velero(nombre, matricula, precioDiario, disponible,cantidadVelas, longitudMetros,  capacidadPersonas, cantidadCamarotes));
-        int guardado = BDDManager.agregarEmbarcacionBDD(nombre, matricula, precioDiario, disponible, cantidadVelas, longitudMetros, capacidadPersonas, cantidadCamarotes, requiereCapitan);
+        Velero v = new Velero(nombre, matricula, precioDiario, disponible,cantidadVelas, longitudMetros,  capacidadPersonas, cantidadCamarotes);
+
+        embarcaciones.put(matricula, v);
+        int guardado = BDDManager.agregarEmbarcacionBDD(v);
         if(guardado == 1)
         {
             return true;
@@ -409,8 +411,11 @@ public class Agencia {
         if (embarcaciones.containsKey(matricula)) {
             throw new ElementoDuplicadoEx("Ya existe una moto de agua con esa matricula");
         }
-        embarcaciones.put(matricula, new MotoDeAgua(nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia));
-        int guardado = BDDManager.agregarEmbarcacionBDD(nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad,requiereLicencia);
+
+        MotoDeAgua m = new MotoDeAgua(nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia);
+
+        embarcaciones.put(matricula, m);
+        int guardado = BDDManager.agregarEmbarcacionBDD(m);
         if(guardado == 1)
         {
             return true;
@@ -423,8 +428,10 @@ public class Agencia {
             throw new ElementoDuplicadoEx("Ya existe una lancha con esa matricula");
         }
 
-        embarcaciones.put(matricula, new Lancha(nombre, matricula, precioDiario, disponible, potenciaMotor, longitudMetros, capacidadPersonas, combustible));
-        int guardado = BDDManager.agregarEmbarcacionBDD( nombre, matricula, precioDiario,disponible, potenciaMotor,  longitudMetros, capacidadPersonas,  combustible);
+        Lancha l = new Lancha(nombre, matricula, precioDiario, disponible, potenciaMotor, longitudMetros, capacidadPersonas, combustible);
+
+        embarcaciones.put(matricula, l);
+        int guardado = BDDManager.agregarEmbarcacionBDD(l);
 
         if(guardado == 1)
         {

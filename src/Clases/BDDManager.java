@@ -346,7 +346,7 @@ public class BDDManager {
 
     /// VELERO
 
-    public static int agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
+    public static int agregarEmbarcacionBDD(Velero v)
     {
         String query = """
     INSERT INTO veleros
@@ -357,19 +357,19 @@ public class BDDManager {
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
 
-            ps.setString(1, nombre);
-            ps.setString(2, matricula);
-            ps.setDouble(3, precioDiario);
-            ps.setBoolean(4, disponible);
-            ps.setInt(5, capacidadPersonas);
-            ps.setInt(6, cantidadVelas);
-            if (longitudMetros == null) {
+            ps.setString(1, v.getNombre());
+            ps.setString(2, v.getID());
+            ps.setDouble(3, v.getPrecioDiario());
+            ps.setBoolean(4, v.isDisponible());
+            ps.setInt(5, v.getCapacidadPersonas());
+            ps.setInt(6, v.getCantidadVelas());
+            if (v.getLongitudMetros() == null) {
                 ps.setNull(7, Types.REAL);
             } else {
-                ps.setDouble(7, longitudMetros);
+                ps.setDouble(7, v.getLongitudMetros());
             }
-            ps.setInt(8, cantidadCamarotes);
-            ps.setBoolean(9, requiereCapitan);
+            ps.setInt(8, v.getCantidadCamarotes());
+            ps.setBoolean(9, v.isRequiereCapitan());
 
            filasAgregadas =  ps.executeUpdate();
 
@@ -381,7 +381,7 @@ public class BDDManager {
 
     /// MOTO DE AGUA
 
-    public static int agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
+    public static int agregarEmbarcacionBDD(MotoDeAgua m)
     {
         String query = """
     INSERT INTO motos_agua
@@ -393,14 +393,14 @@ public class BDDManager {
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
 
-            ps.setString(1, nombre);
-            ps.setString(2, matricula);
-            ps.setDouble(3, precioDiario);
-            ps.setBoolean(4, disponible);
-            ps.setInt(5, capacidadPersonas);
-            ps.setInt(6, cilindrada);
-            ps.setDouble(7, limiteVelocidad);
-            ps.setBoolean(8, requiereLicencia);
+            ps.setString(1, m.getNombre());
+            ps.setString(2, m.getID());
+            ps.setDouble(3, m.getPrecioDiario());
+            ps.setBoolean(4, m.isDisponible());
+            ps.setInt(5, m.getCapacidadPersonas());
+            ps.setInt(6, m.getCilindrada());
+            ps.setDouble(7, m.getLimiteVelocidad());
+            ps.setBoolean(8, m.isRequiereLicencia());
             filasGuardadas  = ps.executeUpdate();
 
         }catch (SQLException ex){
@@ -411,7 +411,7 @@ public class BDDManager {
 
     /// LANCHA
 
-    public static int agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
+    public static int agregarEmbarcacionBDD(Lancha l)
     {
         String query = """
     INSERT INTO lanchas
@@ -423,14 +423,14 @@ public class BDDManager {
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(query)){
 
-            ps.setString(1, nombre);
-            ps.setString(2, matricula);
-            ps.setDouble(3, precioDiario);
-            ps.setBoolean(4, disponible);
-            ps.setInt(5, potenciaMotor);
-            ps.setDouble(6, longitudMetros);
-            ps.setInt(7, capacidadPersonas);
-            ps.setString(8, combustible.name());
+            ps.setString(1, l.getNombre());
+            ps.setString(2, l.getID());
+            ps.setDouble(3, l.getPrecioDiario());
+            ps.setBoolean(4, l.isDisponible());
+            ps.setInt(5, l.getPotenciaMotor());
+            ps.setDouble(6, l.getLongitudMetros());
+            ps.setInt(7, l.getCapacidadPersonas());
+            ps.setString(8, l.getCombustible().name());
 
             filasAgregadas = ps.executeUpdate();
 

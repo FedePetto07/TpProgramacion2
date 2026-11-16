@@ -125,13 +125,13 @@ public class Reserva implements Identificable<Integer> {
     {
         return "\nRESERVA{" +
                 " \n |id=" + id +
-                "| \n |Datos cliente=" + cliente.toString() +
-                "| \n |Cantidad de personas=" + estadoReserva +
-                "| \n |Datos embarcacion=" + embarcacion.toString() +
-                "| \n |Fecha de inicio=" + fechaDeInicio +
+                "| \n |Datos cliente:{" + cliente.toString() +
+                "|} \n |Cantidad de personas=" + estadoReserva +
+                "| \n |Datos embarcacion:{" + embarcacion.toString() +
+                "|} \n |Fecha de inicio=" + fechaDeInicio +
                 "| \n |Fecha de fin=" + fechaDeFin +
                 "| \n |Estado de la reserva=" + estadoReserva +
-                '}';
+                '|';
     }
 
 

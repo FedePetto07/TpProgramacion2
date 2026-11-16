@@ -62,7 +62,7 @@ public class Lancha extends Embarcacion {
                 " \n |potenciaMotor=" + potenciaMotor +
                 "| \n |longitudMetros=" + longitudMetros +
                 "| \n |combustible=" + combustible +
-                '}';
+                '|';
     }
 
 }
