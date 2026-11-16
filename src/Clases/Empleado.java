@@ -58,6 +58,10 @@ public class Empleado extends Persona {
         this.salario = salario;
     }
 
+    public void setPuesto(Puesto puesto) {
+        this.puesto = puesto;
+    }
+
     @Override
     public String toString() {
         return "\nEMPLEADO: " + super.toString() +

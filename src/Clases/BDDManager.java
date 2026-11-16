@@ -762,7 +762,7 @@ public class BDDManager {
 
     //MODIFICACIONES
 
-    public static int  modificarCamposUsuarioBDD(int idEmpleado, Long telefono, String email, String puesto, Double salario)
+    public static int  modificarCamposUsuarioBDD(long idEmpleado, String nombre, Long telefono, String email, String puesto, Double salario)
     {
         StringBuilder query = new StringBuilder("UPDATE usuarios SET ");
         ArrayList<Object> parametros = new ArrayList<>();

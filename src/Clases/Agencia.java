@@ -137,7 +137,67 @@ public class Agencia {
 
         throw new AccionImposibleEx("No existe un empleado con ese DNI");
     }
+    //////setter
+    public String modificarDatosEmpleado(long dni, String nombreNuevo, Long telefonoNuevo, String emailNuevo, Puesto puesto, double salarioNuevo) throws ObjetoNoEncontradoEx, DatoErroneoEx
+    {
+        Empleado aux = empleados.BuscarPorId(dni);
+        if(aux == null)
+        {
+            throw new ObjetoNoEncontradoEx("ERROR. el dni ingresado no existe en el sistema...");
+        }
+        StringBuilder informacionNuevaEmpleado = new StringBuilder();
 
+        if (nombreNuevo != null) {
+            if (nombreNuevo.isBlank() || nombreNuevo.matches(".*\\d.*"))
+            {
+                throw new DatoErroneoEx("El nombre nuevo no puede contener números.");
+            }
+            aux.setNombre(nombreNuevo);
+            informacionNuevaEmpleado.append("Se ha actualizado el nombre. ");
+        }
+
+        if (telefonoNuevo != null) {
+            if (String.valueOf(telefonoNuevo).length() != 10) {
+                throw new DatoErroneoEx("El teléfono nuevo debe tener exactamente 10 dígitos.");
+            }
+
+            aux.setTelefono(telefonoNuevo);
+            informacionNuevaEmpleado.append("Se ha actualizado el telefono. ");
+        }
+
+        if (emailNuevo != null) {
+            if (!emailNuevo.endsWith("@gmail.com")) {
+                throw new DatoErroneoEx("El email debe terminar en @gmail.com");
+            }
+
+            aux.setEmail(emailNuevo);
+            informacionNuevaEmpleado.append("Se ha actualizado el email. ");
+        }
+
+
+        if (puesto != null) {
+            aux.setPuesto(puesto);
+            informacionNuevaEmpleado.append("Se ha actualizado el puesto. ");
+        }
+
+        if (salarioNuevo > 0) {
+            aux.setSalario(salarioNuevo);
+            informacionNuevaEmpleado.append("Se ha actualizado el salario. ");
+        }
+
+        ///////////////////////////////
+        Double salarioNuevoBDD = (salarioNuevo > 0) ? salarioNuevo : null;
+        String puestoParaBDD = (puesto != null) ? puesto.toString() : null;
+
+        // CORREGIDO: Evitar NullPointerException si el puesto es null
+        int modificado = BDDManager.modificarCamposUsuarioBDD(dni, nombreNuevo, telefonoNuevo, emailNuevo, puestoParaBDD, salarioNuevoBDD);
+
+        if(modificado == 1) {
+            return informacionNuevaEmpleado.toString();
+        }
+
+        return "Error en el guardado...";
+    }
     ///  CLIENTES
 
 // AGREGAR Y ELIMINAR CLIENTES
