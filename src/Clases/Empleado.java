@@ -12,16 +12,14 @@ public class Empleado extends Persona {
 
     // Constructor 1: con todos los datos (BDD)
     public Empleado(Long dni, String nombre, int edad, Long telefono, String email,
-                    Puesto puesto, double salario, LocalDate fechaIngreso) throws DatoErroneoEx {
-        super(dni, nombre, edad, telefono, email, fechaIngreso);
+                    Puesto puesto, double salario) throws DatoErroneoEx {
+        super(dni, nombre, edad, telefono, email);
 
         if (puesto == null) {
             throw new DatoErroneoEx("El puesto no puede ser nulo.");
         }
 
         this.puesto = puesto;
-
-
         this.salario = salario;
     }
 
@@ -44,6 +42,8 @@ public class Empleado extends Persona {
         }
     }
 
+    /// GETTERS
+
     public Puesto getPuesto() {
         return puesto;
     }
@@ -52,9 +52,15 @@ public class Empleado extends Persona {
         return salario;
     }
 
+    /// SETTER
+
+    public void setSalario(double salario) {
+        this.salario = salario;
+    }
+
     @Override
     public String toString() {
-        return "\nEMPLEADO" + super.toString() +
+        return "\nEMPLEADO: " + super.toString() +
                 " \n |puesto=" + puesto +
                 "| \n |salario=" + salario + "|";
     }

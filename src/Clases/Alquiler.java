@@ -1,4 +1,5 @@
 package Clases;
+import Excepciones.AccionImposibleEx;
 import Excepciones.DatoErroneoEx;
 import Interfaces.CalcularPrecio;
 import Interfaces.Identificable;
@@ -11,13 +12,15 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
     private int id;
     private Reserva reserva;
     private double montoFinal;
+    private boolean isFinalizado;
 
     /// CONSTRUCTOR BDD
 
-    public Alquiler(int id, Reserva reserva, double montoFinal) {
+    public Alquiler(int id, Reserva reserva, double montoFinal, boolean isFinalizado) {
         this.reserva = reserva;
         this.id = id;
         this.montoFinal = montoFinal;
+        this.isFinalizado = isFinalizado;
     }
 
     public Alquiler(Reserva reserva) throws DatoErroneoEx {
@@ -28,6 +31,7 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
 
         this.reserva = reserva;
         this.montoFinal = calcularPrecio();
+        this.isFinalizado = false;
     }
 
     @Override
@@ -59,14 +63,26 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
        }
 
    }
+
+    public void setMontoFinal(double montoFinal) throws AccionImposibleEx {
+        if(isFinalizado){
+            throw new AccionImposibleEx("El alquiler esta finalizado, por ende no se puede cambiar el monto");
+        }
+        this.montoFinal = montoFinal;
+    }
+
+    public void finalizarAlquiler()
+   {
+       this.isFinalizado = true;
+   }
+
     ///
     @Override
     public double calcularPrecio()
     {
         double precioDiario = reserva.getEmbarcacion().getPrecioDiario();
         long cantDias = ChronoUnit.DAYS.between(reserva.getFechaDeInicio(),reserva.getFechaDeFin());
-        this.montoFinal = cantDias*precioDiario;
-
+        this.montoFinal += cantDias*precioDiario;
         return montoFinal;
     }
     ///////////

@@ -13,11 +13,204 @@ import java.util.HashMap;
 
 public class BDDManager {
 
-    static final String url = "jdbc:mysql://localhost/";
+    static final String url = "jdbc:sqlite:src/AgenciaEmbarcaciones.db";
+
+
+    public static boolean conexion()
+    {
+
+        try (Connection c = DriverManager.getConnection(url)) {
+
+            System.out.println("Conectado");
+
+        }catch (SQLException e){
+            System.out.println("Error: "+e.getMessage());
+            return false;
+        }
+
+
+        return true;
+    }
+
+    public static void mostrarTablasBDD() {
+
+        String query = "SELECT name FROM sqlite_master WHERE type = 'table'";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            System.out.println("===== TABLAS DE LA BASE DE DATOS =====");
+
+            while (rs.next()) {
+                System.out.println("- " + rs.getString("name"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR BDD: No se pudieron obtener las tablas. "
+                    + ex.getMessage());
+        }
+    }
+
+    public static void crearTablasBDD() {
+
+        String[] consultas = {
+
+                // USUARIOS
+                """
+        CREATE TABLE IF NOT EXISTS usuarios (
+            dni INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            edad INTEGER NOT NULL,
+            telefono INTEGER NOT NULL,
+            email TEXT NOT NULL,
+            puesto TEXT NOT NULL CHECK (
+                puesto IN ('GERENTE', 'RECEPCIONISTA')
+            ),
+            salario REAL NOT NULL,
+            contrasena TEXT NOT NULL
+        )
+        """,
+
+                // CLIENTES
+                """
+        CREATE TABLE IF NOT EXISTS clientes (
+            dni INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            edad INTEGER NOT NULL,
+            telefono INTEGER NOT NULL,
+            email TEXT NOT NULL,
+            numeroLicencia INTEGER NOT NULL,
+            cantidadAlquileres INTEGER NOT NULL,
+            fechaIngreso TEXT NOT NULL
+        )
+        """,
+
+                // LANCHAS
+                """
+        CREATE TABLE IF NOT EXISTS lanchas (
+            matricula TEXT PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            precioDiario REAL NOT NULL,
+            disponible INTEGER NOT NULL,
+            capacidadPersonas INTEGER NOT NULL,
+            potenciaMotor INTEGER NOT NULL,
+            longitudMetros REAL NOT NULL,
+            combustible TEXT NOT NULL
+        )
+        """,
+
+                // MOTOS DE AGUA
+                """
+        CREATE TABLE IF NOT EXISTS motos_agua (
+            matricula TEXT PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            precioDiario REAL NOT NULL,
+            disponible INTEGER NOT NULL,
+            capacidadPersonas INTEGER NOT NULL,
+            cilindrada INTEGER NOT NULL,
+            limiteVelocidad REAL NOT NULL,
+            requiereLicencia INTEGER NOT NULL
+        )
+        """,
+
+                // VELEROS
+                """
+        CREATE TABLE IF NOT EXISTS veleros (
+            matricula TEXT PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            precioDiario REAL NOT NULL,
+            disponible INTEGER NOT NULL,
+            capacidadPersonas INTEGER NOT NULL,
+            cantidadVelas INTEGER NOT NULL,
+            longitudMetros REAL,
+            cantidadCamarotes INTEGER NOT NULL,
+            requiereCapitan INTEGER NOT NULL
+        )
+        """,
+
+                // RESERVAS
+                """
+        CREATE TABLE IF NOT EXISTS reservas (
+            id INTEGER PRIMARY KEY,
+            dniCliente INTEGER NOT NULL,
+            matriculaEmbarcacion TEXT NOT NULL,
+            cantidadPersonas INTEGER NOT NULL,
+            fechaDeInicio TEXT NOT NULL,
+            fechaDeFin TEXT NOT NULL,
+            estadoReserva TEXT NOT NULL,
+            FOREIGN KEY (dniCliente) REFERENCES clientes(dni)
+        )
+        """,
+
+                // ALQUILERES
+                """
+        CREATE TABLE IF NOT EXISTS alquileres (
+            id INTEGER PRIMARY KEY,
+            idReserva INTEGER NOT NULL,
+            montoFinal REAL NOT NULL,
+            isFinalizado INTEGER NOT NULL,
+            FOREIGN KEY (idReserva) REFERENCES reservas(id)
+        )
+        """,
+
+                // VENTAS
+                """
+        CREATE TABLE IF NOT EXISTS ventas (
+            id INTEGER PRIMARY KEY,
+            dniCliente INTEGER NOT NULL,
+            matriculaEmbarcacion TEXT NOT NULL,
+            monto REAL NOT NULL,
+            FOREIGN KEY (dniCliente) REFERENCES clientes(dni)
+        )
+        """
+        };
+
+        try (Connection c = DriverManager.getConnection(url);
+             Statement st = c.createStatement()) {
+
+            st.execute("PRAGMA foreign_keys = ON");
+
+            for (String consulta : consultas) {
+                st.executeUpdate(consulta);
+            }
+
+            System.out.println("Se crearon correctamente las tablas.");
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR BDD: No se pudieron crear las tablas.");
+            ex.printStackTrace();
+        }
+    }
+
+    public static void MOSTRAR()
+    {
+
+        System.out.println("EJECUTANDO MOSTRAR");
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(
+                     "SELECT * FROM clientes"
+             );
+             ResultSet rs = ps.executeQuery()) {
+
+            System.out.println("\nEJECUTADO MOSTRAR");
+
+            while (rs.next()) {
+                System.out.println(rs.getString("nombre"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("ERORROROR");
+        }
+    }
+
+    /// EMBARCACIONES
+    //CONSULTAS
 
     public static boolean existeMatriculaBDD(String matricula) {
 
-        String[] tablas = {"lancha", "velero", "moto_de_agua"};
+        String[] tablas = {"lanchas", "veleros", "motos_agua"};
 
         try (Connection c = DriverManager.getConnection(url)) {
 
@@ -50,9 +243,9 @@ public class BDDManager {
 
         HashMap<String, Embarcacion> listaEmbarcacion = new HashMap<>();
 
-        String queryVelero = "SELECT * FROM velero";
-        String queryMoto = "SELECT * FROM moto_de_agua";
-        String queryLancha = "SELECT * FROM lancha";
+        String queryVelero = "SELECT * FROM veleros";
+        String queryMoto = "SELECT * FROM motos_agua";
+        String queryLancha = "SELECT * FROM lanchas";
 
 
         try (Connection c = DriverManager.getConnection(url)) {
@@ -70,19 +263,19 @@ public class BDDManager {
                         Embarcacion embarcacion = new Velero(
                                 rs.getString("nombre"),
                                 matricula,
-                                rs.getDouble("precio_diario"),
+                                rs.getDouble("precioDiario"),
                                 rs.getBoolean("disponible"),
-                                rs.getInt("cantidad_velas"),
-                                rs.getDouble("longitud_metros"),
-                                rs.getInt("capacidad_personas"),
-                                rs.getInt("cantidad_camarotes"),
-                                rs.getBoolean("requiere_capitan")
+                                rs.getInt("cantidadVelas"),
+                                rs.getDouble("longitudMetros"),
+                                rs.getInt("capacidadPersonas"),
+                                rs.getInt("cantidadCamarotes"),
+                                rs.getBoolean("requiereCapitan")
                         );
 
                         listaEmbarcacion.put(matricula, embarcacion);
 
                     }catch (DatoErroneoEx ex){
-                        ex.getMessage();
+                        System.out.println("ERROR BDD: velero " + matricula + ": " + ex.getMessage());
                     }
                 }
             }
@@ -100,17 +293,17 @@ public class BDDManager {
                         Embarcacion embarcacion = new MotoDeAgua(
                                 rs.getString("nombre"),
                                 matricula,
-                                rs.getDouble("precio_diario"),
+                                rs.getDouble("precioDiario"),
                                 rs.getBoolean("disponible"),
-                                rs.getInt("capacidad_personas"),
+                                rs.getInt("capacidadPersonas"),
                                 rs.getInt("cilindrada"),
-                                rs.getDouble("limite_velocidad"),
-                                rs.getBoolean("requiere_licencia")
+                                rs.getDouble("limiteVelocidad"),
+                                rs.getBoolean("requiereLicencia")
                         );
 
                         listaEmbarcacion.put(matricula, embarcacion);
                     }catch (DatoErroneoEx ex){
-                        ex.getMessage();
+                        System.out.println("ERROR BDD: moto de agua " + matricula + ": " + ex.getMessage());
                     }
                 }
             }
@@ -128,277 +321,36 @@ public class BDDManager {
                         Embarcacion embarcacion = new Lancha(
                                 rs.getString("nombre"),
                                 matricula,
-                                rs.getDouble("precio_diario"),
+                                rs.getDouble("precioDiario"),
                                 rs.getBoolean("disponible"),
-                                rs.getInt("potencia_motor"),
-                                rs.getDouble("longitud_metros"),
-                                rs.getInt("capacidad_personas"),
+                                rs.getInt("potenciaMotor"),
+                                rs.getDouble("longitudMetros"),
+                                rs.getInt("capacidadPersonas"),
                                 TipoCombustible.valueOf(rs.getString("combustible"))
                         );
 
                         listaEmbarcacion.put(matricula, embarcacion);
-                    }catch (DatoErroneoEx ex){
-                        ex.getMessage();
+                    }catch (DatoErroneoEx | IllegalArgumentException ex){
+                        System.out.println("ERROR BDD: lancha " + matricula + ": " + ex.getMessage());
                     }
                 }
             }
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.out.println("ERROR BDD: No se pudo descargar las embarcaciones:\n" + ex.getMessage());
         }
 
         return listaEmbarcacion;
     }
-
-    public static Generica<Empleado> getEmpleados() {
-        String query = """
-        SELECT p.dni, p.nombre, p.edad, p.telefono, p.email,
-               p.fecha_ingreso, e.puesto, e.salario
-        FROM persona p
-        INNER JOIN empleado e ON p.dni = e.dni
-        """;
-
-        Generica<Empleado> empleados = new Generica<>();
-
-        try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement ps = c.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-
-                try {
-
-                    Empleado empleado = new Empleado(
-                            rs.getLong("dni"),
-                            rs.getString("nombre"),
-                            rs.getInt("edad"),
-                            rs.getLong("telefono"),
-                            rs.getString("email"),
-                            Puesto.valueOf(rs.getString("puesto")),
-                            rs.getDouble("salario"),
-                            LocalDate.parse(rs.getString("fecha_ingreso"))
-                    );
-
-                    empleados.guardar(empleado);
-                }catch (DatoErroneoEx ex){
-                    ex.getMessage();
-                }
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return empleados;
-    }
-
-    public static Generica<Cliente> getClientesBDD() {
-        String query = """
-        SELECT p.dni, p.nombre, p.edad, p.telefono, p.email,
-               p.fecha_ingreso, c.numero_licencia, c.cantidad_alquileres
-        FROM persona p
-        INNER JOIN cliente c ON p.dni = c.dni
-        """;
-
-        Generica<Cliente> listaClientes = new Generica<>();
-
-        try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement ps = c.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                try {
-                    Cliente cliente = new Cliente(
-                            rs.getLong("dni"),
-                            rs.getString("nombre"),
-                            rs.getInt("edad"),
-                            rs.getLong("telefono"),
-                            rs.getString("email"),
-                            LocalDate.parse(rs.getString("fecha_ingreso")),
-                            rs.getInt("numero_licencia"),
-                            rs.getInt("cantidad_alquileres")
-                    );
-
-                    listaClientes.guardar(cliente);
-                }catch (DatoErroneoEx ex){
-                    ex.getMessage();
-                }
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return listaClientes;
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    public static ArrayList<Reporte> getReportesBDD()
-    {
-        String query = "SELECT * FROM reportes";
-        ArrayList<Reporte> listaReportes = new ArrayList<>();
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next())
-            {
-                int id = resultSet.getInt("id");
-                String descripcion = resultSet.getString("descripcion");
-                double coste = resultSet.getDouble("coste");
-                boolean cargoAgencia = resultSet.getBoolean("cargo_agencia");
-
-                Reporte aux = new Reporte(id,descripcion,coste,cargoAgencia);
-                listaReportes.add(aux);
-            }
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
-        return  listaReportes;
-    }
-
-    /////
-    public static Generica<Venta> listaVenta(Generica<Cliente> c , HashMap<String,Embarcacion>e, ArrayList <Reporte> r)
-    {
-        String query = "SELECT * FROM venta";
-        Generica<Venta> listaVenta = new Generica<>();
-
-        HashMap<Integer, Reporte> hashReportes = new HashMap<>();
-        for(Reporte contador : r)
-        {
-            hashReportes.put(contador.getId(),contador);
-        }
-//////////////////////////
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next())
-            {
-                int id = resultSet.getInt("id");
-                int idClienteComprador = resultSet.getInt("dni_cliente_comprador");
-                String matriculaEmbarcacion = resultSet.getString("matricula_embarcacion");
-                double montoBase = resultSet.getDouble("monto_base");
-                int idReporteVenta = resultSet.getInt("id_reporte_venta");
-                double montoFinal = resultSet.getDouble("monto_final");
-
-
-                Embarcacion auxE = e.get(matriculaEmbarcacion);
-                Cliente auxC = c.BuscarPorId(idClienteComprador);
-                Reporte auxR = hashReportes.get(idReporteVenta);
-
-                Venta aux = new Venta(id,auxC,auxE,montoBase,auxR,montoFinal);
-                listaVenta.guardar(aux);
-            }
-        }
-        catch (SQLException ex)
-        {
-            ex.printStackTrace();
-        }
-        return listaVenta;
-    }
-    //////////
-    public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <String,Embarcacion> e)
-    {
-        String query = "SELECT * FROM reserva";
-
-        Generica <Reserva> listaReservas = new Generica<>();
-
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next())
-            {
-                int id = resultSet.getInt("id");
-                int idCliente = resultSet.getInt("dni_cliente");
-                int cantidadPersonas = resultSet.getInt("cantidad_personas");
-                String matriculaEmbarcacion = resultSet.getString("matricula_embarcacion");
-                LocalDate fechaDeInicio = resultSet.getDate("fecha_inicio").toLocalDate();
-                LocalDate fechaDeFin = resultSet.getDate("fecha_fin").toLocalDate();
-                String estadoReserva = resultSet.getString("estado_reserva");
-
-                ESTADO_RESERVA reserva = null;
-                switch (estadoReserva)
-                {
-                    case "CANCELADA":
-                        reserva = ESTADO_RESERVA.CANCELADA;
-                        break;
-                    case "CONFIRMADA":
-                        reserva = ESTADO_RESERVA.CONFIRMADA;
-                        break;
-                    case "PENDIENTE":
-                        reserva = ESTADO_RESERVA.PENDIENTE;
-                        break;
-                    case "FINALIZADA":
-                        reserva = ESTADO_RESERVA.FINALIZADA;
-                        break;
-                }
-                ////////
-
-                Cliente aux = c.BuscarPorId(idCliente);
-                Embarcacion auxE = e.get(matriculaEmbarcacion);
-
-                try {
-                    Reserva auxR = new Reserva(id,aux,cantidadPersonas,auxE,fechaDeInicio.getYear(),fechaDeInicio.getMonthValue(),fechaDeInicio.getDayOfMonth(),fechaDeFin.getYear(),fechaDeFin.getMonthValue(),fechaDeFin.getDayOfMonth(),reserva);
-                    listaReservas.guardar(auxR);
-                }catch (DatoErroneoEx ex){
-                    ex.getMessage();
-                }
-            }
-        }
-        catch (SQLException ex)
-        {
-            ex.printStackTrace();;
-        }
-        return listaReservas;
-    }
-
-    public static Generica<Alquiler> getAlquileresBDD(Generica<Reserva> r)
-    {
-        String query = "SELECT * FROM alquileres";
-        Generica<Alquiler> listaAlquileres = new Generica<>();
-
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next())
-            {
-                int id = resultSet.getInt("id");
-                int idReserva = resultSet.getInt("id_reserva");
-                Double montoFinal = resultSet.getDouble("monto_final");
-
-                Reserva aux = r.BuscarPorId(idReserva);
-
-                Alquiler auxA = new Alquiler(id, aux, montoFinal);
-                listaAlquileres.guardar(auxA);
-            }
-        }
-        catch (SQLException ex)
-        {
-            ex.printStackTrace();;
-        }
-        return listaAlquileres;
-    }
+    //ALTAS
 
     /// VELERO
 
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan)
     {
         String query = """
-    INSERT INTO velero
-    (nombre, matricula, precio_diario, disponible,
-     cantidad_velas, longitud_metros, capacidad_personas,
-     cantidad_camarotes, requiere_capitan)
+    INSERT INTO veleros
+    (nombre, matricula, precioDiario, disponible, capacidadPersonas, cantidadVelas, longitudMetros, cantidadCamarotes, requiereCapitan)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
@@ -409,10 +361,14 @@ public class BDDManager {
             ps.setString(2, matricula);
             ps.setDouble(3, precioDiario);
             ps.setBoolean(4, disponible);
-            ps.setInt(5, cantidadVelas);
-            ps.setDouble(6, longitudMetros);
-            ps.setInt(7, cantidadCamarotes);
-            ps.setInt(8, capacidadPersonas);
+            ps.setInt(5, capacidadPersonas);
+            ps.setInt(6, cantidadVelas);
+            if (longitudMetros == null) {
+                ps.setNull(7, Types.REAL);
+            } else {
+                ps.setDouble(7, longitudMetros);
+            }
+            ps.setInt(8, cantidadCamarotes);
             ps.setBoolean(9, requiereCapitan);
 
             ps.executeUpdate();
@@ -422,14 +378,14 @@ public class BDDManager {
         }
     }
 
-    /// MotoDeAgua
+    /// MOTO DE AGUA
 
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia)
     {
         String query = """
-    INSERT INTO moto_de_agua
-    (nombre, matricula, precio_diario, disponible,
-     capacidad_personas, cilindrada, limite_velocidad, requiere_licencia)
+    INSERT INTO motos_agua
+    (nombre, matricula, precioDiario, disponible,
+     capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
@@ -444,7 +400,6 @@ public class BDDManager {
             ps.setInt(6, cilindrada);
             ps.setDouble(7, limiteVelocidad);
             ps.setBoolean(8, requiereLicencia);
-
             ps.executeUpdate();
 
         }catch (SQLException ex){
@@ -457,9 +412,9 @@ public class BDDManager {
     public static void agregarEmbarcacionBDD(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible)
     {
         String query = """
-    INSERT INTO lancha
-    (nombre, matricula, precio_diario, disponible,
-     potencia_motor, longitud_metros, capacidad_personas, combustible)
+    INSERT INTO lanchas
+    (nombre, matricula, precioDiario, disponible,
+     potenciaMotor, longitudMetros, capacidadPersonas, combustible)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
@@ -482,14 +437,58 @@ public class BDDManager {
         }
     }
 
-    /// CLIENTE
+    ///CLIENTES
+
+    //CONSULTAS
+
+    public static Generica<Cliente> getClientesBDD() {
+        String query = "SELECT * FROM clientes";
+
+        Generica<Cliente> listaClientes = new Generica<>();
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                try {
+                    Cliente cliente = new Cliente(
+                            rs.getLong("dni"),
+                            rs.getString("nombre"),
+                            rs.getInt("edad"),
+                            rs.getLong("telefono"),
+                            rs.getString("email"),
+                            LocalDate.parse(rs.getString("fechaIngreso")),
+                            rs.getInt("numeroLicencia"),
+                            rs.getInt("cantidadAlquileres")
+                    );
+
+                    listaClientes.guardar(cliente);
+                }catch (DatoErroneoEx | RuntimeException ex){
+                    System.out.println("ERROR BDD: cliente: " + ex.getMessage());
+                }
+            }
+
+            System.out.println("Se han descargado los clientes");
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR BDD: No se pudo descargar clientes:\n" + ex.getMessage());
+        }
+
+
+        return listaClientes;
+    }
+
+    //ALTAS
+
+    ///CLIENTE
 
     public static void agregarCliente(Cliente c){
 
         String query = """
-    INSERT INTO clientes
-    (dni, nombre, edad, telefono, email, fecha_ingreso,
-     numero_licencia, cantidad_alquileres)
+    INSERT INTO clientes 
+    (dni, nombre, edad, telefono, email, fechaIngreso,
+     numeroLicencia, cantidadAlquileres)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """;
 
@@ -501,7 +500,7 @@ public class BDDManager {
             ps.setInt(3, c.getEdad());
             ps.setLong(4, c.getTelefono());
             ps.setString(5, c.getEmail());
-            ps.setDate(6, java.sql.Date.valueOf(LocalDate.now()));
+            ps.setString(6, c.getFechaIngreso().toString());
             ps.setInt(7, c.getNumeroLicencia());
             ps.setInt(8, c.getCantidadAlquileres());
             ps.executeUpdate();
@@ -512,105 +511,94 @@ public class BDDManager {
 
     }
 
-    /*public static void agregarEmpleado(Empleado e, String password){
+    //MODIFICACIONES
 
-            String query = "INSERT INTO usuarios (dni, nombre, edad, telefono, email, fecha_ingreso,puesto, salario) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            String sqlPassword = "INSERT INTO password (dni_empleado, password_hash) VALUES (?, ?)";
-
-            try (Connection c = DriverManager.getConnection(url);
-                 PreparedStatement ps = c.prepareStatement(query)){
-
-                ps.setLong(1, e.getID());
-                ps.setString(2, e.getNombre());
-                ps.setInt(3, e.getEdad());
-                ps.setLong(4, e.getTelefono());
-                ps.setString(5, e.getEmail());
-                ps.setString(6, e.getPuesto().name());
-                ps.setDouble(7, e.getSalario());
-                ps.setDate(8, java.sql.Date.valueOf(LocalDate.now()));
-
-                ps.executeUpdate();
-
-                try(ResultSet rs = addUserStatement.getGeneratedKeys();) {
-                    if (rs.next()) {
-                        idAgregado = rs.getInt(1);
-                        try (PreparedStatement addPasswordStatement = c.prepareStatement(sqlPassword)) {
-                            addPasswordStatement.setInt(1, idAgregado);
-                            addPasswordStatement.setString(2, password);
-
-                            addPasswordStatement.executeUpdate();
-
-                        }
-                    }
-                }
-            }
-        }catch (SQLException ex){
-            ex.printStackTrace();
-        }
-
-    }*/
-
-    public static int agregarReservaBDD(Reserva reserva) {
-
-        String query = """
-        INSERT INTO reserva
-        (dni_cliente, cantidad_personas, matricula_embarcacion,
-         fecha_inicio, fecha_fin, estado_reserva)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """;
+    public static int  modificarCamposCLienteBDD(int idClientes, Long telefono, String email, Integer cantidadAlquileres)
+    {
+        StringBuilder query = new StringBuilder("UPDATE clientes SET ");
+        ArrayList<Object> parametros = new ArrayList<>();
         int filasModificadas = 0;
-        String matricula = reserva.getEmbarcacion().getID();
 
-        try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement ps = c.prepareStatement(query)) {
+        if(telefono != null)
+        {
+            query.append("telefono = ?, ");
+            parametros.add(telefono);
+        }
+        if(email != null)
+        {
+            query.append("email = ?, ");
+            parametros.add(email);
+        }
+        if(cantidadAlquileres != null)
+        {
+            query.append("cantidadAlquileres = ?, ");
+            parametros.add(cantidadAlquileres);
+        }
+        if (parametros.isEmpty()) {
+            return 0;
+        }
+        //eliminar comoa
+        query.setLength(query.length() - 2);
+        query.append(" WHERE dni = ?");
+        parametros.add(idClientes);
 
-            ps.setLong(1, reserva.getCliente().getID());
-            ps.setInt(2, reserva.getCantidadPersonas());
-            ps.setString(3, matricula);
-            ps.setString(4, reserva.getFechaDeInicio().toString());
-            ps.setString(5, reserva.getFechaDeFin().toString());
-            ps.setString(6, reserva.getEstadoReserva().name());
+        try (Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
 
-            filasModificadas = ps.executeUpdate();
 
-        } catch (SQLException ex) {
+            for (int i = 0; i < parametros.size(); i++) {
+                preparedStatement.setObject(i + 1, parametros.get(i));
+            }
+
+            filasModificadas = preparedStatement.executeUpdate();
+
+
+        }catch (SQLException ex)
+        {
             ex.printStackTrace();
         }
         return filasModificadas;
     }
 
-    public static boolean agregarEmpleado(Empleado e, String password) {
 
-        String sqlUsuario = "INSERT INTO usuarios (dni, nombre, edad, telefono, email, puesto, salario, fecha_ingreso) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        String sqlPassword = "INSERT INTO password (dni_usuario, password) VALUES (?, ?)";
+    ///  EMPLEADOS / USUARIOS
+
+    //CONSULTAS
+
+    public static Generica<Empleado> getEmpleados() {
+        String query = "SELECT * FROM usuarios";
+
+        Generica<Empleado> empleados = new Generica<>();
 
         try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement psUsuario = c.prepareStatement(sqlUsuario);
-             PreparedStatement psPassword = c.prepareStatement(sqlPassword)) {
+             PreparedStatement ps = c.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
 
-            psUsuario.setLong(1, e.getID());
-            psUsuario.setString(2, e.getNombre());
-            psUsuario.setInt(3, e.getEdad());
-            psUsuario.setLong(4, e.getTelefono());
-            psUsuario.setString(5, e.getEmail());
-            psUsuario.setString(6, e.getPuesto().name());
-            psUsuario.setDouble(7, e.getSalario());
-            psUsuario.setString(8, LocalDate.now().toString());
+            while (rs.next()) {
 
-            psUsuario.executeUpdate();
+                try {
 
-            psPassword.setLong(1, e.getID());
-            psPassword.setString(2, password);
+                    Empleado empleado = new Empleado(
+                            rs.getLong("dni"),
+                            rs.getString("nombre"),
+                            rs.getInt("edad"),
+                            rs.getLong("telefono"),
+                            rs.getString("email"),
+                            Puesto.valueOf(rs.getString("puesto")),
+                            rs.getDouble("salario"));
 
-            psPassword.executeUpdate();
-
-            return true;
+                    empleados.guardar(empleado);
+                }catch (DatoErroneoEx ex){
+                    System.out.println("ERROR BDD:" + ex.getMessage());
+                }
+            }
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
+            System.out.println("ERROR BDD: No se pudo descargar empleados:\n" + ex.getMessage());
         }
+
+        return empleados;
     }
 
     public static Empleado getEmpleado(Long dni){
@@ -629,13 +617,12 @@ public class BDDManager {
                     int edad = rs.getInt("edad");
                     long telefono = rs.getLong("telefono");
                     String email = rs.getString("email");
-                    LocalDate fechaIngreso = rs.getDate("fecha_ingreso").toLocalDate();
                     Puesto puesto = Puesto.valueOf(rs.getString("puesto"));
                     double salario = rs.getDouble("salario");
                     try {
-                        empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario, fechaIngreso);
+                        empleado = new Empleado(dni,nombre,edad,telefono,email,puesto,salario);
                     }catch (DatoErroneoEx ex){
-                        ex.getMessage();
+                        System.out.println("ERROR BDD: empleado " + dni + ": " + ex.getMessage());
                     }
                 }
             }
@@ -649,7 +636,7 @@ public class BDDManager {
     //Conseguir Contraseña
     public static String getPassword(int dni){
         String password = null;
-        String getPassQuery = "SELECT * from password where dni_empleado = ?";
+        String getPassQuery = "SELECT contrasena from usuarios where dni = ?";
 
         try (Connection c = DriverManager.getConnection(url);
              PreparedStatement ps = c.prepareStatement(getPassQuery)) {
@@ -657,7 +644,7 @@ public class BDDManager {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    password = rs.getString("password_hash");
+                    password = rs.getString("contrasena");
                 }
             }
         }catch (SQLException e){
@@ -666,71 +653,295 @@ public class BDDManager {
         return password;
     }
 
-    ///////////
+    //ALTAS
 
-    public static int agregarReporteABDD(String descripcion, double coste, boolean cargo_agencia)
+    public static boolean agregarEmpleado(Empleado e, String password) {
+
+        String sqlUsuario = "INSERT INTO usuarios (dni, nombre, edad, telefono, email, puesto, salario, contrasena) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement psUsuario = c.prepareStatement(sqlUsuario)) {
+
+            psUsuario.setLong(1, e.getID());
+            psUsuario.setString(2, e.getNombre());
+            psUsuario.setInt(3, e.getEdad());
+            psUsuario.setLong(4, e.getTelefono());
+            psUsuario.setString(5, e.getEmail());
+            psUsuario.setString(6, e.getPuesto().name());
+            psUsuario.setDouble(7, e.getSalario());
+            psUsuario.setString(8, password);
+
+            psUsuario.executeUpdate();
+
+            return true;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    //BAJAS
+
+    public static int borrarEmpleadoBDD(int dniEmpleado)
     {
-        String queryAdd = "INSERT INTO reporte (descripcion,coste,cargo_agencia) VALUES (?,?,?) ";
-        int id = -1;
+        String query = "DELETE FROM usuarios WHERE dni=?";
+        int filasAfectadas= 0;
         try(Connection connection = DriverManager.getConnection(url))
         {
-            PreparedStatement preparedStatement = connection.prepareStatement(queryAdd, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1,dniEmpleado);
 
-            preparedStatement.setString(1,descripcion);
-            preparedStatement.setDouble(2,coste);
-            preparedStatement.setBoolean(3,cargo_agencia);
-
-            preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-            if(resultSet.next())
-            {
-                id = resultSet.getInt(1);
-            }
+            filasAfectadas = preparedStatement.executeUpdate();
+        }catch (SQLException ex)
+        {
+            ex.printStackTrace();;
         }
-        catch (SQLException ex)
+        return filasAfectadas;
+    }
+
+    //MODIFICACIONES
+
+    public static int  modificarCamposUsuarioBDD(int idEmpleado, Long telefono, String email, String puesto, Double salario)
+    {
+        StringBuilder query = new StringBuilder("UPDATE usuarios SET ");
+        ArrayList<Object> parametros = new ArrayList<>();
+        int filasModificadas = 0;
+
+        if(telefono != null)
+        {
+            query.append("telefono = ?, ");
+            parametros.add(telefono);
+        }
+        if(email != null)
+        {
+            query.append("email = ?, ");
+            parametros.add(email);
+        }
+        if(puesto != null)
+        {
+            query.append("puesto = ?, ");
+            parametros.add(puesto);
+        }
+        if(salario !=  null)
+        {
+            query.append("salario = ?, ");
+            parametros.add(salario);
+        }
+        if (parametros.isEmpty()) {
+            return 0;
+        }
+        //eliminar comoa
+        query.setLength(query.length() - 2);
+        query.append(" WHERE dni = ?");
+        parametros.add(idEmpleado);
+
+        try (Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
+
+
+            for (int i = 0; i < parametros.size(); i++) {
+                preparedStatement.setObject(i + 1, parametros.get(i));
+            }
+
+            filasModificadas = preparedStatement.executeUpdate();
+
+
+        }catch (SQLException ex)
         {
             ex.printStackTrace();
         }
-        return id;
+        return filasModificadas;
     }
 
-    /////////////////////////////
-    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double montoBase, Reporte reporteVenta, Double montoFinal)
+
+    ///  RESERVAS
+
+
+    //CONSULTAS
+
+    public static Generica<Reserva> getReservasBDD(Generica<Cliente> c, HashMap <String,Embarcacion> e)
     {
-        String query = "INSERT INTO venta (dni_cliente_comprador,matricula_embarcacion,monto_base,id_reporte_venta,monto_final)VALUES(?,?,?,?)";
-        int id = -1;
-        long dni_cliente_comprador = clienteComprador.getID();
-        String matricula_embarcacion = embarcacion.getID();
-        int idReporte = reporteVenta.getId();
+        String query = "SELECT * FROM reservas";
+
+        Generica <Reserva> listaReservas = new Generica<>();
+
         try(Connection connection = DriverManager.getConnection(url))
         {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
 
-            preparedStatement.setLong(1,dni_cliente_comprador);
-            preparedStatement.setString(2,matricula_embarcacion);
-            preparedStatement.setDouble(3,montoBase);
-            preparedStatement.setInt(4,idReporte);
-            preparedStatement.setDouble(5,montoFinal);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-
-            if(resultSet.next())
+            while (resultSet.next())
             {
-                id = resultSet.getInt(1);
-            }
+                int id = resultSet.getInt("id");
+                Long idCliente = resultSet.getLong("dniCliente");
+                int cantidadPersonas = resultSet.getInt("cantidadPersonas");
+                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
+                LocalDate fechaDeInicio = LocalDate.parse(resultSet.getString("fechaDeInicio"));
+                LocalDate fechaDeFin = LocalDate.parse(resultSet.getString("fechaDeFin"));
+                String estadoReserva = resultSet.getString("estadoReserva");
 
+                ESTADO_RESERVA reserva = null;
+                switch (estadoReserva)
+                {
+                    case "CANCELADA":
+                        reserva = ESTADO_RESERVA.CANCELADA;
+                        break;
+                    case "CONFIRMADA":
+                        reserva = ESTADO_RESERVA.CONFIRMADA;
+                        break;
+                    case "PENDIENTE":
+                        reserva = ESTADO_RESERVA.PENDIENTE;
+                        break;
+                    case "FINALIZADA":
+                        reserva = ESTADO_RESERVA.FINALIZADA;
+                        break;
+                }
+
+                Cliente aux = c.BuscarPorId(idCliente);
+                Embarcacion auxE = e.get(matriculaEmbarcacion);
+
+                try {
+                    Reserva auxR = new Reserva(id,aux,cantidadPersonas,auxE,fechaDeInicio.getYear(),fechaDeInicio.getMonthValue(),fechaDeInicio.getDayOfMonth(),fechaDeFin.getYear(),fechaDeFin.getMonthValue(),fechaDeFin.getDayOfMonth(),reserva);
+                    listaReservas.guardar(auxR);
+                }catch (DatoErroneoEx ex){
+                    System.out.println(ex.getMessage());
+                }
+            }
+            System.out.println("Se han descargado las reservas");
+        }
+        catch (SQLException ex)
+        {
+            System.out.println("ERROR BDD: No se han descargado las reservas: \n" + ex.getMessage());
+        }
+        return listaReservas;
+    }
+
+    //ALTAS
+
+    public static void agregarReservaBDD(Reserva reserva) {
+
+        String query = """
+        INSERT INTO reservas
+        (dniCliente, cantidadPersonas, matriculaEmbarcacion,
+         fechaDeInicio, fechaDeFin, estadoReserva)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """;
+
+        String matricula = reserva.getEmbarcacion().getID();
+
+        if (!existeMatriculaBDD(matricula)) {
+            System.out.println("La embarcación no existe.");
+            return;
+        }
+
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query)) {
+
+            ps.setLong(1, reserva.getCliente().getID());
+            ps.setInt(2, reserva.getCantidadPersonas());
+            ps.setString(3, matricula);
+            ps.setString(4, reserva.getFechaDeInicio().toString());
+            ps.setString(5, reserva.getFechaDeFin().toString());
+            ps.setString(6, reserva.getEstadoReserva().name());
+
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR BDD: No se pudo guardar la reserva: \n" + ex.getMessage());
+        }
+    }
+
+    //BAJAS
+
+    public static int borrarReserva(int idReserva)
+    {
+        String query = "DELETE FROM reservas WHERE id = ? ";
+        int filasAfectadas= 0;
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1,idReserva);
+
+            filasAfectadas = preparedStatement.executeUpdate();
+        }catch (SQLException ex)
+        {
+            ex.printStackTrace();;
+        }
+        return filasAfectadas;
+    }
+
+    //MODIFICACIONES
+
+    public static int modificarEstadoReservaBDD(int id, String estado_reserva){
+        String query = "UPDATE reservas SET estadoReserva = ? WHERE id = ?";
+        int filasAfectadas = 0;
+
+        try (Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1,estado_reserva);
+            preparedStatement.setInt(2,id);
+
+            filasAfectadas =  preparedStatement.executeUpdate();
         }
         catch (SQLException ex)
         {
             ex.printStackTrace();
         }
-        return id;
+        return filasAfectadas;
     }
+
+    ///  ALQUILERES
+
+
+    //CONSULTAS
+
+    public static Generica<Alquiler> getAlquileresBDD(Generica<Reserva> r)
+    {
+        String query = "SELECT * FROM alquileres";
+        Generica<Alquiler> listaAlquileres = new Generica<>();
+
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int idReserva = resultSet.getInt("idReserva");
+                Double montoFinal = resultSet.getDouble("montoFinal");
+                boolean isFinalizado = resultSet.getBoolean("isFinalizado");
+
+
+                Reserva aux = r.BuscarPorId(idReserva);
+
+                if (aux == null) {
+                    System.out.println("ERROR BDD: el alquiler " + id + " referencia la reserva " + idReserva + ", que no se pudo cargar.");
+                    continue;
+                }
+
+                Alquiler auxA = new Alquiler(id, aux, montoFinal, isFinalizado);
+                listaAlquileres.guardar(auxA);
+            }
+
+            System.out.println("Se han descargado los alquileres");
+
+        }catch (SQLException ex) {
+            System.out.println("ERROR BDD: No se han descargado los alquileres: \n" + ex.getMessage());
+        }
+
+        return listaAlquileres;
+    }
+
+    //ALTAS
 
     public static int agregarAlquilerBDD(Reserva reserva, double montoFinal)
     {
-        String query = "INSERT INTO alquileres (id_reserva,monto_final) VALUES (?,?)";
+        String query = "INSERT INTO alquileres (idReserva,montoFinal,isFinalizado) VALUES (?,?,0)";
         int id = -1;
 
         try(Connection connection = DriverManager.getConnection(url))
@@ -756,260 +967,78 @@ public class BDDManager {
         return id;
     }
 
-/////////////////////////BORRAR///////////////////////////////////////////
+    ///  VENTAS
 
-public static int eliminarClienteBDD(long dniCliente)
-{
-    String query = "DELETE FROM clientes WHERE dni=?";
-    int filasAfectadas= 0;
-    try(Connection connection = DriverManager.getConnection(url))
+    //CONSULTAS
+
+    public static Generica<Venta> listaVenta(Generica<Cliente> c , HashMap<String,Embarcacion>e)
     {
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setLong(1,dniCliente);
+        String query = "SELECT * FROM ventas";
+        Generica<Venta> listaVenta = new Generica<>();
 
-        preparedStatement.executeUpdate();
-        filasAfectadas = preparedStatement.executeUpdate();
-    }catch (SQLException ex)
-    {
-        ex.printStackTrace();;
-    }
-    return filasAfectadas;
-}
-
-public static int borrarEmpleadoBDD(int dniEmpleado)
-{
-    String query = "DELETE FROM usuarios WHERE dni=?";
-    int filasAfectadas= 0;
-    try(Connection connection = DriverManager.getConnection(url))
-    {
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setInt(1,dniEmpleado);
-
-        filasAfectadas = preparedStatement.executeUpdate();
-    }catch (SQLException ex)
-    {
-        ex.printStackTrace();;
-    }
-    return filasAfectadas;
-}
-
-public static <T extends Identificable<String>> int borrarEmbarcacion(T embarcacion )
-{
-    String query = "";
-    int filasAfectadas = -1;
-    if(embarcacion instanceof Velero)
-    {
-        query = "DELETE FROM velero WHERE matricula=?";
-    }
-    if(embarcacion instanceof Lancha)
-    {
-        query = "DELETE FROM lancha WHERE matricula=?";
-    }
-    if(embarcacion instanceof MotoDeAgua)
-    {
-        query = query = "DELETE FROM moto_de_agua WHERE matricula=?";
-    }
-    try (Connection connection = DriverManager.getConnection(url))
-    {
-      PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-      preparedStatement.setString(1,embarcacion.getID());
-      filasAfectadas = preparedStatement.executeUpdate();
-    }catch (SQLException ex)
-    {
-        ex.printStackTrace();;
-    }
-    return filasAfectadas;
-}
-
-public static int borrarReserva(int idReserva)
-{
-    String query = "DELETE FROM Reserva WHERE id = ? ";
-    int filasAfectadas= 0;
-    try(Connection connection = DriverManager.getConnection(url))
-    {
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setInt(1,idReserva);
-
-        preparedStatement.executeUpdate();
-        filasAfectadas = preparedStatement.executeUpdate();
-    }catch (SQLException ex)
-    {
-        ex.printStackTrace();;
-    }
-    return filasAfectadas;
-}
-
-///////MODIFICAR////////
-
-public static int modificarCamposClienteBDD(long idClientes, Long telefono, String email, Integer cantidadAlquileres, String nombre, Integer edad, Integer numeroLicencia)
-{
-    StringBuilder query = new StringBuilder("UPDATE clientes SET ");
-    ArrayList<Object> parametros = new ArrayList<>();
-    int filasModificadas = 0;
-
-    if (telefono != null) {
-        query.append("telefono = ?, ");
-        parametros.add(telefono);
-    }
-
-    if (email != null) {
-        query.append("email = ?, ");
-        parametros.add(email);
-    }
-
-    if (cantidadAlquileres != null) {
-        query.append("cantidad_alquileres = ?, ");
-        parametros.add(cantidadAlquileres);
-    }
-
-    if (nombre != null) {
-        query.append("nombre = ?, ");
-        parametros.add(nombre);
-    }
-
-    if (edad != null) {
-        query.append("edad = ?, ");
-        parametros.add(edad);
-    }
-
-    if (numeroLicencia != null) {
-        query.append("numero_licencia = ?, ");
-        parametros.add(numeroLicencia);
-    }
-
-    if (parametros.isEmpty()) {
-        return 0;
-    }
-
-    // Eliminar última coma
-    query.setLength(query.length() - 2);
-
-    query.append(" WHERE dni = ?");
-    parametros.add(idClientes);
-
-    try (Connection connection = DriverManager.getConnection(url);
-         PreparedStatement preparedStatement =
-                 connection.prepareStatement(query.toString()))
-    {
-        for (int i = 0; i < parametros.size(); i++) {
-            preparedStatement.setObject(i + 1, parametros.get(i));
-        }
-
-        filasModificadas = preparedStatement.executeUpdate();
-
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-    }
-
-    return filasModificadas;
-}
-
-////////////
-
-public static int  modificarCamposUsuarioBDD(int idEmpleado, Long telefono, String email, String puesto, Double salario)
-{
-    StringBuilder query = new StringBuilder("UPDATE usuarios SET ");
-    ArrayList<Object> parametros = new ArrayList<>();
-    int filasModificadas = 0;
-
-    if(telefono != null)
-    {
-        query.append("telefono = ?, ");
-        parametros.add(telefono);
-    }
-    if(email != null)
-    {
-        query.append("email = ?, ");
-        parametros.add(email);
-    }
-    if(puesto != null)
-    {
-        query.append("puesto = ?, ");
-        parametros.add(puesto);
-    }
-    if(salario !=  null)
-    {
-        query.append("salario = ?, ");
-        parametros.add(salario);
-    }
-    if (parametros.isEmpty()) {
-        return 0;
-    }
-    //eliminar comoa
-    query.setLength(query.length() - 2);
-    query.append(" WHERE dni = ?");
-    parametros.add(idEmpleado);
-
-    try (Connection connection = DriverManager.getConnection(url))
-    {
-        PreparedStatement preparedStatement = connection.prepareStatement(query.toString());
-
-
-        for (int i = 0; i < parametros.size(); i++) {
-            preparedStatement.setObject(i + 1, parametros.get(i));
-        }
-
-        filasModificadas = preparedStatement.executeUpdate();
-
-
-    }catch (SQLException ex)
-    {
-        ex.printStackTrace();
-    }
-    return filasModificadas;
-}
-//////////////////////////////////////////
-
-    public static int modificarEstadoReservaBDD(int id, String estado_reserva) {
-        String query = "UPDATE reserva SET estado_reserva = ? WHERE id = ?";
-        int filasAfectadas = 0;
-
-        try (Connection connection = DriverManager.getConnection(url))
+        try(Connection connection = DriverManager.getConnection(url))
         {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1,estado_reserva);
-            preparedStatement.setInt(2,id);
 
-           filasAfectadas =  preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())
+            {
+                int id = resultSet.getInt("id");
+                long idClienteComprador = resultSet.getInt("dniCliente");
+                String matriculaEmbarcacion = resultSet.getString("matriculaEmbarcacion");
+                double monto = resultSet.getDouble("monto");
+
+                Embarcacion auxE = e.get(matriculaEmbarcacion);
+                Cliente auxC = c.BuscarPorId(idClienteComprador);
+
+                if (auxC == null || auxE == null) {
+                    System.out.println("ERROR BDD: la venta " + id + " referencia un cliente o una embarcación que no se pudo cargar.");
+                    continue;
+                }
+                Venta aux = new Venta(id,auxC,auxE,monto);
+                listaVenta.guardar(aux);
+            }
+
+            System.out.println("Se han descargado las ventas");
+
+        }
+        catch (SQLException ex)
+        {
+            System.out.println("ERROR BDD: No se han descargado las ventas: \n" + ex.getMessage());
+        }
+        return listaVenta;
+    }
+
+    // ALTAS
+
+
+    public static int agregarVentaBDD(Cliente clienteComprador,Embarcacion embarcacion, double monto)
+    {
+        String query = "INSERT INTO ventas (dniCliente,matriculaEmbarcacion,monto)VALUES(?,?,?)";
+        int id = -1;
+        long dni_cliente_comprador = clienteComprador.getID();
+        String matricula_embarcacion = embarcacion.getID();
+        try(Connection connection = DriverManager.getConnection(url))
+        {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setLong(1,dni_cliente_comprador);
+            preparedStatement.setString(2,matricula_embarcacion);
+            preparedStatement.setDouble(3,monto);
+
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+
+            if(resultSet.next())
+            {
+                id = resultSet.getInt(1);
+            }
+
         }
         catch (SQLException ex)
         {
             ex.printStackTrace();
         }
-        return filasAfectadas;
-    }
-
-    ///////////////////////////////////
-    public static <T extends Identificable<String>>  int modificarDisponibilidad(T embarcacion, boolean disponibilidadNueva)
-    {
-        String query = "";
-        int filasModificadas = 0;
-        if(embarcacion instanceof Velero)
-        {
-            query = "UPDATE  velero SET disponible where matricula = ?";
-        }
-        if(embarcacion instanceof MotoDeAgua)
-        {
-            query = "UPDATE moto_de_agua  SET disponible where matricula = ?";
-        }
-        if(embarcacion instanceof Lancha)
-        {
-            query = "UPDATE lancha  SET disponible where matricula = ?";
-        }
-        try(Connection connection = DriverManager.getConnection(url))
-        {
-           PreparedStatement preparedStatement = connection.prepareStatement(query);
-
-           preparedStatement.setBoolean(1,disponibilidadNueva);
-           preparedStatement.setString(2,embarcacion.getID());
-
-           filasModificadas = preparedStatement.executeUpdate();
-        }
-        catch (SQLException ex)
-        {
-            ex.printStackTrace();;
-        }
-       return filasModificadas;
+        return id;
     }
 }

@@ -7,13 +7,15 @@ import java.time.LocalDate;
 public class Cliente extends Persona {
     private int numeroLicencia;
     private int cantidadAlquileres;
+    private LocalDate fechaIngreso;
 
     /// CONSTRUCTOR BDD
 
     public Cliente(Long dni, String nombre, int edad, Long telefono, String email, LocalDate fechaIngreso, int numeroLicencia, int cantidadAlquileres) throws DatoErroneoEx {
-        super(dni, nombre, edad, telefono, email, fechaIngreso);
+        super(dni, nombre, edad, telefono, email);
         this.numeroLicencia = numeroLicencia;
         this.cantidadAlquileres = cantidadAlquileres;
+        this.fechaIngreso = fechaIngreso;
     }
 
     public Cliente(Long dni, String nombre, int edad, Long telefono, String email, int numeroLicencia) throws DatoErroneoEx {
@@ -25,6 +27,7 @@ public class Cliente extends Persona {
 
         this.numeroLicencia = numeroLicencia;
         this.cantidadAlquileres = 0;
+        this.fechaIngreso = LocalDate.now();
     }
 
     public void setNumeroLicencia(int numeroLicencia) throws DatoErroneoEx {
@@ -49,8 +52,8 @@ public class Cliente extends Persona {
         return cantidadAlquileres;
     }
 
-    public void setCantidadAlquileres(int cantidadAlquileres) {
-        this.cantidadAlquileres = cantidadAlquileres;
+    public LocalDate getFechaIngreso() {
+        return fechaIngreso;
     }
 
     public boolean esRecurrente(int mesesMinimos, int alquileresMinimos) {
