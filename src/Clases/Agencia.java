@@ -599,7 +599,9 @@ public class Agencia {
         auxAlquiler.setId(id);
 
         auxAlquiler.cambiarDisponibilidad();
-        ///falta modificar disponibilidad en bdd
+
+        BDDManager.modificarDisponibilidad(aux.getEmbarcacion(), aux.getEmbarcacion().isDisponible());
+        BDDManager.modificarCamposCLienteBDD(null,null,null,aux.getCliente().getID(),null,null,aux.getCliente().getCantidadAlquileres());
         listaReservas.eliminar(idReserva);
 
         return true;
@@ -775,7 +777,7 @@ public class Agencia {
         return true;
     }
 
-    private boolean alquilerFinalizado(Alquiler alquiler) {
+   /* private boolean alquilerFinalizado(Alquiler alquiler) {
         for (Venta v : listaVentas.getLista()) {
             if (v.getID() == alquiler.getID()) {
                 return true;
@@ -783,5 +785,5 @@ public class Agencia {
         }
 
         return false;
-    }
+    }*/
 }
