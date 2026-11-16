@@ -538,13 +538,13 @@ public class Agencia {
             throw new AccionImposibleEx("La embarcación no está disponible.");
         }
 
-        aux.getCliente().agregarAlquiler();
-
         Alquiler auxAlquiler = new Alquiler(aux);
 
         if (!listaAlquileres.guardar(auxAlquiler)) {
             return false;
         }
+        aux.getCliente().agregarAlquiler();
+
         int id= BDDManager.agregarAlquilerBDD(aux, auxAlquiler.getMontoFinal());
         auxAlquiler.setId(id);
 
