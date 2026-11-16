@@ -55,6 +55,10 @@ public class Venta implements Identificable<Integer> {
         return monto;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     ////
     @Override
     public String toString()

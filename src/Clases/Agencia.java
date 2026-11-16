@@ -475,15 +475,29 @@ public class Agencia {
     // MODIFICAR ESTADO
 
     public void actualizarEstadoReserva(int id, ESTADO_RESERVA nuevoEstado)
-            throws ObjetoNoEncontradoEx, DatoErroneoEx {
+            throws AccionImposibleEx, DatoErroneoEx, ObjetoNoEncontradoEx {
 
         Reserva reserva = listaReservas.BuscarPorId(id);
-
+        if (reserva == null) {
+            throw new ObjetoNoEncontradoEx("No existe una reserva con ese ID.");
+        }
         if (nuevoEstado == null) {
             throw new DatoErroneoEx("El estado de la reserva no puede ser nulo.");
         }
-
+        if(reserva.getEstadoReserva() == ESTADO_RESERVA.FINALIZADA)
+        {
+            throw new AccionImposibleEx("ERROR. la reserva ya esta finalizada, no se puede modificar su estado...");
+        }
+        if(reserva.getEstadoReserva() == ESTADO_RESERVA.CANCELADA)
+        {
+            throw new AccionImposibleEx("ERROR. la reserva ya esta cancelada, no se puede modificar su estado...");
+        }
+        if(reserva.getEstadoReserva().equals(ESTADO_RESERVA.CONFIRMADA)  && nuevoEstado.equals(ESTADO_RESERVA.PENDIENTE))
+        {
+            throw new AccionImposibleEx("ERROR. No puede volver a pendiente una reserva confirmada...");
+        }
         reserva.setEstadoReserva(nuevoEstado);
+        BDDManager.modificarEstadoReservaBDD(id,reserva.getEstadoReserva().toString());
     }
 
     // LISTAR RESERVA POR ID
@@ -581,8 +595,7 @@ public class Agencia {
 
     ///  VENTAS
 
-    public boolean iniciarVenta(int idAlquiler)
-            throws AccionImposibleEx, DatoErroneoEx {
+    public boolean iniciarVenta(int idAlquiler) throws AccionImposibleEx, DatoErroneoEx {
 
         Alquiler aux = listaAlquileres.BuscarPorId(idAlquiler);
 
@@ -590,26 +603,30 @@ public class Agencia {
             throw new AccionImposibleEx("El alquiler no existe.");
         }
 
-        if (aux.isFinalizado() == true) {
+        if (aux.isFinalizado()) {
             throw new AccionImposibleEx("El alquiler ya fue finalizado.");
         }
 
+        double montoBase = aux.calcularPrecio();
         Venta nuevaVenta = new Venta(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion());
 
         if (!listaVentas.guardar(nuevaVenta)) {
             return false;
         }
-        BDDManager.agregarVentaBDD(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion(), nuevaVenta.getMonto());
+
+        int id = BDDManager.agregarVentaBDD(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion(), nuevaVenta.getMonto());
+        nuevaVenta.setId(id);
+
+        aux.finalizarAlquiler();
 
         aux.getReserva().getEmbarcacion().setDisponible(false);
-        BDDManager.m
+        BDDManager.modificarDisponibilidad(aux.getReserva().getEmbarcacion(), false);
 
         return true;
     }
-
     // REGISTRAR VENTA
 
-    public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion) throws AccionImposibleEx, DatoErroneoEx
+   /* public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion) throws AccionImposibleEx, DatoErroneoEx
     {
         if(!clientes.getLista().contains(clienteComprador))
         {
@@ -622,7 +639,7 @@ public class Agencia {
 
         Venta aux = new Venta(clienteComprador, embarcacion);
         return listaVentas.guardar(aux);
-    }
+    }*/
 
     // VER TODAS LAS VENTAS
 
