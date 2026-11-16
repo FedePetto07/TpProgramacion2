@@ -590,19 +590,19 @@ public class Agencia {
             throw new AccionImposibleEx("El alquiler no existe.");
         }
 
-        if (alquilerFinalizado(aux)) {
+        if (aux.isFinalizado() == true) {
             throw new AccionImposibleEx("El alquiler ya fue finalizado.");
         }
-
-        double montoBase = aux.calcularPrecio();
 
         Venta nuevaVenta = new Venta(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion());
 
         if (!listaVentas.guardar(nuevaVenta)) {
             return false;
         }
+        BDDManager.agregarVentaBDD(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion(), nuevaVenta.getMonto());
 
-        aux.getReserva().getEmbarcacion().setDisponible(true);
+        aux.getReserva().getEmbarcacion().setDisponible(false);
+        BDDManager.m
 
         return true;
     }

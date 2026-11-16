@@ -440,6 +440,46 @@ public class BDDManager {
         return  filasAgregadas;
     }
 
+    ///MODIFICAR DDISPONIBILIAD;
+    public static  <T extends Identificable<String>> boolean modificarDisponibilidad(T embarcacion, boolean disponibilidad)
+    {
+        String query = "";
+        boolean seGuardo = false;
+        if(embarcacion instanceof Velero)
+        {
+            query = "UPDATE veleros SET disponible = ? WHERE matricula = ?";
+            seGuardo = true;
+        }
+        if(embarcacion instanceof MotoDeAgua)
+        {
+            query = "UPDATE motos_agua SET disponible = ?nWHERE matricula = ?";
+            seGuardo = true;
+        }
+        if(embarcacion instanceof Lancha)
+        {
+            query = "UPDATE lanchas SET disponible = ? WHERE matricula = ?";
+            seGuardo = true;
+        }
+        if(seGuardo == true)
+        {
+            try(Connection connection  = DriverManager.getConnection(url))
+            {
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+                preparedStatement.setBoolean(1,disponibilidad);
+                preparedStatement.setString(2,embarcacion.getID());
+
+                preparedStatement.executeUpdate();
+            }
+            catch (SQLException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+        else {return false;}
+        return true;
+    }
+
     ///CLIENTES
 
     //CONSULTAS
