@@ -187,35 +187,64 @@ public class Agencia {
 
 // MODIFICAR CLIENTES
 
-    public StringBuilder modificarDatosCliente(long dni, String nombreNuevo, int edadNueva, Long telefonoNuevo, String emailNuevo, int numeroLicenciaNuevo) throws DatoErroneoEx
+    public String modificarDatosCliente(long dni, String nombreNuevo, int edadNueva, Long telefonoNuevo, String emailNuevo, int numeroLicenciaNuevo) throws DatoErroneoEx, ObjetoNoEncontradoEx
     {
 
         Cliente aux = clientes.BuscarPorId(dni);
-
+        if(aux == null)
+        {
+            throw  new ObjetoNoEncontradoEx("ERROR. el dni ingresado no existe en el sistema...");
+        }
         StringBuilder informacionNueva = new StringBuilder();
 
         if (nombreNuevo != null) {
+            if ( nombreNuevo.isBlank() || nombreNuevo.matches(".*\\d.*"))
+            {
+                throw new DatoErroneoEx("El nombre nuevo no puede contener números.");
+            }
             aux.setNombre(nombreNuevo);
             informacionNueva.append("Se ha actualizado el nombre");
         }
-        if (edadNueva > 0) {
+        if (edadNueva >0 ) {
+            if (edadNueva < 18) {
+                throw new DatoErroneoEx("El cliente no puede ser menor de 18");
+            }
             aux.setEdad(edadNueva);
             informacionNueva.append("Se ha actualizado la edad");
         }
+
         if (telefonoNuevo != null) {
+            if (String.valueOf(telefonoNuevo).length() != 10) {
+                throw new DatoErroneoEx("El teléfono nuevo debe tener exactamente 10 dígitos.");
+            }
+
             aux.setTelefono(telefonoNuevo);
             informacionNueva.append("Se ha actualizado el telefono");
         }
+
         if (emailNuevo != null) {
+            if (!emailNuevo.endsWith("@gmail.com")) {
+                throw new DatoErroneoEx("El email debe terminar en @gmail.com");}
+
             aux.setEmail(emailNuevo);
             informacionNueva.append("Se ha actualizado el email");
         }
         if (numeroLicenciaNuevo > 0) {
+            if (numeroLicenciaNuevo != 0 && (numeroLicenciaNuevo < 5 || numeroLicenciaNuevo > 9)) {
+                throw new DatoErroneoEx("La licencia debe ser 0 o tener un código entre 5 y 9.");}
+
             aux.setNumeroLicencia(numeroLicenciaNuevo);
             informacionNueva.append("Se ha actualizado el numero de licencia");
         }
+        ///////////////////////////////
+        Integer edadParaBDD = (edadNueva > 0) ? edadNueva : null;
+        Integer licenciaParaBDD = (numeroLicenciaNuevo > 0) ? numeroLicenciaNuevo : null;
+        //
+        int modificado = BDDManager.modificarCamposCLienteBDD(nombreNuevo,edadParaBDD,licenciaParaBDD,dni,telefonoNuevo,emailNuevo,null);
+        if(modificado == 1)
+        {return informacionNueva.toString();}
 
-        return informacionNueva;
+        return "Error en el guardado...";
     }
 
 // LIMPIAR CLIENTES NO RECURRENTES
@@ -445,30 +474,37 @@ public class Agencia {
 
     // CANCELAR RESERVA
 
-    public String cancelarReserva(int idReserva) throws ObjetoNoEncontradoEx,AccionImposibleEx
+    public String cancelarReserva(int idReserva) throws ObjetoNoEncontradoEx, AccionImposibleEx
     {
-        if(listaReservas.BuscarPorId(idReserva) == null)
-        {
-            throw new ObjetoNoEncontradoEx( "ERROR. No existe el id ingresado de la reserva.");
-        }
         Reserva aux = listaReservas.BuscarPorId(idReserva);
+
+        if(aux == null)
+        {
+            throw new ObjetoNoEncontradoEx("ERROR. No existe el id ingresado de la reserva.");
+        }
+
         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CANCELADA))
         {
-            throw new AccionImposibleEx ( "ERROR.No se pudo canclear la reserva. Ya esta cancelda...");
+            throw new AccionImposibleEx("ERROR. No se pudo cancelar la reserva. Ya está cancelada...");
         }
+
         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.FINALIZADA))
         {
-            throw new AccionImposibleEx("ERROR. la reserva ya esta finalizada, no se puede cancelar...");
+            throw new AccionImposibleEx("ERROR. La reserva ya está finalizada, no se puede cancelar...");
         }
+
         if(aux.getEstadoReserva().equals(ESTADO_RESERVA.CONFIRMADA))
         {
             LocalDate fechaActual = LocalDate.now();
-            if(aux.getFechaDeInicio().isAfter(fechaActual))
+
+            if(!aux.getFechaDeInicio().isAfter(fechaActual))
             {
-                throw new AccionImposibleEx("ERROR. no se puede cancelar la reserva porque esta confirmada en la fecha determinada.");
+                throw new AccionImposibleEx("ERROR. No se puede cancelar la reserva porque la fecha de inicio ya llegó o ya pasó.");
             }
         }
+
         aux.cancelar();
+        BDDManager.modificarEstadoReservaBDD(aux.getID(),ESTADO_RESERVA.CANCELADA.toString());
         return "Cancelado correctamente";
     }
 

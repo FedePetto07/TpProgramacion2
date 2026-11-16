@@ -556,7 +556,7 @@ public class BDDManager {
 
     //MODIFICACIONES
 
-    public static int  modificarCamposCLienteBDD(int idClientes, Long telefono, String email, Integer cantidadAlquileres)
+    public static int  modificarCamposCLienteBDD(String nombre, Integer edad, Integer numeroDeLicencia,long idClientes, Long telefono, String email, Integer cantidadAlquileres)
     {
         StringBuilder query = new StringBuilder("UPDATE clientes SET ");
         ArrayList<Object> parametros = new ArrayList<>();
@@ -577,6 +577,22 @@ public class BDDManager {
             query.append("cantidadAlquileres = ?, ");
             parametros.add(cantidadAlquileres);
         }
+        if(nombre != null)
+        {
+            query.append("nombre = ?, ");
+            parametros.add(nombre);
+        }
+        if(edad != null)
+        {
+            query.append("edad = ?, ");
+            parametros.add(edad);
+        }
+        if(numeroDeLicencia != null)
+        {
+            query.append("numeroLicencia = ?, ");
+            parametros.add(numeroDeLicencia);
+        }
+
         if (parametros.isEmpty()) {
             return 0;
         }
