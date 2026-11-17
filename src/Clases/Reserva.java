@@ -30,7 +30,7 @@ public class Reserva implements Identificable<Integer> {
         this.estadoReserva = estadoReserva;
     }
 
-    public Reserva(Cliente cliente, int cantidadPersonas, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin, ESTADO_RESERVA estadoReserva) throws DatoErroneoEx {
+    public Reserva(Cliente cliente, int cantidadPersonas, Embarcacion embarcacion, int añoInicio, int mesInicio, int diaInicio, int añoFin, int mesFin, int diaFin) throws DatoErroneoEx {
 
         if (cliente == null) {
             throw new DatoErroneoEx("La reserva debe tener un cliente asignado.");
@@ -46,10 +46,6 @@ public class Reserva implements Identificable<Integer> {
 
         if (cantidadPersonas > embarcacion.getCapacidadPersonas()) {
             throw new DatoErroneoEx("La cantidad de personas supera la capacidad de la embarcación.");
-        }
-
-        if (estadoReserva == null) {
-            throw new DatoErroneoEx("El estado de la reserva no puede ser nulo.");
         }
 
         try {
@@ -74,7 +70,7 @@ public class Reserva implements Identificable<Integer> {
         this.embarcacion = embarcacion;
         this.fechaDeInicio = fechaDeInicio;
         this.fechaDeFin = fechaDeFin;
-        this.estadoReserva = estadoReserva;
+        this.estadoReserva = ESTADO_RESERVA.PENDIENTE;
     }
 
     ///////
