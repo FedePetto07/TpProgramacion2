@@ -16,21 +16,6 @@ public class BDDManager {
     static final String url = "jdbc:sqlite:src/AgenciaEmbarcaciones.db";
 
 
-    public static boolean conexion()
-    {
-
-        try (Connection c = DriverManager.getConnection(url)) {
-
-            System.out.println("Conectado");
-
-        }catch (SQLException e){
-            System.out.println("Error: "+e.getMessage());
-            return false;
-        }
-
-
-        return true;
-    }
 
     public static void mostrarTablasBDD() {
 
@@ -452,7 +437,7 @@ public class BDDManager {
         }
         if(embarcacion instanceof MotoDeAgua)
         {
-            query = "UPDATE motos_agua SET disponible = ?nWHERE matricula = ?";
+            query = "UPDATE motos_agua SET disponible = ? WHERE matricula = ?";
             seGuardo = true;
         }
         if(embarcacion instanceof Lancha)
@@ -768,6 +753,12 @@ public class BDDManager {
         ArrayList<Object> parametros = new ArrayList<>();
         int filasModificadas = 0;
 
+        if(nombre != null)
+        {
+            query.append("nombre = ?, ");
+            parametros.add(nombre);
+        }
+
         if(telefono != null)
         {
             query.append("telefono = ?, ");
@@ -791,7 +782,7 @@ public class BDDManager {
         if (parametros.isEmpty()) {
             return 0;
         }
-        //eliminar comoa
+        //eliminar como
         query.setLength(query.length() - 2);
         query.append(" WHERE dni = ?");
         parametros.add(idEmpleado);
@@ -881,6 +872,7 @@ public class BDDManager {
 
     //ALTAS
 
+
     public static int agregarReservaBDD(Reserva reserva) {
 
         String query = """
@@ -891,13 +883,14 @@ public class BDDManager {
         """;
 
         String matricula = reserva.getEmbarcacion().getID();
-        int filasCreadas = 0;
+        int idGenerado = -1;
         if (!existeMatriculaBDD(matricula)) {
             System.out.println("La embarcación no existe.");
+            return -1;
         }
 
         try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement ps = c.prepareStatement(query)) {
+             PreparedStatement ps = c.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setLong(1, reserva.getCliente().getID());
             ps.setInt(2, reserva.getCantidadPersonas());
@@ -906,12 +899,18 @@ public class BDDManager {
             ps.setString(5, reserva.getFechaDeFin().toString());
             ps.setString(6, reserva.getEstadoReserva().name());
 
-           filasCreadas = ps.executeUpdate();
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    idGenerado = rs.getInt(1);
+                }
+            }
 
         } catch (SQLException ex) {
             System.out.println("ERROR BDD: No se pudo guardar la reserva: \n" + ex.getMessage());
         }
-        return filasCreadas;
+        return idGenerado;
     }
 
     //BAJAS
@@ -1024,6 +1023,18 @@ public class BDDManager {
             ex.printStackTrace();
         }
         return id;
+    }
+
+    public static int finalizarAlquilerBDD(int idAlquiler) {
+        String query = "UPDATE alquileres SET isFinalizado = 1 WHERE id = ?";
+        try (Connection c = DriverManager.getConnection(url);
+             PreparedStatement ps = c.prepareStatement(query)) {
+            ps.setInt(1, idAlquiler);
+            return ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("ERROR BDD: No se pudo finalizar el alquiler: \n" + ex.getMessage());
+            return -1;
+        }
     }
 
     ///  VENTAS
