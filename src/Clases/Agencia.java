@@ -193,7 +193,7 @@ public class Agencia {
     }
     ///  CLIENTES
 
-// AGREGAR Y ELIMINAR CLIENTES
+// AGREGAR CLIENTES
 
     public boolean agregarCliente(Long dni, String nombre, int edad, Long telefono, String email, int numeroLicencia) throws ElementoDuplicadoEx, DatoErroneoEx {
 
@@ -209,12 +209,6 @@ public class Agencia {
         return true;
     }
 
-    public boolean eliminarCliente(long dni) throws ObjetoNoEncontradoEx {
-        if (!clientes.eliminar(dni)) {
-            throw new ObjetoNoEncontradoEx("No existe un cliente con ese DNI");
-        }
-        return true;
-    }
 
 // VER CLIENTES
 
