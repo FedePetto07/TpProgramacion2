@@ -665,51 +665,56 @@ public class Agencia {
 
     ///  VENTAS
 
-    public boolean iniciarVenta(int idAlquiler) throws AccionImposibleEx, DatoErroneoEx {
+    public boolean registrarVenta(long dniCliente, String matriculaEmbarcacion) throws AccionImposibleEx, ObjetoNoEncontradoEx, DatoErroneoEx {
 
-        Alquiler aux = listaAlquileres.BuscarPorId(idAlquiler);
-
-        if (aux == null) {
-            throw new AccionImposibleEx("El alquiler no existe.");
+        Cliente cliente = clientes.BuscarPorId(dniCliente);
+        if (cliente == null) {
+            throw new ObjetoNoEncontradoEx("El cliente ingresado no existe.");
         }
 
-        if (aux.isFinalizado()) {
-            throw new AccionImposibleEx("El alquiler ya fue finalizado.");
+        Embarcacion embarcacion = null;
+        for (Embarcacion e : embarcaciones.values()) {
+            if (e.getID().equalsIgnoreCase(matriculaEmbarcacion)) {
+                embarcacion = e;
+                break;
+            }
+        }
+        if (embarcacion == null) {
+            throw new ObjetoNoEncontradoEx("La embarcación ingresada no existe.");
         }
 
-        double montoBase = aux.calcularPrecio();
-        Venta nuevaVenta = new Venta(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion());
+        for (Venta v : listaVentas.getLista()) {
+            if (v.getEmbarcacion().getID().equals(embarcacion.getID())) {
+                throw new AccionImposibleEx("La embarcación ya fue vendida.");
+            }
+        }
 
-        if (!listaVentas.guardar(nuevaVenta)) {
+        if (!embarcacion.isDisponible()) {
+            throw new AccionImposibleEx("La embarcación no está disponible (tiene un alquiler en curso).");
+        }
+
+        for (Reserva r : listaReservas.getLista()) {
+            if (r.getEmbarcacion().getID().equals(embarcacion.getID())
+                    && r.getEstadoReserva() != ESTADO_RESERVA.CANCELADA
+                    && r.getEstadoReserva() != ESTADO_RESERVA.FINALIZADA) {
+                throw new AccionImposibleEx("La embarcación tiene reservas pendientes o confirmadas.");
+            }
+        }
+
+        Venta nuevaVenta = new Venta(cliente, embarcacion);
+
+        int id = BDDManager.agregarVentaBDD(cliente, embarcacion, nuevaVenta.getMonto());
+        if (id <= 0) {
             return false;
         }
-
-        int id = BDDManager.agregarVentaBDD(aux.getReserva().getCliente(), aux.getReserva().getEmbarcacion(), nuevaVenta.getMonto());
         nuevaVenta.setId(id);
+        listaVentas.guardar(nuevaVenta);
 
-        aux.finalizarAlquiler();
-
-        aux.getReserva().getEmbarcacion().setDisponible(false);
-        BDDManager.modificarDisponibilidad(aux.getReserva().getEmbarcacion(), false);
+        embarcacion.setDisponible(false);
+        BDDManager.modificarDisponibilidad(embarcacion, false);
 
         return true;
     }
-    // REGISTRAR VENTA
-
-   /* public boolean registrarVenta (int id, Cliente clienteComprador, Embarcacion embarcacion) throws AccionImposibleEx, DatoErroneoEx
-    {
-        if(!clientes.getLista().contains(clienteComprador))
-        {
-            throw new AccionImposibleEx("ERROR. el identificador del comprador ingresado no existe...");
-        }
-        if(embarcaciones.containsKey(embarcacion.getID()) == false)
-        {
-            throw new AccionImposibleEx("ERROR. la matricula ingresada no existe...");
-        }
-
-        Venta aux = new Venta(clienteComprador, embarcacion);
-        return listaVentas.guardar(aux);
-    }*/
 
     // VER TODAS LAS VENTAS
 
