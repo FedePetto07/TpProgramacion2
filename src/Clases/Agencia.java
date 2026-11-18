@@ -361,15 +361,12 @@ public class Agencia {
             throw new ElementoDuplicadoEx("Ya existe un velero con esa matricula");
         }
 
-        Velero v = new Velero(nombre, matricula, precioDiario, disponible, cantidadVelas, longitudMetros, capacidadPersonas, cantidadCamarotes, requiereCapitan);
+        Velero v = new Velero(nombre, matricula, precioDiario, disponible, cantidadVelas, longitudMetros, capacidadPersonas, cantidadCamarotes);
+        v.setRequiereCapitan(requiereCapitan);
 
-
-        int guardado = BDDManager.agregarEmbarcacionBDD(v);
-        if(guardado != 1) {
+        if (BDDManager.agregarEmbarcacionBDD(v) != 1) {
             return false;
         }
-
-        // 2. Si la BDD OK, guardar en memoria
         embarcaciones.put(matricula, v);
         return true;
     }
@@ -381,13 +378,12 @@ public class Agencia {
 
         MotoDeAgua m = new MotoDeAgua(nombre, matricula, precioDiario, disponible, capacidadPersonas, cilindrada, limiteVelocidad, requiereLicencia);
 
-        embarcaciones.put(matricula, m);
-        int guardado = BDDManager.agregarEmbarcacionBDD(m);
-        if(guardado == 1)
-        {
-            return true;
+        if (BDDManager.agregarEmbarcacionBDD(m) != 1) {
+            return false;
         }
-        return false;
+
+        embarcaciones.put(matricula, m);
+        return true;
     }
 
     public boolean registrarLancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) throws ElementoDuplicadoEx, DatoErroneoEx {
@@ -397,14 +393,11 @@ public class Agencia {
 
         Lancha l = new Lancha(nombre, matricula, precioDiario, disponible, potenciaMotor, longitudMetros, capacidadPersonas, combustible);
 
-        embarcaciones.put(matricula, l);
-        int guardado = BDDManager.agregarEmbarcacionBDD(l);
-
-        if(guardado == 1)
-        {
-            return true;
+        if (BDDManager.agregarEmbarcacionBDD(l) != 1) {
+            return false;
         }
-        return false;
+        embarcaciones.put(matricula, l);
+        return true;
     }
 
     // VER EMBARCACIONES
