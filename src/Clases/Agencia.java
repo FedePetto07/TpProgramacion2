@@ -594,8 +594,7 @@ public class Agencia {
 
     ///  ALQUILERES
 
-    public boolean iniciarAlquiler(int idReserva)
-            throws AccionImposibleEx, DatoErroneoEx {
+    public boolean iniciarAlquiler(int idReserva) throws AccionImposibleEx, DatoErroneoEx {
 
         Reserva aux = listaReservas.BuscarPorId(idReserva);
 
@@ -606,7 +605,6 @@ public class Agencia {
         if (aux.getEstadoReserva() != ESTADO_RESERVA.CONFIRMADA) {
             throw new AccionImposibleEx("La reserva no está confirmada.");
         }
-
 
         for (Alquiler a : listaAlquileres.getLista()) {
             if (a.getReserva().getID() == idReserva) {
@@ -621,15 +619,12 @@ public class Agencia {
 
         Alquiler auxAlquiler = new Alquiler(aux);
 
-
         int idBDD = BDDManager.agregarAlquilerBDD(aux, auxAlquiler.getMontoFinal());
         if (idBDD <= 0) {
             return false;
         }
 
-
         auxAlquiler.setId(idBDD);
-
 
         if (!listaAlquileres.guardar(auxAlquiler)) {
             return false;
@@ -638,12 +633,8 @@ public class Agencia {
         aux.getCliente().agregarAlquiler();
         auxAlquiler.cambiarDisponibilidad();
 
-
         BDDManager.modificarDisponibilidad(aux.getEmbarcacion(), aux.getEmbarcacion().isDisponible());
         BDDManager.modificarCamposCLienteBDD(null, null, null, aux.getCliente().getID(), null, null, aux.getCliente().getCantidadAlquileres());
-
-
-        listaReservas.eliminar(idReserva);
 
         return true;
     }
