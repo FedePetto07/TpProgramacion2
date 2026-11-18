@@ -76,21 +76,18 @@ public class Agencia {
 
     public boolean agregarEmpleado(Long dni, String nombre, int edad, Long telefono, String email, Puesto puesto, String contraseña) throws ElementoDuplicadoEx, DatoErroneoEx {
 
-        for (Empleado empleado : empleados.getLista()) {
-            if (empleado.getID().equals(dni)) {
-                throw new ElementoDuplicadoEx("Ya existe un empleado con ese DNI");
-            }
-            if (edad < 18) {
-                throw new DatoErroneoEx("El empleado no puede ser menor a 18");
-            }
+        if (empleados.BuscarPorId(dni) != null) {
+            throw new ElementoDuplicadoEx("Ya existe un empleado con ese DNI");
+        }
+        if (contraseña == null || contraseña.isBlank()) {
+            throw new DatoErroneoEx("La contraseña no puede estar vacía.");
         }
         Empleado aux = new Empleado(dni, nombre, edad, telefono, email, puesto);
-
-        boolean agregado = BDDManager.agregarEmpleado(aux, contraseña);
-        if(agregado == true){
+        if (!BDDManager.agregarEmpleado(aux, contraseña)) {
+            return false;
+        }
         empleados.guardar(aux);
-        return true;}
-        return false;
+        return true;
 
     }
 
@@ -514,8 +511,6 @@ public class Agencia {
         aux.setId(idGenerado);
         listaReservas.guardar(aux);
         return true;
-
-        return false;
     }
 
     // CANCELAR RESERVA
