@@ -74,6 +74,7 @@ public class Reserva implements Identificable<Integer> {
     }
 
     ///////
+    public void setId(int id) {this.id = id;}
     public Integer getID() {
         return id;
     }
@@ -105,6 +106,7 @@ public class Reserva implements Identificable<Integer> {
     }
 
     ////////////////////
+
 
     public void confirmar()
     {

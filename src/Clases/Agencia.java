@@ -507,12 +507,14 @@ public class Agencia {
                 añoFin, mesFin, diaFin
         );
 
-         int guardadoCorrectamente =  BDDManager.agregarReservaBDD(aux);
-        if(guardadoCorrectamente == 1)
-        {
-            listaReservas.guardar(aux);
-            return true;
+        int idGenerado = BDDManager.agregarReservaBDD(aux);
+        if (idGenerado <= 0) {
+            return false;
         }
+        aux.setId(idGenerado);
+        listaReservas.guardar(aux);
+        return true;
+
         return false;
     }
 
