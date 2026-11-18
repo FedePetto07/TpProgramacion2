@@ -16,7 +16,7 @@ public class Generica <T extends Identificable>{
         return lista.add(elemento);
     }
 
-    public T BuscarPorId(Long id){
+    public T BuscarPorId(long id){
 
         for(T elemento : lista){
             if (elemento.getID().equals(id)) {

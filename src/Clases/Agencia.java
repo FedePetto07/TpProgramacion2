@@ -94,24 +94,16 @@ public class Agencia {
 
     }
 
-    public boolean eliminarEmpleado(int dni) throws AccionImposibleEx {
-        Empleado empleadoAEliminar = empleados.BuscarPorId((long) dni);
-        if(empleadoAEliminar == null)
-        {
+    public boolean eliminarEmpleado(long dni) throws AccionImposibleEx {
+        Empleado empleado = empleados.BuscarPorId(dni);
+        if (empleado == null) {
             throw new AccionImposibleEx("No existe un empleado con ese DNI");
         }
-        Iterator<Empleado> iterator = empleados.getLista().iterator();
-        while (iterator.hasNext()) {
-            Empleado empleado = iterator.next();
-            if (empleado.getID().equals(dni)) {
-                iterator.remove();
-               int filasAfectadas =  BDDManager.borrarEmpleadoBDD(empleado.getID());
-                if(filasAfectadas == 1)
-                {return true;}
-            }
+        if (BDDManager.borrarEmpleadoBDD(empleado.getID()) != 1) {
+            return false;
         }
-
-        return false;
+        empleados.getLista().remove(empleado);
+        return true;
     }
 
     // VER EMPLEADOS
