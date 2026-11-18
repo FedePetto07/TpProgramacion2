@@ -28,8 +28,8 @@ public abstract class Embarcacion implements Identificable<String>, CalcularPrec
             throw new DatoErroneoEx("La matrícula debe tener el formato ABC123.");
         }
 
-        if (precioDiario < 10000) {
-            throw new DatoErroneoEx("El precio diario debe ser como mínimo $10.000.");
+        if (precioDiario < 100) {
+            throw new DatoErroneoEx("El precio diario debe ser como mínimo $100.");
         }
 
         if (capacidadPersonas < 2) {
