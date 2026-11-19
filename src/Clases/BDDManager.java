@@ -425,7 +425,7 @@ public class BDDManager {
         return  filasAgregadas;
     }
 
-    ///MODIFICAR DDISPONIBILIAD;
+    /// MODIFICAR DISPONIBILIDAD;
     public static  <T extends Identificable<String>> boolean modificarDisponibilidad(T embarcacion, boolean disponibilidad)
     {
         String query = "";
@@ -463,6 +463,26 @@ public class BDDManager {
         }
         else {return false;}
         return true;
+    }
+
+    /// MODIFICAR REQUISITO CAPITAN
+
+    public static int modificarRequiereCapitanBDD(String matricula, boolean requiereCapitan)
+    {
+        String query = "UPDATE veleros SET requiereCapitan = ? WHERE matricula = ?";
+        int filasAfectadas = 0;
+
+        try (Connection connection = DriverManager.getConnection(url);
+             PreparedStatement ps = connection.prepareStatement(query))
+        {
+            ps.setBoolean(1, requiereCapitan);
+            ps.setString(2, matricula);
+            filasAfectadas = ps.executeUpdate();
+        } catch (SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        return filasAfectadas;
     }
 
     ///CLIENTES
@@ -725,6 +745,7 @@ public class BDDManager {
             return false;
         }
     }
+
 
     //BAJAS
 

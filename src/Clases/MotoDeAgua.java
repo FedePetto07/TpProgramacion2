@@ -27,11 +27,11 @@ public class MotoDeAgua extends Embarcacion {
             throw new DatoErroneoEx("Las motos para principiantes no pueden superar los 60 km/h.");
         }
 
-        if (cilindrada < 1000) {
+        if (requiereLicencia && cilindrada < 1000) {
             throw new DatoErroneoEx("La cilindrada no puede ser menor a 1000.");
         }
 
-        if (limiteVelocidad < 60) {
+        if (requiereLicencia && limiteVelocidad < 60) {
             throw new DatoErroneoEx("El límite de velocidad debe ser como minimo 60km/h.");
         }
 

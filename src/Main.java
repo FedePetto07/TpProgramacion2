@@ -39,7 +39,7 @@ public class Main {
                 Empleado empleado = iniciarSesion(agencia);
 
                 if (empleado == null) {
-                    break; // DNI "0" o demasiados intentos fallidos: se cierra el programa
+                    break;
                 }
 
                 System.out.println("\nBienvenido/a " + empleado.getNombre() + " (" + empleado.getPuesto() + ")");
@@ -325,10 +325,11 @@ public class Main {
             System.out.println("\n--- EMBARCACIONES ---");
             System.out.println("1. Ver todas las embarcaciones");
             System.out.println("2. Ver embarcación por matrícula");
+            System.out.println("3. Indicar si un velero requiere capitán");
             if (esGerente(empleado)) {
-                System.out.println("3. Agregar velero");
-                System.out.println("4. Agregar moto de agua");
-                System.out.println("5. Agregar lancha");
+                System.out.println("4. Agregar velero");
+                System.out.println("5. Agregar moto de agua");
+                System.out.println("6. Agregar lancha");
             }
             System.out.println("0. Volver");
 
@@ -340,6 +341,16 @@ public class Main {
                 // VER EMBARCACIONES
                 case 2 -> ejecutar(() -> System.out.println(agencia.verEmbarcacionMat(leerMatricula())));
                 case 3 -> ejecutar(() -> {
+                    String matricula = leerMatricula();
+                    boolean capitan = leerSiNo("¿El velero requiere capitán?");
+
+                    if (agencia.modificarRequiereCapitan(matricula, capitan)) {
+                        System.out.println("Se actualizó si el velero requiere capitán.");
+                    } else {
+                        System.out.println("No se pudo guardar el cambio en la base de datos.");
+                    }
+                });
+                case 4 -> ejecutar(() -> {
 
                     // AGREGAR VELERO
 
@@ -351,15 +362,14 @@ public class Main {
                     double longitud = leerDouble("Longitud (metros)(MINIMO 5): ");
                     int capacidad = leerEntero("Capacidad de personas (2 a 12): ");
                     int camarotes = leerEntero("Cantidad de camarotes (MIN 1): ");
-                    boolean capitan = leerSiNo("¿Requiere capitán?");
 
-                    if (agencia.registrarVelero(nombre, matricula, precio, true, velas, longitud, capacidad, camarotes, capitan)) {
+                    if (agencia.registrarVelero(nombre, matricula, precio, true, velas, longitud, capacidad, camarotes, false)) {
                         System.out.println("Velero registrado correctamente.");
                     } else {
                         System.out.println("No se pudo guardar el velero en la base de datos.");
                     }
                 });
-                case 4 -> ejecutar(() -> {
+                case 5 -> ejecutar(() -> {
 
                     // AGREGAR MOTO DE AGUA
 
@@ -367,10 +377,14 @@ public class Main {
                     String nombre = leerTexto("Nombre: ");
                     String matricula = leerMatricula();
                     double precio = leerDouble("Precio diario (MINIMO 100.0): ");
-                    int capacidad = leerEntero("Capacidad de personas (1 a 3): ");
-                    int cilindrada = leerEntero("Cilindrada (cc MINIMO 1000): ");
-                    double velocidad = leerDouble("Límite de velocidad (km/h MINIMO 60): ");
                     boolean licencia = leerSiNo("¿Requiere licencia?");
+                    int capacidad = leerEntero("Capacidad de personas (1 a 3): ");
+                    int cilindrada = leerEntero(licencia
+                            ? "Cilindrada (cc, mínimo 1000): "
+                            : "Cilindrada (cc, máximo 1000): ");
+                    double velocidad = leerDouble(licencia
+                            ? "Límite de velocidad (km/h, mínimo 60): "
+                            : "Límite de velocidad (km/h, máximo 60): ");
 
                     if (agencia.registrarMotoDeAgua(nombre, matricula, precio, true, capacidad, cilindrada, velocidad, licencia)) {
                         System.out.println("Moto de agua registrada correctamente.");
@@ -378,7 +392,7 @@ public class Main {
                         System.out.println("No se pudo guardar la moto de agua en la base de datos.");
                     }
                 });
-                case 5 -> ejecutar(() -> {
+                case 6 -> ejecutar(() -> {
 
                     // AGREGAR LANCHA
 

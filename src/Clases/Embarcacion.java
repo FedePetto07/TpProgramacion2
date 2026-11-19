@@ -32,8 +32,8 @@ public abstract class Embarcacion implements Identificable<String>, CalcularPrec
             throw new DatoErroneoEx("El precio diario debe ser como mínimo $100.");
         }
 
-        if (capacidadPersonas < 2) {
-            throw new DatoErroneoEx("La capacidad mínima es de 2 personas.");
+        if (capacidadPersonas < 1) {
+            throw new DatoErroneoEx("La capacidad mínima es de 1 personas.");
         }
 
         this.nombre = nombre;

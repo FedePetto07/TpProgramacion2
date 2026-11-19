@@ -413,6 +413,22 @@ public class Agencia {
         return true;
     }
 
+    public boolean modificarRequiereCapitan(String matricula, boolean requiereCapitan) throws ObjetoNoEncontradoEx, AccionImposibleEx {
+        Embarcacion embarcacion = embarcaciones.get(matricula);
+
+        if (embarcacion == null) {
+            throw new ObjetoNoEncontradoEx("No existe una embarcacion con esa matricula");
+        }
+        if (!(embarcacion instanceof Velero velero)) {
+            throw new AccionImposibleEx("Solo los veleros pueden requerir capitán.");
+        }
+        if (BDDManager.modificarRequiereCapitanBDD(matricula, requiereCapitan) != 1) {
+            return false;
+        }
+        velero.setRequiereCapitan(requiereCapitan);
+        return true;
+    }
+
     // LISTAR EMBARCACIONES
 
     public StringBuilder listarEmbarcaciones() throws AccionImposibleEx
