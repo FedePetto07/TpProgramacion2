@@ -536,6 +536,28 @@ public class Agencia {
         return "Cancelado correctamente";
     }
 
+    public boolean eliminarReserva(int idReserva) throws ObjetoNoEncontradoEx, AccionImposibleEx
+    {
+        Reserva aux = listaReservas.BuscarPorId(idReserva);
+
+        if (aux == null) {
+            throw new ObjetoNoEncontradoEx("ERROR. No existe el id ingresado de la reserva.");
+        }
+        if (aux.getEstadoReserva() != ESTADO_RESERVA.CANCELADA) {
+            throw new AccionImposibleEx("ERROR. Solo se pueden eliminar reservas CANCELADAS (estado actual: " + aux.getEstadoReserva() + ").");
+        }
+        for (Alquiler a : listaAlquileres.getLista()) {
+            if (a.getReserva().getID() == idReserva) {
+                throw new AccionImposibleEx("ERROR. La reserva tiene un alquiler asociado, no se puede eliminar.");
+            }
+        }
+        if (BDDManager.borrarReserva(idReserva) != 1) {
+            return false;
+        }
+        listaReservas.getLista().remove(aux);
+        return true;
+    }
+
     // MODIFICAR ESTADO
 
     public void actualizarEstadoReserva(int id, ESTADO_RESERVA nuevoEstado)

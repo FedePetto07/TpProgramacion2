@@ -24,6 +24,10 @@ public class Velero extends Embarcacion {
     public Velero(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes) throws DatoErroneoEx {
         super(nombre, matricula, precioDiario, disponible, capacidadPersonas);
 
+        if (getCapacidadPersonas() > 12 || getCapacidadPersonas() <= 1) {
+            throw new DatoErroneoEx("Las motos de agua tienen que tener de capacidad entre 2 y 12");
+        }
+
         if (cantidadVelas < 1) {
             throw new DatoErroneoEx("El velero debe tener al menos una vela.");
         }

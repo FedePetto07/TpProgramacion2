@@ -16,6 +16,10 @@ public class Lancha extends Embarcacion {
     public Lancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) throws DatoErroneoEx {
         super(nombre, matricula, precioDiario, disponible, capacidadPersonas);
 
+        if (getCapacidadPersonas() > 12 || getCapacidadPersonas() <= 1) {
+            throw new DatoErroneoEx("Las motos de agua tienen que tener de capacidad entre 2 y 12");
+        }
+
         if (potenciaMotor <= 15) {
             throw new DatoErroneoEx("La potencia del motor debe ser mayor a 15.");
         }

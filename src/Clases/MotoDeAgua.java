@@ -15,6 +15,10 @@ public class MotoDeAgua extends Embarcacion {
     public MotoDeAgua(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia) throws DatoErroneoEx {
         super(nombre, matricula, precioDiario, disponible, capacidadPersonas);
 
+        if (getCapacidadPersonas() > 3 || getCapacidadPersonas() <= 0) {
+            throw new DatoErroneoEx("Las motos de agua tienen que tener de capacidad entre 1 y 3");
+        }
+
         if (!requiereLicencia && cilindrada > 1000) {
             throw new DatoErroneoEx("Las motos para principiantes no pueden superar los 1000 cc.");
         }
