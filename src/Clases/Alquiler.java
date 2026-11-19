@@ -10,7 +10,7 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
     /// - Reserva reserva
     /// - Double montoFinal
     private int id;
-    private Reserva reserva;
+    private final Reserva reserva;
     private double montoFinal;
     private boolean isFinalizado;
 
@@ -47,14 +47,11 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
         return montoFinal;
     }
 
-    public boolean isFinalizado() {
-        return isFinalizado;
-    }
 
     ///
    public boolean cambiarDisponibilidad()
    {
-       if(reserva.getEmbarcacion().isDisponible() == true)
+       if(reserva.getEmbarcacion().isDisponible())
        {
            reserva.getEmbarcacion().setDisponible(false);
            return false;
@@ -70,18 +67,6 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
     public void setId(int id) {
         this.id = id;
     }
-
-    public void setMontoFinal(double montoFinal) throws AccionImposibleEx {
-        if(isFinalizado){
-            throw new AccionImposibleEx("El alquiler esta finalizado, por ende no se puede cambiar el monto");
-        }
-        this.montoFinal = montoFinal;
-    }
-
-    public void finalizarAlquiler()
-   {
-       this.isFinalizado = true;
-   }
 
     ///
     @Override

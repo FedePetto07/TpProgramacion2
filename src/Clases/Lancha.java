@@ -7,9 +7,9 @@ public class Lancha extends Embarcacion {
 
     /// ATRIBUTOS
 
-    private int potenciaMotor;
-    private double longitudMetros;
-    private TipoCombustible combustible;
+    private final int potenciaMotor;
+    private final double longitudMetros;
+    private final TipoCombustible combustible;
 
     /// CONSTRUCTOR
 
@@ -49,7 +49,7 @@ public class Lancha extends Embarcacion {
 
     @Override
     public double calcularPrecio() {
-        Double precio = 0.0;
+        double precio = 0.0;
 
         precio += getCapacidadPersonas()*500;
         precio += longitudMetros*1000;

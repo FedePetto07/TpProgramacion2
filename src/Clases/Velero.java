@@ -6,9 +6,9 @@ public class Velero extends Embarcacion {
 
     /// ATRIBUTOS
 
-    private int cantidadVelas;
-    private Double longitudMetros;
-    private int cantidadCamarotes;
+    private final int cantidadVelas;
+    private final Double longitudMetros;
+    private final int cantidadCamarotes;
     private boolean requiereCapitan;
 
     /// CONSTRUCTOR BDD
@@ -72,7 +72,7 @@ public class Velero extends Embarcacion {
 
     @Override
     public double calcularPrecio() {
-        Double precio = 0.0;
+        double precio = 0.0;
 
         precio += cantidadVelas*1500.0;
         precio += longitudMetros*18000.0;

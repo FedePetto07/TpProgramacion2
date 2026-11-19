@@ -9,8 +9,8 @@ public class Venta implements Identificable<Integer> {
     /// - Embarcacion embarcacion
     /// - Double montoTotal
     private int id;
-    private Cliente clienteComprador;
-    private Embarcacion embarcacion;
+    private final Cliente clienteComprador;
+    private final Embarcacion embarcacion;
     private double monto;
 
 

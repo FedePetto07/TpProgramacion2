@@ -6,9 +6,9 @@ public class MotoDeAgua extends Embarcacion {
 
     /// ATRIBUTOS
 
-    private int cilindrada;
-    private double limiteVelocidad;
-    private boolean requiereLicencia;
+    private final int cilindrada;
+    private final double limiteVelocidad;
+    private final boolean requiereLicencia;
 
     /// CONSTRUCTOR
 
@@ -56,7 +56,7 @@ public class MotoDeAgua extends Embarcacion {
 
     @Override
     public double calcularPrecio() {
-        Double precio = 0.0;
+        double precio = 0.0;
 
         precio += cilindrada*10.0;
         precio += limiteVelocidad*100;

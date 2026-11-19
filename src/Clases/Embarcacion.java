@@ -10,11 +10,11 @@ public abstract class Embarcacion implements Identificable<String>, CalcularPrec
 
     /// ATRIBUTOS
 
-    private String nombre;
-    private String matricula;
-    private double precioDiario;
+    private final String nombre;
+    private final String matricula;
+    private final double precioDiario;
     private boolean disponible;
-    private int capacidadPersonas;
+    private final int capacidadPersonas;
 
     /// CONSTRUCTOR
 
@@ -67,19 +67,6 @@ public abstract class Embarcacion implements Identificable<String>, CalcularPrec
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
-
-    public void setCapacidadPersonas(int capacidadPersonas) {
-        this.capacidadPersonas = capacidadPersonas;
-    }
-
-    public void setPrecioDiario(double precioDiario) {
-        this.precioDiario = precioDiario;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
 
 
     /// ToString

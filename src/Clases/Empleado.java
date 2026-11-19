@@ -3,8 +3,6 @@ package Clases;
 import Enums.Puesto;
 import Excepciones.DatoErroneoEx;
 
-import java.time.LocalDate;
-
 public class Empleado extends Persona {
 
     private Puesto puesto;

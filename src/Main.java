@@ -31,7 +31,7 @@ public class Main {
         }
     }
 
-    // ===================== MAIN =====================
+    /// MAIN
     public static void main(String[] args) {
 
         try {
@@ -56,7 +56,7 @@ public class Main {
         }
     }
 
-    // ===================== INICIAR SESION =====================
+    /// INICIAR SESION
 
     private static Empleado iniciarSesion(Agencia agencia) {
         System.out.println("\n=== INICIO DE SESIÓN (escriba \"0\" como DNI para cerrar el programa) ===");
@@ -84,7 +84,7 @@ public class Main {
         return null;
     }
 
-    // ===================== PERMISOS =====================
+    ///  PERMISOS
 
     private static boolean esGerente(Empleado empleado) {
         return empleado != null && empleado.getPuesto() == Puesto.GERENTE;
@@ -154,7 +154,7 @@ public class Main {
         } while (opcion != 0);
     }
 
-    // ===================== EMPLEADOS (solo gerente) =====================
+    /// EMPLEADOS (solo gerente)
 
     private static void menuEmpleados(Empleado empleado) {
         int opcion;
@@ -172,6 +172,9 @@ public class Main {
 
             switch (opcion) {
                 case 1 -> ejecutar(() -> {
+
+                    // AGREGAR EMPLEADO
+
                     exigirGerente(empleado, "agregar empleados");
                     long dni = leerLong("DNI: ");
                     String nombre = leerTexto("Nombre: ");
@@ -188,14 +191,23 @@ public class Main {
                     }
                 });
                 case 2 -> ejecutar(() -> {
+
+                    // VER EMPLEADOS
+
                     exigirGerente(empleado, "ver empleados");
                     System.out.println(agencia.listarEmpleados());
                 });
                 case 3 -> ejecutar(() -> {
+
+                    // VER EMPLEADO POR ID
+
                     exigirGerente(empleado, "ver empleados");
                     System.out.println(agencia.verEmpleadoId(leerEntero("DNI del empleado: ")));
                 });
                 case 4 -> ejecutar(() -> {
+
+                    // MODIFICAR EMPLEADO
+
                     exigirGerente(empleado, "modificar empleados");
                     long dni = leerLong("DNI del empleado a modificar: ");
                     System.out.println("(deje vacío lo que no quiera modificar)");
@@ -230,7 +242,7 @@ public class Main {
         } while (opcion != 0);
     }
 
-    // ===================== CLIENTES =====================
+    /// MENU CLIENTES
 
     private static void menuClientes() {
         int opcion;
@@ -250,6 +262,9 @@ public class Main {
 
             switch (opcion) {
                 case 1 -> ejecutar(() -> {
+
+                    // CONSTRUCTOR
+
                     long dni = leerLong("DNI: ");
                     String nombre = leerTexto("Nombre: ");
                     int edad = leerEntero("Edad: ");
@@ -261,8 +276,11 @@ public class Main {
                         System.out.println("Cliente agregado correctamente.");
                     }
                 });
+                // LISTAR
                 case 2 -> ejecutar(() -> System.out.println(agencia.listarClientes()));
+                // VER POR ID
                 case 3 -> ejecutar(() -> System.out.println(agencia.verClienteDni(leerLong("DNI del cliente: "))));
+                // MODIFICAR
                 case 4 -> ejecutar(() -> {
                     long dni = leerLong("DNI del cliente a modificar: ");
                     System.out.println("(deje vacío lo que no quiera modificar)");
@@ -274,16 +292,19 @@ public class Main {
 
                     System.out.println(agencia.modificarDatosCliente(dni, nombre, edad, telefono, email, licencia));
                 });
+                // VER RESERVAS DE CLIENTES
                 case 5 -> ejecutar(() -> {
                     for (Reserva r : agencia.getReservasCliente(leerLong("DNI del cliente: "))) {
                         System.out.println(r);
                     }
                 });
+                // VER ALQUILERES DE CLIENTES
                 case 6 -> ejecutar(() -> {
                     for (Alquiler a : agencia.getAlquileresCliente(leerLong("DNI del cliente: "))) {
                         System.out.println(a);
                     }
                 });
+                // VER VENTAS DE CLIENTES
                 case 7 -> ejecutar(() -> {
                     for (Venta v : agencia.getVentasCliente(leerLong("DNI del cliente: "))) {
                         System.out.println(v);
@@ -295,7 +316,7 @@ public class Main {
         } while (opcion != 0);
     }
 
-    // ===================== EMBARCACIONES =====================
+    /// EMBARCACIONES
 
     private static void menuEmbarcaciones(Empleado empleado) {
         int opcion;
@@ -314,9 +335,14 @@ public class Main {
             opcion = leerOpcion();
 
             switch (opcion) {
+                // LISTAR EMBARCACIONES
                 case 1 -> ejecutar(() -> System.out.println(agencia.listarEmbarcaciones()));
+                // VER EMBARCACIONES
                 case 2 -> ejecutar(() -> System.out.println(agencia.verEmbarcacionMat(leerMatricula())));
                 case 3 -> ejecutar(() -> {
+
+                    // AGREGAR VELERO
+
                     exigirGerente(empleado, "agregar embarcaciones");
                     String nombre = leerTexto("Nombre: ");
                     String matricula = leerMatricula();
@@ -334,6 +360,9 @@ public class Main {
                     }
                 });
                 case 4 -> ejecutar(() -> {
+
+                    // AGREGAR MOTO DE AGUA
+
                     exigirGerente(empleado, "agregar embarcaciones");
                     String nombre = leerTexto("Nombre: ");
                     String matricula = leerMatricula();
@@ -350,12 +379,15 @@ public class Main {
                     }
                 });
                 case 5 -> ejecutar(() -> {
+
+                    // AGREGAR LANCHA
+
                     exigirGerente(empleado, "agregar embarcaciones");
                     String nombre = leerTexto("Nombre: ");
                     String matricula = leerMatricula();
                     double precio = leerDouble("Precio diario (MINIMO 100.0): ");
-                    int potencia = leerEntero("Potencia del motor (): ");
-                    double longitud = leerDouble("Longitud (Metros MINIMO ): ");
+                    int potencia = leerEntero("Potencia del motor (MINIMO 15): ");
+                    double longitud = leerDouble("Longitud (Metros MINIMO 3): ");
                     int capacidad = leerEntero("Capacidad de personas (2 a 12): ");
                     TipoCombustible combustible = leerCombustible();
 
@@ -371,7 +403,7 @@ public class Main {
         } while (opcion != 0);
     }
 
-    // ===================== RESERVAS =====================
+    /// RESERVAS
 
     private static void menuReservas() {
         int opcion;
@@ -390,6 +422,9 @@ public class Main {
 
             switch (opcion) {
                 case 1 -> ejecutar(() -> {
+
+                    // AGREGAR RESERVA
+
                     int dni = leerEntero("DNI del cliente: ");
                     String matricula = leerMatricula();
                     int personas = leerEntero("Cantidad de personas: ");
@@ -404,15 +439,22 @@ public class Main {
                         System.out.println("No se pudo guardar la reserva en la base de datos.");
                     }
                 });
+
+                // CANCELAR RESERVA
+
                 case 2 -> ejecutar(() -> System.out.println(agencia.cancelarReserva(leerEntero("ID de la reserva: "))));
+                // ACTUALIZAR ESTADO
                 case 3 -> ejecutar(() -> {
                     int id = leerEntero("ID de la reserva: ");
                     ESTADO_RESERVA estado = leerEstadoReserva();
                     agencia.actualizarEstadoReserva(id, estado);
                     System.out.println("Estado actualizado correctamente.");
                 });
+                // LISTAR RESERVA POR ID
                 case 4 -> ejecutar(() -> System.out.println(agencia.listarReservaPorID(leerEntero("ID de la reserva: "))));
+                // LISTAR TODAS LAS RESERVAS
                 case 5 -> ejecutar(() -> System.out.println(agencia.listarTodasLasReservas()));
+                // ELIMINAR RESERVA CANCELADA
                 case 6 -> ejecutar(() -> {
                     int id = leerEntero("ID de la reserva a eliminar: ");
 
@@ -432,7 +474,7 @@ public class Main {
         } while (opcion != 0);
     }
 
-    // ===================== ALQUILERES =====================
+    /// ALQUILERES
 
     private static void menuAlquileres() {
         int opcion;
@@ -448,13 +490,16 @@ public class Main {
 
             switch (opcion) {
                 case 1 -> ejecutar(() -> {
+                    // INICIAR ALQUILER
                     if (agencia.iniciarAlquiler(leerEntero("ID de la reserva: "))) {
                         System.out.println("Alquiler iniciado correctamente.");
                     } else {
                         System.out.println("No se pudo iniciar el alquiler.");
                     }
                 });
+                // LISTAR ALQUILERES
                 case 2 -> ejecutar(() -> System.out.println(agencia.listarAlquileres()));
+                // VER ALQUILER POR ID
                 case 3 -> ejecutar(() -> System.out.println(agencia.verAlquiler(leerEntero("ID del alquiler: "))));
                 case 0 -> { }
                 default -> System.out.println("Opción inválida.");
@@ -462,7 +507,7 @@ public class Main {
         } while (opcion != 0);
     }
 
-    // ===================== VENTAS =====================
+    /// VENTAS
 
     private static void menuVentas() {
         int opcion;
@@ -477,6 +522,9 @@ public class Main {
             opcion = leerOpcion();
 
             switch (opcion) {
+
+                // AGREGAR VENTA
+
                 case 1 -> ejecutar(() -> {
                     long dni = leerLong("DNI del cliente comprador: ");
                     String matricula = leerMatricula();
@@ -487,7 +535,13 @@ public class Main {
                         System.out.println("No se pudo registrar la venta.");
                     }
                 });
+
+                // LISTAR VENTAS
+
                 case 2 -> ejecutar(() -> System.out.println(agencia.listarVentas()));
+
+                // VER VENTA POR ID
+
                 case 3 -> ejecutar(() -> System.out.println(agencia.verVentaId(leerEntero("ID de la venta: "))));
                 case 0 -> { }
                 default -> System.out.println("Opción inválida.");

@@ -11,11 +11,11 @@ public class Reserva implements Identificable<Integer> {
     ///- int id, Cliente cliente ,Embarcacion embarcacion ,
     ///LocalDate fechaInicio, LocalDate fechaFin ,EstadoReserva estado
     private int id;
-    private Cliente cliente;
-    private int cantidadPersonas;
-    private Embarcacion embarcacion;
-    private LocalDate fechaDeInicio;
-    private LocalDate fechaDeFin;
+    private final Cliente cliente;
+    private final int cantidadPersonas;
+    private final Embarcacion embarcacion;
+    private final LocalDate fechaDeInicio;
+    private final LocalDate fechaDeFin;
     private ESTADO_RESERVA estadoReserva;
 
     /// CONSTRUCTOR BDD
@@ -68,8 +68,6 @@ public class Reserva implements Identificable<Integer> {
         this.cliente = cliente;
         this.cantidadPersonas = cantidadPersonas;
         this.embarcacion = embarcacion;
-        this.fechaDeInicio = fechaDeInicio;
-        this.fechaDeFin = fechaDeFin;
         this.estadoReserva = ESTADO_RESERVA.PENDIENTE;
     }
 
@@ -108,10 +106,6 @@ public class Reserva implements Identificable<Integer> {
     ////////////////////
 
 
-    public void confirmar()
-    {
-        this.estadoReserva = ESTADO_RESERVA.CONFIRMADA;
-    }
     public void cancelar()
     {
         this.estadoReserva = ESTADO_RESERVA.CANCELADA;

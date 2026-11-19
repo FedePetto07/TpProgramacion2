@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 public class Generica <T extends Identificable>{
 
-    private ArrayList<T> lista;
+    private final ArrayList<T> lista;
 
     public Generica() {
         this.lista = new ArrayList<>();

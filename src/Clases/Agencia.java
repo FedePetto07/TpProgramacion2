@@ -17,7 +17,7 @@ import java.util.Iterator;
 public class Agencia {
 
 
-    //  ATRIBUTOS
+    ///  ATRIBUTOS
 
 
     private HashMap<String, Embarcacion>embarcaciones;
@@ -28,7 +28,7 @@ public class Agencia {
     private Generica<Venta> listaVentas;
     private Empleado empleadoLogueado;
 
-    //  CONSTRUCTOR
+    ///  CONSTRUCTOR
 
     public Agencia() {
         this.embarcaciones = BDDManager.getEmbarcacionesBDD();
@@ -91,6 +91,8 @@ public class Agencia {
 
     }
 
+    // ELIMINAR EMPLEADO
+
     public boolean eliminarEmpleado(long dni) throws AccionImposibleEx {
         Empleado empleado = empleados.BuscarPorId(dni);
         if (empleado == null) {
@@ -120,6 +122,8 @@ public class Agencia {
 
         return sb;
     }
+
+    // VER EMPLEADO POR ID
 
     public String verEmpleadoId(int dni) throws ObjetoNoEncontradoEx {
         for (Empleado empleado : empleados.getLista()) {
@@ -210,7 +214,7 @@ public class Agencia {
     }
 
 
-// VER CLIENTES
+// VER CLIENTE POR DNI
 
     public String verClienteDni(Long dni) throws ObjetoNoEncontradoEx {
         Cliente aux = clientes.BuscarPorId(dni);
@@ -221,6 +225,8 @@ public class Agencia {
 
         return aux.toString();
     }
+
+    // LISTAR CLIENTES
 
     public String listarClientes() throws ObjetoNoEncontradoEx {
         if (clientes.getLista().isEmpty()) {
@@ -294,7 +300,7 @@ public class Agencia {
         return "Error en el guardado...";
     }
 
-// HISTORIAL DEL CLIENTE
+    // VER RESERVAS POR CLIENTE
 
     public ArrayList<Reserva> getReservasCliente(long dni)
             throws ObjetoNoEncontradoEx {
@@ -314,6 +320,8 @@ public class Agencia {
         return resultado;
     }
 
+    // VER ALQUILERES POR CLIENTE
+
     public ArrayList<Alquiler> getAlquileresCliente(long dni)
             throws ObjetoNoEncontradoEx {
 
@@ -331,6 +339,8 @@ public class Agencia {
 
         return resultado;
     }
+
+    // VER VENTAS POR CLIENTE
 
     public ArrayList<Venta> getVentasCliente(long dni)
             throws ObjetoNoEncontradoEx {
@@ -353,8 +363,7 @@ public class Agencia {
 
     ///  EMBARCACIONES
 
-
-    // AGREGAR Y ELIMINAR EMBARCACIONES
+    // AGREGAR VELERO
 
     public boolean registrarVelero(String nombre, String matricula, double precioDiario, boolean disponible, int cantidadVelas, Double longitudMetros, int capacidadPersonas, int cantidadCamarotes, boolean requiereCapitan) throws ElementoDuplicadoEx, DatoErroneoEx {
         if (embarcaciones.containsKey(matricula)) {
@@ -371,6 +380,8 @@ public class Agencia {
         return true;
     }
 
+    // AGREGAR MOTO DE AGUA
+
     public boolean registrarMotoDeAgua(String nombre, String matricula, double precioDiario, boolean disponible, int capacidadPersonas, int cilindrada, double limiteVelocidad, boolean requiereLicencia) throws ElementoDuplicadoEx, DatoErroneoEx {
         if (embarcaciones.containsKey(matricula)) {
             throw new ElementoDuplicadoEx("Ya existe una moto de agua con esa matricula");
@@ -386,6 +397,8 @@ public class Agencia {
         return true;
     }
 
+    // AGREGAR LANCHA
+
     public boolean registrarLancha(String nombre, String matricula, double precioDiario, boolean disponible, int potenciaMotor, double longitudMetros, int capacidadPersonas, TipoCombustible combustible) throws ElementoDuplicadoEx, DatoErroneoEx {
         if (embarcaciones.containsKey(matricula)){
             throw new ElementoDuplicadoEx("Ya existe una lancha con esa matricula");
@@ -400,7 +413,7 @@ public class Agencia {
         return true;
     }
 
-    // VER EMBARCACIONES
+    // LISTAR EMBARCACIONES
 
     public StringBuilder listarEmbarcaciones() throws AccionImposibleEx
     {
@@ -416,6 +429,8 @@ public class Agencia {
 
         return sb;
     }
+
+    // VER EMBARCACION POR MATRICULA
 
     public String verEmbarcacionMat(String matricula) throws ObjetoNoEncontradoEx {
 
@@ -536,6 +551,8 @@ public class Agencia {
         return "Cancelado correctamente";
     }
 
+    // ELIMINAR RESERVA
+
     public boolean eliminarReserva(int idReserva) throws ObjetoNoEncontradoEx, AccionImposibleEx
     {
         Reserva aux = listaReservas.BuscarPorId(idReserva);
@@ -616,6 +633,8 @@ public class Agencia {
 
     ///  ALQUILERES
 
+    // INICIAR ALQUILER
+
     public boolean iniciarAlquiler(int idReserva) throws AccionImposibleEx, DatoErroneoEx {
 
         Reserva aux = listaReservas.BuscarPorId(idReserva);
@@ -661,6 +680,8 @@ public class Agencia {
         return true;
     }
 
+    // LISTAR ALQUILERES
+
     public String listarAlquileres() throws ObjetoNoEncontradoEx
     {
         if (listaAlquileres.getLista().isEmpty()){
@@ -674,6 +695,8 @@ public class Agencia {
         return rta;
     }
 
+    // VER ALQUILER POR ID
+
     public String verAlquiler(int id) throws ObjetoNoEncontradoEx
     {
         if  (listaAlquileres.BuscarPorId(id) == null){
@@ -686,6 +709,8 @@ public class Agencia {
     }
 
     ///  VENTAS
+
+    // REGISTRAR VENTA
 
     public boolean registrarVenta(long dniCliente, String matriculaEmbarcacion) throws AccionImposibleEx, ObjetoNoEncontradoEx, DatoErroneoEx {
 
@@ -770,42 +795,6 @@ public class Agencia {
 
     //  COMPROBACIONES (MÉTODOS PRIVADOS)
 
-    private boolean tieneReservas(Cliente cliente) {
-        for (Reserva r : listaReservas.getLista()) {
-            if (r.getCliente().getID().equals(cliente.getID()) ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean tieneAlquileres(Cliente cliente) {
-        for (Alquiler a : listaAlquileres.getLista()) {
-            if (a.getReserva().getCliente().getID().equals(cliente.getID())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean tieneReservas(Embarcacion embarcacion) {
-        for (Reserva r : listaReservas.getLista()) {
-            if (r.getEmbarcacion().getID().equals(embarcacion.getID())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean tieneAlquileres(Embarcacion embarcacion) {
-        for (Alquiler a : listaAlquileres.getLista()) {
-            if (a.getReserva().getEmbarcacion().getID().equals(embarcacion.getID())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean embarcacionDisponible(Embarcacion embarcacion,
                                           LocalDate inicio,
                                           LocalDate fin) {
@@ -835,14 +824,4 @@ public class Agencia {
 
         return true;
     }
-
-   /* private boolean alquilerFinalizado(Alquiler alquiler) {
-        for (Venta v : listaVentas.getLista()) {
-            if (v.getID() == alquiler.getID()) {
-                return true;
-            }
-        }
-
-        return false;
-    }*/
 }

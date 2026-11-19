@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public class Cliente extends Persona {
     private int numeroLicencia;
     private int cantidadAlquileres;
-    private LocalDate fechaIngreso;
+    private final LocalDate fechaIngreso;
 
     /// CONSTRUCTOR BDD
 
@@ -54,11 +54,6 @@ public class Cliente extends Persona {
 
     public LocalDate getFechaIngreso() {
         return fechaIngreso;
-    }
-
-    public boolean esRecurrente(int mesesMinimos, int alquileresMinimos) {
-        LocalDate limite = LocalDate.now().minusMonths(mesesMinimos);
-        return getFechaIngreso().isAfter(limite) || cantidadAlquileres >= alquileresMinimos;
     }
 
     @Override

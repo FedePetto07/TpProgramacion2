@@ -1,15 +1,14 @@
 package Clases;
 
-import Enums.Puesto;
+
 import Excepciones.DatoErroneoEx;
 import Interfaces.Identificable;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 public abstract class Persona implements Identificable<Long> {
 
-    private long dni;
+    private final long dni;
     private String nombre;
     private int edad;
     private long telefono;
