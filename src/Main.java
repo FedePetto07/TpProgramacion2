@@ -25,7 +25,6 @@ public class Main {
         void ejecutar() throws Exception;
     }
 
-
     private static class EntradaCerradaException extends RuntimeException {
         EntradaCerradaException() {
             super("Se cerró la entrada de datos.");
@@ -34,6 +33,7 @@ public class Main {
 
     // ===================== MAIN =====================
     public static void main(String[] args) {
+
         try {
             while (true) {
                 Empleado empleado = iniciarSesion(agencia);
@@ -320,11 +320,11 @@ public class Main {
                     exigirGerente(empleado, "agregar embarcaciones");
                     String nombre = leerTexto("Nombre: ");
                     String matricula = leerMatricula();
-                    double precio = leerDouble("Precio diario: ");
-                    int velas = leerEntero("Cantidad de velas: ");
-                    double longitud = leerDouble("Longitud (metros): ");
+                    double precio = leerDouble("Precio diario (MINIMO 100.0): ");
+                    int velas = leerEntero("Cantidad de velas (MAYOR A 5): ");
+                    double longitud = leerDouble("Longitud (metros)(MINIMO 5): ");
                     int capacidad = leerEntero("Capacidad de personas (2 a 12): ");
-                    int camarotes = leerEntero("Cantidad de camarotes: ");
+                    int camarotes = leerEntero("Cantidad de camarotes (MIN 1): ");
                     boolean capitan = leerSiNo("¿Requiere capitán?");
 
                     if (agencia.registrarVelero(nombre, matricula, precio, true, velas, longitud, capacidad, camarotes, capitan)) {
@@ -337,10 +337,10 @@ public class Main {
                     exigirGerente(empleado, "agregar embarcaciones");
                     String nombre = leerTexto("Nombre: ");
                     String matricula = leerMatricula();
-                    double precio = leerDouble("Precio diario: ");
+                    double precio = leerDouble("Precio diario (MINIMO 100.0): ");
                     int capacidad = leerEntero("Capacidad de personas (1 a 3): ");
-                    int cilindrada = leerEntero("Cilindrada (cc): ");
-                    double velocidad = leerDouble("Límite de velocidad (km/h): ");
+                    int cilindrada = leerEntero("Cilindrada (cc MINIMO 1000): ");
+                    double velocidad = leerDouble("Límite de velocidad (km/h MINIMO 60): ");
                     boolean licencia = leerSiNo("¿Requiere licencia?");
 
                     if (agencia.registrarMotoDeAgua(nombre, matricula, precio, true, capacidad, cilindrada, velocidad, licencia)) {
@@ -353,9 +353,9 @@ public class Main {
                     exigirGerente(empleado, "agregar embarcaciones");
                     String nombre = leerTexto("Nombre: ");
                     String matricula = leerMatricula();
-                    double precio = leerDouble("Precio diario: ");
-                    int potencia = leerEntero("Potencia del motor: ");
-                    double longitud = leerDouble("Longitud (metros): ");
+                    double precio = leerDouble("Precio diario (MINIMO 100.0): ");
+                    int potencia = leerEntero("Potencia del motor (): ");
+                    double longitud = leerDouble("Longitud (Metros MINIMO ): ");
                     int capacidad = leerEntero("Capacidad de personas (2 a 12): ");
                     TipoCombustible combustible = leerCombustible();
 

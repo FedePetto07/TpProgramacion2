@@ -28,7 +28,7 @@ public class MotoDeAgua extends Embarcacion {
         }
 
         if (cilindrada < 1000) {
-            throw new DatoErroneoEx("La cilindrada no puede ser menor a 700.");
+            throw new DatoErroneoEx("La cilindrada no puede ser menor a 1000.");
         }
 
         if (limiteVelocidad < 60) {
@@ -69,7 +69,7 @@ public class MotoDeAgua extends Embarcacion {
 
     @Override
     public String toString() {
-        return "\nMotoDeAgua" + super.toString() +
+        return "\nMoto de agua" + super.toString() +
                 " \n |cilindrada:" + cilindrada +
                 "\n |limiteVelocidad:" + limiteVelocidad +
                 "\n |requiereLicencia:" + requiereLicencia +
