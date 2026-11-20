@@ -28,9 +28,9 @@ public class Main {
     }
 
     private static class EntradaCerradaException extends RuntimeException {
-        EntradaCerradaException() {
-            super("Se cerró la entrada de datos.");
-        }
+            EntradaCerradaException() {
+                super("Se cerró la entrada de datos.");
+            }
     }
 
     //// MAIN ////
@@ -42,7 +42,7 @@ public class Main {
                 Empleado empleado = iniciarSesion(agencia);
 
                 if (empleado == null) {
-                    break; // DNI "0" o demasiados intentos fallidos: se cierra el programa
+                    break;
                 }
 
                 System.out.println("\nBienvenido/a " + empleado.getNombre() + " (" + empleado.getPuesto() + ")");
@@ -105,7 +105,7 @@ public class Main {
         try {
             accion.ejecutar();
         } catch (EntradaCerradaException e) {
-            throw e; // se maneja en el main
+            throw e;
         } catch (DatoErroneoEx e) {
             System.out.println("Dato erróneo: " + e.getMessage());
         } catch (ElementoDuplicadoEx e) {
@@ -201,7 +201,6 @@ public class Main {
                 case 4 -> ejecutar(() -> {
                     exigirGerente(empleado, "modificar empleados");
                     long dni = leerLong("DNI del empleado a modificar: ");
-                    try {
                         agencia.existeDNI(dni);
                         System.out.println("(deje vacío lo que no quiera modificar)");
                         String nombre = leerTextoOpcional("Nombre nuevo: ");
@@ -211,10 +210,6 @@ public class Main {
                         double salario = leerDoubleOpcional("Salario nuevo: ");
 
                         System.out.println(agencia.modificarDatosEmpleado(dni, nombre, telefono, email, puesto, salario));
-                    }catch (ObjetoNoEncontradoEx ex)
-                    {
-                        System.out.println(ex.getMessage());
-                    }
                 });
                 case 5 -> ejecutar(() -> {
                     exigirGerente(empleado, "eliminar empleados");
@@ -274,7 +269,7 @@ public class Main {
                 case 3 -> ejecutar(() -> System.out.println(agencia.verClienteDni(leerLong("DNI del cliente: "))));
                 case 4 -> ejecutar(() -> {
                     long dni = leerLong("DNI del cliente a modificar: ");
-                    try {
+
                         agencia.existeDNI(dni);
                         System.out.println("(deje vacío lo que no quiera modificar)");
                         String nombre = leerTextoOpcional("Nombre nuevo: ");
@@ -284,11 +279,7 @@ public class Main {
                         int licencia = leerEnteroOpcional("Número de licencia nuevo (5 a 9): ");
 
                         System.out.println(agencia.modificarDatosCliente(dni, nombre, edad, telefono, email, licencia));
-                    }
-                    catch (ObjetoNoEncontradoEx ex)
-                    {
-                        System.out.println(ex.getMessage());
-                    }
+
                 });
                 case 5 -> ejecutar(() -> {
                     for (Reserva r : agencia.getReservasCliente(leerLong("DNI del cliente: "))) {

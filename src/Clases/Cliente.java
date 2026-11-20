@@ -59,7 +59,8 @@ public class Cliente extends Persona {
     @Override
     public String toString() {
         return "\nCLIENTE" + super.toString() +
-                " \n |numeroLicencia=" + numeroLicencia +
-                "| \n |cantidadAlquileres=" + cantidadAlquileres + "|";
+                " \n |numero de licencia=" + numeroLicencia +
+                "| \n |cantidad de alquileres=" + cantidadAlquileres + "|" +
+                "| \n |Fecha de ingreso=" +fechaIngreso + "|";
     }
 }
