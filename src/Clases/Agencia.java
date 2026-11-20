@@ -244,10 +244,7 @@ public class Agencia {
     {
 
         Cliente aux = clientes.BuscarPorId(dni);
-        if(aux == null)
-        {
-            throw  new ObjetoNoEncontradoEx("ERROR. el dni ingresado no existe en el sistema...");
-        }
+
         StringBuilder informacionNueva = new StringBuilder();
 
         if (nombreNuevo != null) {
@@ -838,6 +835,16 @@ public class Agencia {
             }
         }
 
+        return true;
+    }
+
+    public boolean existeDNI(long dni) throws ObjetoNoEncontradoEx
+    {
+        Cliente cliente = clientes.BuscarPorId(dni);
+        if(cliente == null)
+        {
+            throw new ObjetoNoEncontradoEx("ERROR. el dni ingresado no existe.");
+        }
         return true;
     }
 }
