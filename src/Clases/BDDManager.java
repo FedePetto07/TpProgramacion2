@@ -1045,18 +1045,19 @@ public class BDDManager {
         }
         return id;
     }
+/////finalizar
 
-    public static int finalizarAlquilerBDD(int idAlquiler) {
-        String query = "UPDATE alquileres SET isFinalizado = 1 WHERE id = ?";
-        try (Connection c = DriverManager.getConnection(url);
-             PreparedStatement ps = c.prepareStatement(query)) {
-            ps.setInt(1, idAlquiler);
-            return ps.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println("ERROR BDD: No se pudo finalizar el alquiler: \n" + ex.getMessage());
-            return -1;
-        }
+public static int finalizarAlquilerBDD(int idAlquiler) {
+    String query = "UPDATE alquileres SET isFinalizado = 1 WHERE id = ?";
+    try (Connection c = DriverManager.getConnection(url);
+         PreparedStatement ps = c.prepareStatement(query)) {
+        ps.setInt(1, idAlquiler);
+        return ps.executeUpdate();
+    } catch (SQLException ex) {
+        System.out.println("ERROR BDD: No se pudo finalizar el alquiler: \n" + ex.getMessage());
+        return -1;
     }
+}
 
     ///  VENTAS
 

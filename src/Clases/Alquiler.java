@@ -46,7 +46,8 @@ public class Alquiler implements CalcularPrecio, Identificable<Integer> {
     public double getMontoFinal() {
         return montoFinal;
     }
-
+    public boolean isFinalizado()
+    {return isFinalizado;}
 
     ///
    public boolean cambiarDisponibilidad()

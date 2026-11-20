@@ -93,14 +93,14 @@ public class Main {
         return empleado != null && empleado.getPuesto() == Puesto.GERENTE;
     }
 
-    /// Doble seguridad: ademas de ocultar la opcion del menu, se valida el permiso al ejecutar.
+    ///
     private static void exigirGerente(Empleado empleado, String accion) throws AccionImposibleEx {
         if (!esGerente(empleado)) {
             throw new AccionImposibleEx("Acceso denegado: solo un GERENTE puede " + accion + ".");
         }
     }
 
-    /// Ejecuta una accion atrapando todas las excepciones que puede lanzar.
+    ///
     private static void ejecutar(Accion accion) {
         try {
             accion.ejecutar();
@@ -457,6 +457,7 @@ public class Main {
             System.out.println("1. Iniciar alquiler (desde una reserva confirmada)");
             System.out.println("2. Ver todos los alquileres");
             System.out.println("3. Ver alquiler por ID");
+            System.out.println("4. Actualizar alquileres vencidos");
             System.out.println("0. Volver");
 
             opcion = leerOpcion();
@@ -471,6 +472,10 @@ public class Main {
                 });
                 case 2 -> ejecutar(() -> System.out.println(agencia.listarAlquileres()));
                 case 3 -> ejecutar(() -> System.out.println(agencia.verAlquiler(leerEntero("ID del alquiler: "))));
+                case 4 -> ejecutar(() ->{
+                    agencia.actualizarAlquileresVencidos();
+                    System.out.println("Alquileres vencidos actualizados exitosamente.");
+                });
                 case 0 -> { }
                 default -> System.out.println("Opción inválida.");
             }

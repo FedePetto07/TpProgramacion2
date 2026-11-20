@@ -720,6 +720,33 @@ public class Agencia {
 
         return auxAlquiler.toString();
     }
+    public void actualizarAlquileresVencidos() {
+        LocalDate hoy = LocalDate.now();
+
+        for (Alquiler a : listaAlquileres.getLista()) {
+            if (!a.isFinalizado()) {
+                Reserva res = a.getReserva();
+                LocalDate fechaFin = res.getFechaDeFin();
+
+                if (!fechaFin.isAfter(hoy)) {
+                    a.cambiarDisponibilidad();
+                    BDDManager.finalizarAlquilerBDD(a.getID());
+
+                    res.setEstadoReserva(ESTADO_RESERVA.FINALIZADA);
+                    BDDManager.modificarEstadoReservaBDD(res.getID(), ESTADO_RESERVA.FINALIZADA.name());
+
+                    Embarcacion emb = res.getEmbarcacion();
+                    boolean fueVendida = listaVentas.getLista().stream()
+                            .anyMatch(v -> v.getEmbarcacion().getID().equals(emb.getID()));
+
+                    if (emb != null && !fueVendida) {
+                        emb.setDisponible(true);
+                        BDDManager.modificarDisponibilidad(emb, true);
+                    }
+                }
+            }
+        }
+    }
 
     ///  VENTAS
 
